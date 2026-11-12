@@ -256,7 +256,7 @@ function renderCombinations(){
 document.getElementById('combinationSize').addEventListener('change',()=>{comboPage=0;renderCombinations()});
 document.getElementById('combinationMore').addEventListener('click',()=>{comboPage++;renderCombinations()});
 document.getElementById('cameraBtn').onclick=()=>document.getElementById('camera').click();document.getElementById('uploadBtn').onclick=()=>document.getElementById('upload').click();['camera','upload'].forEach(id=>document.getElementById(id).addEventListener('change',e=>{takeFile(e.target.files[0]);e.target.value=''}));photo.addEventListener('click',e=>{if(!hasImage)return;let box=canvas.getBoundingClientRect(),x=(e.clientX-box.left)/box.width,y=(e.clientY-box.top)/box.height;if(x<0||x>1||y<0||y>1)return; // canvas rendered with object-fit contain: account for letterboxing
-let ratio=Math.min(box.width/canvas.width,box.height/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio,ox=(box.width-w)/2,oy=(box.height-h)/2;let px=(e.clientX-box.left-ox)/w,py=(e.clientY-box.top-oy)/h;if(px<0||px>1||py<0||py>1)return;if(selectingGray){grayPoint={x:px,y:py};selectingGray=false;photo.classList.remove('pick-gray');document.getElementById('grayBtn').textContent='◉ Recalibrate gray card';let gt=document.getElementById('grayTarget');gt.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';gt.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';gt.classList.add('visible');computeGrayCalibration();analyse();return}point={x:px,y:py};mode='zona';target.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';target.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';target.classList.add('visible');analyse()});document.getElementById('correction').onchange=analyse;document.getElementById('copyBtn').onclick=async()=>{if(!selected)return;let value=selected.name+' '+selected.hex.toUpperCase();try{await navigator.clipboard.writeText(value);document.getElementById('copyBtn').textContent='✓ Copied';setTimeout(()=>document.getElementById('copyBtn').textContent='Copy Wada color',1500)}catch{prompt('Copy color:',value)}};if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=30.0').catch(()=>{});
+let ratio=Math.min(box.width/canvas.width,box.height/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio,ox=(box.width-w)/2,oy=(box.height-h)/2;let px=(e.clientX-box.left-ox)/w,py=(e.clientY-box.top-oy)/h;if(px<0||px>1||py<0||py>1)return;if(selectingGray){grayPoint={x:px,y:py};selectingGray=false;photo.classList.remove('pick-gray');document.getElementById('grayBtn').textContent='◉ Recalibrate gray card';let gt=document.getElementById('grayTarget');gt.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';gt.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';gt.classList.add('visible');computeGrayCalibration();analyse();return}point={x:px,y:py};mode='zona';target.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';target.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';target.classList.add('visible');analyse()});document.getElementById('correction').onchange=analyse;document.getElementById('copyBtn').onclick=async()=>{if(!selected)return;let value=selected.name+' '+selected.hex.toUpperCase();try{await navigator.clipboard.writeText(value);document.getElementById('copyBtn').textContent='✓ Copied';setTimeout(()=>document.getElementById('copyBtn').textContent='Copy Wada color',1500)}catch{prompt('Copy color:',value)}};if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=41.0').catch(()=>{});
 
 // First-run guide stored locally; can be reopened with Help.
 const overlay=document.getElementById('guideOverlay'),helpBtn=document.getElementById('helpBtn'),guideClose=document.getElementById('guideClose');
@@ -271,8 +271,14 @@ document.getElementById('correction').addEventListener('change',()=>{if(grayGain
 
 // Dress Me: editorial raster templates and modular garment masks, with Wada colors and patterns.
 let dressComboId=null,dressColors=[];
+let dressColorTab='colors';
+const denimImages=Array(8).fill(null);
+const denimStatus=Array(8).fill(false);
+function loadDenimImages(){for(let i=0;i<8;i++){if(denimStatus[i])continue;denimStatus[i]=true;const im=new Image();im.onload=()=>{denimImages[i]=im;if(Object.values(dressState.denim).includes(i))renderDress()};im.onerror=()=>{denimStatus[i]=false;console.warn('Denim texture missing:',i+1)};im.src='assets/denim/denim-'+(i+1)+'.jpg?v=41.0';}}
+function denimFill(ctx,piece){const selected=dressState.denim[piece];if(selected===undefined||selected===null)return false;const im=denimImages[selected];if(!im)return false;const pattern=ctx.createPattern(im,'repeat');if(!pattern)return false;ctx.fillStyle=pattern;return true;}
+
 const SHOE_STYLE_FIXED='sneakers';
-const dressState={gender:'man',top:'tee',bottom:'trousers',colors:{top:0,jacket:1,bottom:1,tights:0,neck:0},skin:'#d6a27a',hair:'#4a3426',shoeStyle:SHOE_STYLE_FIXED,shoeColor:'#ffffff',tightsColor:null,showTights:false,neck:'none',patterns:{},strokes:{}};
+const dressState={gender:'man',top:'tee',bottom:'trousers',colors:{top:0,jacket:1,bottom:1,tights:0,neck:0},skin:'#d6a27a',hair:'#4a3426',shoeStyle:SHOE_STYLE_FIXED,shoeColor:'#ffffff',tightsColor:null,showTights:false,neck:'none',denim:{},patterns:{},strokes:{}};
 const dressTops={
  man:[['tee','T-shirt'],['tee-jacket','T-shirt + jacket'],['shirt','Shirt'],['shirt-jacket','Shirt + jacket']],
  woman:[['tee','T-shirt'],['tee-jacket','T-shirt + jacket'],['shirt','Shirt'],['shirt-jacket','Shirt + jacket']]
@@ -289,9 +295,37 @@ function hasJacket(){return dressState.top.endsWith('jacket')}
 function dressPieces(){return ['top',...(hasJacket()?['jacket']:[]),'bottom',...(dressState.gender==='woman'&&isSkirt()?['tights']:[]),...(dressState.neck!=='none'?['neck']:[])]}
 function dressColor(piece){const item=dressColors[dressState.colors[piece]%dressColors.length];return item?item.hex:'#999999'}
 function pieceSettings(piece){return dressState.patterns[piece]||(dressState.patterns[piece]={type:'solid',size:10,angle:0,dotSize:10,accent:Math.min(1,dressColors.length-1),brush:8})}
+function hexToColorComponents(hex){const v=hex.replace('#','');return{r:parseInt(v.slice(0,2),16),g:parseInt(v.slice(2,4),16),b:parseInt(v.slice(4,6),16)}}
+function colorComponentsToHex(r,g,b){const c=n=>Math.max(0,Math.min(255,Math.round(n))).toString(16).padStart(2,'0');return '#'+c(r)+c(g)+c(b)}
+function mixHex(a,b,t){const A=hexToColorComponents(a),B=hexToColorComponents(b);return colorComponentsToHex(A.r+(B.r-A.r)*t,A.g+(B.g-A.g)*t,A.b+(B.b-A.b)*t)}
 function makePattern(defs,piece){const setting=pieceSettings(piece);if(setting.type==='solid'||setting.type==='draw')return dressColor(piece);const base=dressColor(piece),accent=dressColors[setting.accent%dressColors.length]?.hex||base;const size=Math.max(3,setting.size),pattern=svgElt('pattern',{id:'fabric-'+piece,patternUnits:'userSpaceOnUse',width:setting.type==='dots'?Math.max(12,setting.dotSize*2.8):size*2,height:setting.type==='dots'?Math.max(12,setting.dotSize*2.8):size*2,patternTransform:'rotate('+setting.angle+')'});if(setting.type==='stripes'){pattern.append(svgElt('rect',{width:size*2,height:size*2,fill:base}),svgElt('rect',{width:size,height:size*2,fill:accent}))}else if(setting.type==='checks'){pattern.append(svgElt('rect',{width:size*2,height:size*2,fill:base}));for(const [x,y] of [[0,0],[size,size]])pattern.append(svgElt('rect',{x,y,width:size,height:size,fill:accent}))}else{const spacing=Math.max(12,setting.dotSize*2.8);pattern.setAttribute('width',spacing);pattern.setAttribute('height',spacing);pattern.append(svgElt('rect',{width:spacing,height:spacing,fill:base}),svgElt('circle',{cx:spacing/2,cy:spacing/2,r:setting.dotSize/2,fill:accent}))}defs.append(pattern);return 'url(#fabric-'+piece+')'}
 function svgElt(tag,attributes){const el=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attributes).forEach(([name,value])=>el.setAttribute(name,String(value)));return el}
-function openDressMe(id,colors){dressComboId=id;dressColors=colors.slice();dressState.colors={top:0,jacket:Math.min(1,colors.length-1),bottom:Math.min(1,colors.length-1),tights:0,neck:0};dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';const section=document.getElementById('dressSection');section.classList.add('visible');document.getElementById('dressCombinationLabel').textContent='Vol. '+(selected?volumeForColor(selected):1)+' · Combination #'+id;const bars=document.getElementById('dressPalette');bars.replaceChildren();dressColors.forEach(c=>{const bar=document.createElement('span');bar.style.backgroundColor=c.hex;bar.title=c.name+' · '+c.hex.toUpperCase();bars.append(bar)});refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();activePiece='top';renderDress();section.scrollIntoView({behavior:'smooth',block:'start'})}
+function refreshDressPalette(){
+ const bars=document.getElementById('dressPalette');if(!bars)return;
+ bars.replaceChildren();dressColors.forEach(c=>{const bar=document.createElement('span');bar.style.backgroundColor=c.hex;bar.title=c.name+' · '+c.hex.toUpperCase();bars.append(bar)});
+ const count=document.getElementById('customColorsCount');if(count)count.textContent=dressColors.filter(c=>c.custom).length+' custom colors added';
+}
+function addDressCustomColor(){
+ if(!dressColors.length)return;
+ const input=document.getElementById('dressCustomColor');if(!input)return;
+ const hex=input.value.toLowerCase();
+ if(!/^#[a-f0-9]{6}$/.test(hex))return;
+ if(dressColors.some(c=>c.hex.toLowerCase()===hex)){
+  document.getElementById('dressCustomStatus').textContent='This color is already in the current palette.';return;
+ }
+ dressColors.push({name:'Custom '+hex.toUpperCase(),hex,custom:true});
+ document.getElementById('dressCustomStatus').textContent='Added '+hex.toUpperCase()+' to this outfit palette.';
+ refreshDressPalette();renderDress();
+}
+function selectDressColorTab(tab){
+ dressColorTab=tab;
+ for(const choice of ['colors','denim']){
+  const b=document.getElementById(choice==='colors'?'dressColorTabColors':'dressColorTabDenim');
+  if(b){b.setAttribute('aria-selected',String(choice===tab));b.classList.toggle('active',choice===tab)}
+ }
+ renderDress();
+}
+function openDressMe(id,colors){if(aiImageSource){aiImageSource=null;aiImageBlob=null;aiResult.classList.add('hidden');aiMessage('A new Wada combination was selected. Generate another AI preview for this outfit.')}dressComboId=id;dressColors=colors.slice();dressColorTab='colors';dressState.denim={};dressState.colors={top:0,jacket:Math.min(1,colors.length-1),bottom:Math.min(1,colors.length-1),tights:0,neck:0};dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';const section=document.getElementById('dressSection');section.classList.add('visible');document.getElementById('dressCombinationLabel').textContent='Vol. '+(selected?volumeForColor(selected):1)+' · Combination #'+id;refreshDressPalette();refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();activePiece='top';renderDress();section.scrollIntoView({behavior:'smooth',block:'start'})}
 function refreshDressTops(){const sel=document.getElementById('dressTop'),current=dressState.top;sel.replaceChildren();dressTops[dressState.gender].forEach(([id,label])=>{const opt=document.createElement('option');opt.value=id;opt.textContent=label;sel.append(opt)});const fallback=dressState.gender==='woman'?'tee':'tee';dressState.top=dressTops[dressState.gender].some(o=>o[0]===current)?current:fallback;sel.value=dressState.top}
 function refreshDressBottoms(){const sel=document.getElementById('dressBottom'),current=dressState.bottom;sel.replaceChildren();dressBottoms[dressState.gender].forEach(([id,label])=>{const opt=document.createElement('option');opt.value=id;opt.textContent=label;sel.append(opt)});const fallback=dressState.gender==='woman'?'skirt-knee':'trousers';dressState.bottom=dressBottoms[dressState.gender].some(o=>o[0]===current)?current:fallback;sel.value=dressState.bottom}
 function refreshShoeOptions(){
@@ -321,7 +355,47 @@ function refreshHairColorButtons(){
  HAIR_COLORS.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='dress-color-btn';b.style.background=c.hex;b.title=c.name;b.setAttribute('aria-label','Hair color '+c.name);b.setAttribute('aria-pressed',String(dressState.hair===c.hex));b.addEventListener('click',()=>{dressState.hair=c.hex;drawOutfit();refreshHairColorButtons()});group.append(b)});
  document.getElementById('hairColorName').textContent=HAIR_COLORS.find(c=>c.hex===dressState.hair)?.name||'Dark brown';
 }
-function renderDress(){if(!dressColors.length)return;const controls=document.getElementById('dressColorControls');controls.replaceChildren();const pieceLabels={top:'Top / inner layer',jacket:'Jacket',bottom:'Bottom',tights:'Tights / stockings',neck:'Neck accessory'};dressPieces().forEach(piece=>{const line=document.createElement('div');line.className='dress-color-row';const title=document.createElement('p');title.className='dress-color-title';title.textContent=pieceLabels[piece];const buttons=document.createElement('div');buttons.className='dress-color-options';(piece==='tights'?dressColors.concat(TIGHTS_EXTRAS):dressColors).forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.className='dress-color-btn';b.style.backgroundColor=c.hex;b.title=c.name+' · '+c.hex.toUpperCase();b.setAttribute('aria-label',pieceLabels[piece]+': '+c.name);b.setAttribute('aria-pressed',String(piece==='tights'?(i<dressColors.length?!dressState.tightsColor&&dressState.colors.tights===i:dressState.tightsColor===c.hex):dressState.colors[piece]===i));b.addEventListener('click',()=>{if(piece==='tights'&&i>=dressColors.length){dressState.tightsColor=c.hex;dressState.showTights=true}else{dressState.colors[piece]=i;if(piece==='tights'){dressState.tightsColor=null;dressState.showTights=true}}renderDress()});buttons.append(b)});const selectedColor=piece==='tights'&&dressState.tightsColor?TIGHTS_EXTRAS.find(c=>c.hex===dressState.tightsColor):dressColors[dressState.colors[piece]]||dressColors[0];const choice=document.createElement('p');choice.className='dress-color-choice';choice.textContent=selectedColor.name+' · '+selectedColor.hex.toUpperCase();line.append(title,buttons,choice);controls.append(line)});refreshShoeColorButtons();refreshHairColorButtons();refreshPatternPanel();drawOutfit()}
+function renderDress(){
+ if(!dressColors.length)return;
+ aiUpdatePreviousFlag();
+ for(const [tab,id] of [['colors','dressColorTabColors'],['denim','dressColorTabDenim']]){const b=document.getElementById(id);if(b){b.setAttribute('aria-selected',String(dressColorTab===tab));b.classList.toggle('active',dressColorTab===tab)}}
+ const controls=document.getElementById('dressColorControls');controls.replaceChildren();
+ const pieceLabels={top:'Top / inner layer',jacket:'Jacket',bottom:'Bottom',tights:'Tights / stockings',neck:'Neck accessory'};
+ dressPieces().forEach(piece=>{
+  const line=document.createElement('div');line.className='dress-color-row';
+  const title=document.createElement('p');title.className='dress-color-title';title.textContent=pieceLabels[piece];
+  const buttons=document.createElement('div');buttons.className='dress-color-options';
+  if(dressColorTab==='denim'){
+   buttons.classList.add('denim-swatch-grid');
+   for(let i=0;i<8;i++){
+    const b=document.createElement('button');b.type='button';b.className='denim-swatch';
+    b.style.backgroundImage=`url('assets/denim/denim-${i+1}.jpg')`;
+    b.title='Denim option '+(i+1);b.setAttribute('aria-label',pieceLabels[piece]+': denim '+(i+1));
+    b.setAttribute('aria-pressed',String(dressState.denim[piece]===i));
+    b.innerHTML='<span>'+(i+1)+'</span>';
+    b.addEventListener('click',()=>{dressState.denim[piece]=i;pieceSettings(piece).type='solid';if(piece==='tights')dressState.showTights=true;renderDress()});
+    buttons.append(b);
+   }
+  }else{
+   (piece==='tights'?dressColors.concat(TIGHTS_EXTRAS):dressColors).forEach((c,i)=>{
+    const b=document.createElement('button');b.type='button';b.className='dress-color-btn';b.style.backgroundColor=c.hex;
+    b.title=c.name+' · '+c.hex.toUpperCase();b.setAttribute('aria-label',pieceLabels[piece]+': '+c.name);
+    b.setAttribute('aria-pressed',String(dressState.denim[piece]==null&&(piece==='tights'?(i<dressColors.length?!dressState.tightsColor&&dressState.colors.tights===i:dressState.tightsColor===c.hex):dressState.colors[piece]===i)));
+    b.addEventListener('click',()=>{
+     delete dressState.denim[piece];
+     if(piece==='tights'&&i>=dressColors.length){dressState.tightsColor=c.hex;dressState.showTights=true}
+     else{dressState.colors[piece]=i;if(piece==='tights'){dressState.tightsColor=null;dressState.showTights=true}}
+     renderDress();
+    });buttons.append(b);
+   });
+  }
+  const choice=document.createElement('p');choice.className='dress-color-choice';
+  if(dressState.denim[piece]!=null)choice.textContent='Denim · Option '+(dressState.denim[piece]+1);
+  else{const c=piece==='tights'&&dressState.tightsColor?TIGHTS_EXTRAS.find(c=>c.hex===dressState.tightsColor):dressColors[dressState.colors[piece]]||dressColors[0];choice.textContent=c.name+' · '+c.hex.toUpperCase()}
+  line.append(title,buttons,choice);controls.append(line);
+ });
+ refreshShoeColorButtons();refreshHairColorButtons();refreshPatternPanel();drawOutfit();
+}
 // Editorial raster templates: transparent garment apertures + independent grayscale ink overlay.
 const TEMPLATE_SIZE={w:1086,h:1448};
 const templateAssets={};
@@ -362,19 +436,90 @@ function recoloredInk(assets){
  return result;
 }
 function makeFabricTile(piece){
- const s=pieceSettings(piece),unit=Math.max(5,s.size*3.6),dots=Math.max(4,s.dotSize*3.6);
- const tile=document.createElement('canvas');let sz=Math.ceil(s.type==='dots'?dots*2.8:unit*2);sz=Math.min(280,Math.max(18,sz));tile.width=sz;tile.height=sz;
- const t=tile.getContext('2d'),base=outfitColor(piece),accent=dressColors[s.accent%dressColors.length]?.hex||base;
- t.fillStyle=base;t.fillRect(0,0,sz,sz);t.fillStyle=accent;
- if(s.type==='stripes')t.fillRect(0,0,sz/2,sz);
- else if(s.type==='checks'){t.fillRect(0,0,sz/2,sz/2);t.fillRect(sz/2,sz/2,sz/2,sz/2)}
- else if(s.type==='dots'){t.beginPath();t.arc(sz/2,sz/2,dots/2,0,Math.PI*2);t.fill()}
+ const s=pieceSettings(piece),base=outfitColor(piece),accent=dressColors[s.accent%dressColors.length]?.hex||base;
+ const tone=mixHex(base,accent,.45),shadow=mixHex(accent,'#111111',.45);
+ const size=Math.max(5,Number(s.size)||10),unit=Math.max(8,size*3.6),dots=Math.max(4,Number(s.dotSize)||10);
+ let sz=Math.ceil(s.type==='dots'?dots*2.8:unit*2);sz=Math.min(320,Math.max(24,sz));
+ const tile=document.createElement('canvas');tile.width=sz;tile.height=sz;const t=tile.getContext('2d');
+ t.fillStyle=base;t.fillRect(0,0,sz,sz);t.fillStyle=accent;t.strokeStyle=accent;t.lineWidth=Math.max(2,size*0.26);t.lineCap='round';t.lineJoin='round';
+ if(s.type==='stripes'){
+  t.fillRect(0,0,sz/2,sz);
+ }else if(s.type==='checks'){
+  t.fillRect(0,0,sz/2,sz/2);t.fillRect(sz/2,sz/2,sz/2,sz/2);
+ }else if(s.type==='dots'){
+  t.beginPath();t.arc(sz/2,sz/2,dots/2,0,Math.PI*2);t.fill();
+ }else if(s.type==='tiger'){
+  t.fillStyle=accent;
+  const stripes=Math.max(4,Math.round(sz/(size*1.35)));
+  for(let i=0;i<stripes;i++){
+   const x=(i+.35)*(sz/stripes)+(i%2?size*.4:-size*.25);
+   t.beginPath();t.moveTo(x,size*.1);t.quadraticCurveTo(x-size*.8,sz*.28,x-size*.15,sz*.58);t.quadraticCurveTo(x+size*.55,sz*.82,x-size*.1,sz-size*.08);
+   t.lineWidth=Math.max(3,size*.34);t.stroke();
+  }
+ }else if(s.type==='leopard'){
+  t.lineWidth=Math.max(2,size*.18);t.strokeStyle=shadow;
+  const spots=[[sz*.24,sz*.24],[sz*.66,sz*.28],[sz*.35,sz*.67],[sz*.76,sz*.73]];
+  for(const [x,y] of spots){
+   t.beginPath();t.arc(x,y,size*.42,0,Math.PI*1.65);t.stroke();
+   t.beginPath();t.arc(x+size*.28,y+size*.12,size*.2,0,Math.PI*1.45);t.stroke();
+  }
+ }else if(s.type==='jaguar'){
+  t.lineWidth=Math.max(2,size*.16);t.strokeStyle=shadow;t.fillStyle=accent;
+  const spots=[[sz*.25,sz*.24],[sz*.68,sz*.27],[sz*.32,sz*.68],[sz*.76,sz*.7]];
+  for(const [x,y] of spots){
+   t.beginPath();t.arc(x,y,size*.43,0,Math.PI*1.75);t.stroke();
+   t.beginPath();t.arc(x+size*.3,y+size*.08,size*.18,0,Math.PI*1.4);t.stroke();
+   t.beginPath();t.arc(x+size*.08,y+size*.05,size*.1,0,Math.PI*2);t.fill();
+  }
+ }else if(s.type==='wavy'){
+  t.strokeStyle=accent;t.lineWidth=Math.max(3,size*.28);
+  const gap=Math.max(10,size*1.25);
+  for(let y=-gap;y<sz+gap;y+=gap){
+   t.beginPath();
+   for(let x=-gap;x<=sz+gap;x+=gap){
+    const yy=y+Math.sin((x/gap)*Math.PI)*gap*.35;
+    if(x===-gap)t.moveTo(x,yy); else t.lineTo(x,yy);
+   }
+   t.stroke();
+  }
+ }else if(s.type==='floral'){
+  t.fillStyle=accent; t.strokeStyle=shadow; t.lineWidth=Math.max(1.5,size*.08);
+  const flowers=[[sz*.3,sz*.32],[sz*.72,sz*.26],[sz*.45,sz*.72]];
+  for(const [cx,cy] of flowers){
+   for(let i=0;i<5;i++){
+    const ang=i*Math.PI*2/5;
+    t.beginPath();t.ellipse(cx+Math.cos(ang)*size*.48,cy+Math.sin(ang)*size*.48,size*.26,size*.16,ang,0,Math.PI*2);t.fill();t.stroke();
+   }
+   t.fillStyle=tone;t.beginPath();t.arc(cx,cy,size*.16,0,Math.PI*2);t.fill();t.fillStyle=accent;
+  }
+ }else if(s.type==='military'){
+  const c2=tone,c3=shadow;
+  const blobs=[[accent, [[0,0],[sz*.55,0],[sz*.42,sz*.28],[sz*.16,sz*.34]]],[c2, [[sz*.45,sz*.08],[sz,0],[sz,sz*.35],[sz*.66,sz*.42],[sz*.38,sz*.24]]],[c3, [[sz*.08,sz*.45],[sz*.34,sz*.28],[sz*.72,sz*.5],[sz*.58,sz*.86],[sz*.16,sz*.78]]],[accent, [[sz*.62,sz*.58],[sz,sz*.46],[sz,sz],[sz*.54,sz],[sz*.42,sz*.78]]]];
+  for(const [col,pts] of blobs){t.fillStyle=col;t.beginPath();t.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)t.quadraticCurveTo(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1]);t.closePath();t.fill();}
+ }else if(s.type==='paisley'){
+  t.fillStyle=accent;t.strokeStyle=shadow;t.lineWidth=Math.max(1.8,size*.09);
+  const motifs=[[sz*.28,sz*.34,1],[sz*.72,sz*.32,-1],[sz*.48,sz*.74,1]];
+  for(const [cx,cy,dir] of motifs){
+   t.beginPath();t.moveTo(cx,cy-size*.55);t.bezierCurveTo(cx+dir*size*.72,cy-size*.38,cx+dir*size*.72,cy+size*.42,cx,cy+size*.62);t.bezierCurveTo(cx-dir*size*.42,cy+size*.22,cx-dir*size*.42,cy-size*.18,cx,cy-size*.55);t.fill();t.stroke();
+   t.fillStyle=base;t.beginPath();t.arc(cx+dir*size*.1,cy,size*.12,0,Math.PI*2);t.fill();t.fillStyle=accent;
+  }
+ }else if(s.type==='houndstooth'){
+  t.fillStyle=accent;
+  const step=Math.max(10,size*1.15), block=step*1.05;
+  for(let ox of [0,step])for(let oy of [0,step]){
+   t.beginPath();
+   t.moveTo(ox,oy+block*.12);t.lineTo(ox+block*.36,oy);t.lineTo(ox+block*.48,oy+block*.18);t.lineTo(ox+block*.68,oy);t.lineTo(ox+block,oy+block*.34);t.lineTo(ox+block*.8,oy+block*.5);t.lineTo(ox+block,oy+block*.78);t.lineTo(ox+block*.66,oy+block);t.lineTo(ox+block*.5,oy+block*.82);t.lineTo(ox+block*.3,oy+block);t.lineTo(ox,oy+block*.66);t.lineTo(ox+block*.18,oy+block*.48);t.closePath();
+   t.fill();
+  }
+ }
  return tile;
 }
+
+
 function paintGarment(ctx,assets,piece){
  const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h,settings=pieceSettings(piece);
  const layer=document.createElement('canvas');layer.width=w;layer.height=h;const c=layer.getContext('2d');
- if(settings.type==='solid'||settings.type==='draw'){
+ if(denimFill(c,piece)){c.fillRect(0,0,w,h)}else if(settings.type==='solid'||settings.type==='draw'){
   c.fillStyle=outfitColor(piece);c.fillRect(0,0,w,h);
  }else{
   const tile=makeFabricTile(piece),pattern=c.createPattern(tile,'repeat');
@@ -420,7 +565,7 @@ function renderPiecePath(ctx,part,paths,addLines=[]){
  const mask=document.createElement('canvas');mask.width=w;mask.height=h;const mc=mask.getContext('2d');
  mc.fillStyle='#fff';for(const p of paths)mc.fill(p);
  const layer=document.createElement('canvas');layer.width=w;layer.height=h;const lc=layer.getContext('2d');
- if(setting.type==='solid'||setting.type==='draw'){lc.fillStyle=outfitColor(part);lc.fillRect(0,0,w,h)}
+ if(denimFill(lc,part)){lc.fillRect(0,0,w,h)}else if(setting.type==='solid'||setting.type==='draw'){lc.fillStyle=outfitColor(part);lc.fillRect(0,0,w,h)}
  else {const tile=makeFabricTile(part),pat=lc.createPattern(tile,'repeat');if(pat&&pat.setTransform){const a=Number(setting.angle)*Math.PI/180;pat.setTransform(new DOMMatrix([Math.cos(a),Math.sin(a),-Math.sin(a),Math.cos(a),0,0]))}lc.fillStyle=pat||outfitColor(part);lc.fillRect(0,0,w,h)}
  for(const st of dressState.strokes[part]||[]){if(!st.points.length)continue;lc.strokeStyle=st.color;lc.fillStyle=st.color;lc.lineWidth=st.size*3.6;lc.lineJoin='round';lc.lineCap='round';lc.beginPath();lc.moveTo(...st.points[0]);if(st.points.length===1){lc.arc(st.points[0][0],st.points[0][1],st.size*1.8,0,Math.PI*2);lc.fill()}else{st.points.slice(1).forEach(pt=>lc.lineTo(...pt));lc.stroke()}}
  lc.globalCompositeOperation='destination-in';lc.drawImage(mask,0,0);ctx.drawImage(layer,0,0);
@@ -523,7 +668,7 @@ async function drawModularOutfit(){
  }
  if(gender==='woman'&&isSkirt()&&dressState.showTights){
   const tights=document.createElement('canvas');tights.width=TEMPLATE_SIZE.w;tights.height=TEMPLATE_SIZE.h;
-  const tc=tights.getContext('2d');tc.fillStyle=dressState.tightsColor||dressColor('tights');tc.fillRect(0,0,tights.width,tights.height);tc.globalCompositeOperation='destination-in';tc.drawImage(assets.tights,0,0);c.drawImage(tights,0,0);
+  const tc=tights.getContext('2d');if(!denimFill(tc,'tights'))tc.fillStyle=dressState.tightsColor||dressColor('tights');tc.fillRect(0,0,tights.width,tights.height);tc.globalCompositeOperation='destination-in';tc.drawImage(assets.tights,0,0);c.drawImage(tights,0,0);
  }
  renderPiecePath(c,'bottom',shapes.bottom,shapes.bottomLines);
  renderPiecePath(c,'top',shapes.top,shapes.topLines);
@@ -536,7 +681,7 @@ async function drawModularOutfit(){
  // Retain ink outlines of the original shoes even when their fill is white.
  c.drawImage(assets['shoes-ink'],0,0);
  const swatches=TEMPLATE_BOXES[gender];
- for(const [part,[x1,y1,x2,y2]] of Object.entries(swatches)){c.fillStyle=outfitColor(part);c.fillRect(x1+4,y1+4,x2-x1-8,y2-y1-8)}
+ for(const [part,[x1,y1,x2,y2]] of Object.entries(swatches)){if(!denimFill(c,part))c.fillStyle=outfitColor(part);c.fillRect(x1+4,y1+4,x2-x1-8,y2-y1-8)}
  canvas.setAttribute('aria-label',gender+' fashion figure with '+dressState.top+' and '+dressState.bottom);
  preview.classList.toggle('draw-active',pieceSettings(activePiece).type==='draw');
  document.getElementById('dressStatus').textContent='Simple preview · '+dressState.top.replaceAll('-',' ')+' + '+dressState.bottom.replaceAll('-',' ');
@@ -549,7 +694,7 @@ const EDITORIAL_LOOKS = {
  'man|tee-jacket|trousers':'man-tee-jacket-trousers',
  'man|shirt|jeans':'man-shirt-jeans',
  'woman|shirt-jacket|trousers':'woman-shirt-jacket-trousers',
- 'woman|tee-jacket|trousers':'woman-shirt-jacket-trousers',
+ 'woman|tee-jacket|trousers':'woman-tee-jacket-trousers',
  'woman|long-tee|skirt-knee':'woman-long-tee-skirt-knee',
  'woman|tee-jacket|skirt-knee':'woman-tee-jacket-skirt-knee',
  'woman|shirt|jeans':'woman-shirt-jeans',
@@ -563,6 +708,9 @@ const EDITORIAL_LOOKS = {
  'woman|tee|trousers':'woman-tee-trousers',
  'woman|shirt|trousers':'woman-shirt-trousers'
 };
+// Jacket-based looks use the illustrated renderer again because it preserves
+// the body proportions and trouser/skirt masks much better than the modular fallback.
+// Minor imperfections may still remain around lapels and shirt collars.
 const editorialAssetCache = new Map();
 const editorialSwatches = {
  'man-tee-shorts':{"top": [268, 1292, 148, 71], "bottom": [472, 1292, 148, 71], "shoes": [674, 1292, 148, 71]},
@@ -570,6 +718,7 @@ const editorialSwatches = {
  'man-tee-jacket-trousers':{"top": [189, 1292, 147, 70], "jacket": [384, 1292, 144, 70], "bottom": [569, 1292, 145, 70], "shoes": [756, 1292, 146, 70]},
  'man-shirt-jeans':{"top": [268, 1291, 148, 72], "bottom": [472, 1291, 149, 72], "shoes": [673, 1291, 148, 72]},
  'woman-shirt-jacket-trousers':{"top": [172, 1262, 146, 77], "jacket": [371, 1262, 146, 77], "bottom": [569, 1262, 146, 77], "shoes": [768, 1262, 145, 77]},
+ 'woman-tee-jacket-trousers':{"top": [172, 1262, 146, 77], "jacket": [371, 1262, 146, 77], "bottom": [569, 1262, 146, 77], "shoes": [768, 1262, 145, 77]},
  'woman-long-tee-skirt-knee':{"top": [254, 1261, 150, 77], "bottom": [472, 1261, 149, 77], "shoes": [689, 1261, 150, 77]},
  'woman-tee-jacket-skirt-knee':{"top": [183, 1262, 140, 75], "jacket": [377, 1262, 139, 75], "bottom": [571, 1262, 139, 75], "shoes": [764, 1262, 139, 75]},
  'woman-shirt-jeans':{"top": [256, 1262, 148, 77], "bottom": [470, 1262, 148, 77], "shoes": [683, 1262, 148, 77]},
@@ -585,7 +734,7 @@ const editorialSwatches = {
 };
 function activeEditorialKey(){return EDITORIAL_LOOKS[[dressState.gender,dressState.top,dressState.bottom].join('|')]||null}
 function loadEditorialPicture(path){
- return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Unable to load '+path));image.src='assets/editorial/'+path+'?v=29.0'})
+ return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Unable to load '+path));image.src='assets/editorial/'+path+'?v=41.0'})
 }
 function loadEditorialLook(key){
  if(editorialAssetCache.has(key))return editorialAssetCache.get(key);
@@ -600,11 +749,14 @@ function loadEditorialLook(key){
  ready.catch(()=>editorialAssetCache.delete(key));
  return ready;
 }
+
 function editorialColoredLayer(piece,mask){
  const layer=document.createElement('canvas');layer.width=TEMPLATE_SIZE.w;layer.height=TEMPLATE_SIZE.h;
  const c=layer.getContext('2d');
  const settings=pieceSettings(piece),base=outfitColor(piece);
- if(settings.type==='solid'||settings.type==='draw'){
+ if(denimFill(c,piece)){
+  c.fillRect(0,0,layer.width,layer.height);
+ }else if(settings.type==='solid'||settings.type==='draw'){
   c.fillStyle=base;c.fillRect(0,0,layer.width,layer.height);
  }else{
   const tile=makeFabricTile(piece),pat=c.createPattern(tile,'repeat');
@@ -652,7 +804,7 @@ async function drawNewEditorial(){
  if(dressState.neck!=='none')drawNeckLayer(c,dressState.gender);
  const boxes=editorialSwatches[key];
  for(const [p,[x,y,w,h]] of Object.entries(boxes)){
-  c.fillStyle=outfitColor(p);c.fillRect(x,y,w,h);
+  if(denimFill(c,p)){c.fillRect(x,y,w,h)}else{c.fillStyle=outfitColor(p);c.fillRect(x,y,w,h)}
  }
  canvas.setAttribute('aria-label','Illustrated '+key.replaceAll('-',' ')+' with colorable clothing');
  preview.classList.toggle('draw-active',pieceSettings(activePiece).type==='draw');
@@ -660,6 +812,7 @@ async function drawNewEditorial(){
 }
 
 async function drawOutfit(){
+ aiUpdatePreviousFlag();
  try{
   if(activeEditorialKey()){modularNonce++;renderNonce++;await drawNewEditorial()}
   else{editorialRenderNonce++;renderNonce++;await drawModularOutfit()}
@@ -685,8 +838,256 @@ function refreshNeckOptions(){const sel=document.getElementById('dressNeck'),val
 for(const id of ['dressGender','dressTop','dressBottom','dressSkin'])document.getElementById(id).addEventListener('change',e=>{const key={dressGender:'gender',dressTop:'top',dressBottom:'bottom',dressSkin:'skin'}[id];dressState[key]=e.target.value;if(key==='gender'){refreshDressTops();refreshDressBottoms();refreshShoeOptions()}if(key==='top')refreshNeckOptions();dressState.shoeStyle=SHOE_STYLE_FIXED;if(!dressPieces().includes(activePiece))activePiece='top';renderDress()});
 document.getElementById('dressNeck').addEventListener('change',e=>{dressState.neck=e.target.value;if(!dressPieces().includes(activePiece))activePiece='top';renderDress()});
 const dressShoesEl=document.getElementById('dressShoes');if(dressShoesEl)dressShoesEl.addEventListener('change',e=>{dressState.shoeStyle=e.target.value;drawOutfit()});
-document.getElementById('dressReset').addEventListener('click',()=>{dressState.gender='man';dressState.top='tee';dressState.bottom='trousers';dressState.colors={top:0,jacket:Math.min(1,dressColors.length-1),bottom:Math.min(1,dressColors.length-1),tights:0,neck:0};dressState.skin='#d6a27a';dressState.hair='#4a3426';dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';dressState.shoeStyle=SHOE_STYLE_FIXED;dressState.shoeColor='#ffffff';dressState.patterns={};dressState.strokes={};activePiece='top';document.getElementById('dressSkin').value=dressState.skin;document.getElementById('dressGender').value=dressState.gender;refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();renderDress();document.getElementById('dressStatus').textContent='Outfit reset.'});
-document.getElementById('dressSave').addEventListener('click',()=>{const canvas=document.querySelector('#dressPreview canvas');if(!canvas)return;canvas.toBlob(file=>{if(!file)return;const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download='wada-dress-me-template-'+dressState.gender+'.png';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);document.getElementById('dressStatus').textContent='Outfit PNG exported.'},'image/png')});
+document.getElementById('dressReset').addEventListener('click',()=>{dressState.gender='man';dressState.top='tee';dressState.bottom='trousers';dressState.colors={top:0,jacket:Math.min(1,dressColors.length-1),bottom:Math.min(1,dressColors.length-1),tights:0,neck:0};dressState.skin='#d6a27a';dressState.hair='#4a3426';dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';dressState.shoeStyle=SHOE_STYLE_FIXED;dressState.shoeColor='#ffffff';dressState.denim={};dressState.patterns={};dressState.strokes={};activePiece='top';document.getElementById('dressSkin').value=dressState.skin;document.getElementById('dressGender').value=dressState.gender;refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();renderDress();document.getElementById('dressStatus').textContent='Outfit reset.'});
+function outfitFilename(){return 'wada-lens-outfit-'+dressState.gender+'.png'}
+function saveOutfitBlob(blob){
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=outfitFilename();document.body.append(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),30000);
+}
+function outfitCanvas(){return document.querySelector('#dressPreview canvas')}
+document.getElementById('dressSave').addEventListener('click',()=>{
+ const canvas=outfitCanvas(),status=document.getElementById('dressStatus');
+ if(!canvas){status.textContent='Choose a Wada combination to create an outfit first.';return}
+ canvas.toBlob(blob=>{
+  if(!blob){status.textContent='Unable to export this outfit.';return}
+  saveOutfitBlob(blob);status.textContent='Outfit PNG downloaded.';
+ },'image/png');
+});
+// Native file sharing keeps the actual outfit image intact in WhatsApp, Messages,
+// AirDrop and other targets offered by the user's operating system. No server.
+// Preparing the File synchronously before navigator.share helps preserve mobile
+// browsers' transient user activation (lost by some canvas.toBlob callbacks).
+document.getElementById('dressShare').addEventListener('click',()=>{
+ const canvas=outfitCanvas(),status=document.getElementById('dressStatus');
+ if(!canvas){status.textContent='Choose a Wada combination to create an outfit first.';return}
+ let blob;
+ try{
+  const png=canvas.toDataURL('image/png');
+  const binary=atob(png.substring(png.indexOf(',')+1));
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  blob=new Blob([bytes],{type:'image/png'});
+ }catch(error){console.error('Outfit export failed',error);status.textContent='Unable to prepare the outfit image.';return}
+ const file=new File([blob],outfitFilename(),{type:'image/png'});
+ const data={files:[file],title:'My Wada Lens outfit',text:'Created with Wada Lens · https://jesty.github.io/WadaLens/'};
+ if(typeof navigator.share==='function'&&typeof navigator.canShare==='function'&&navigator.canShare({files:[file]})){
+  // Call share from the click handler, not after an asynchronous canvas operation.
+  navigator.share(data).then(()=>{status.textContent='Outfit shared.'}).catch(error=>{
+   if(error.name==='AbortError'){status.textContent='Sharing cancelled.';return}
+   console.warn('Native share failed',error);
+   saveOutfitBlob(blob);
+   status.textContent='Sharing is unavailable here. The outfit PNG was downloaded instead.';
+  });
+ }else{
+  saveOutfitBlob(blob);
+  status.textContent='This browser cannot share image files directly. The outfit PNG was downloaded; you can attach it in WhatsApp, Instagram or another app.';
+ }
+});
+
+
+// Optional photorealistic preview via Puter.js. No Wada Lens backend or API keys.
+// The SDK is loaded only after opening the optional AI panel. The first connection
+// is initiated by a separate click so browsers can permit the Puter sign-in popup.
+const AI_SDK_URL='https://js.puter.com/v2/';
+let aiSdkLoad=null,aiBusy=false,aiImageSource=null,aiImageBlob=null,aiOutfitSnapshot='';
+const aiPanel=document.getElementById('aiFashionPanel');
+const aiStatus=document.getElementById('aiStatus');
+const aiConnect=document.getElementById('aiConnect');
+const aiGenerate=document.getElementById('aiGenerate');
+const aiConsent=document.getElementById('aiConsent');
+const aiResult=document.getElementById('aiResult');
+const aiResultImage=document.getElementById('aiResultImage');
+const aiOpen=document.getElementById('aiOpen');
+function aiMessage(msg){if(aiStatus)aiStatus.textContent=msg}
+function aiRefreshControls(){
+ const ready=Boolean(window.puter?.ai?.txt2img);
+ const signedIn=ready&&Boolean(window.puter.auth?.isSignedIn?.());
+ aiConnect.disabled=!ready||aiBusy;
+ aiConnect.textContent=signedIn?'Connected to Puter':'Connect Puter account';
+ aiGenerate.disabled=!ready||!signedIn||!aiConsent.checked||aiBusy;
+ aiGenerate.textContent=aiBusy?'Generating…':'Generate realistic look';
+}
+function aiLoadSdk(){
+ if(window.puter?.ai?.txt2img){aiRefreshControls();return Promise.resolve()}
+ if(aiSdkLoad)return aiSdkLoad;
+ aiMessage('Loading the optional Puter AI service…');
+ aiSdkLoad=new Promise((resolve,reject)=>{
+  const script=document.createElement('script');script.src=AI_SDK_URL;script.async=true;
+  script.onload=()=>window.puter?.ai?.txt2img?resolve():reject(new Error('Puter SDK did not initialize.'));
+  script.onerror=()=>reject(new Error('Unable to load Puter. Check your connection or content blocker.'));
+  document.head.append(script);
+ }).then(()=>{aiMessage('AI service ready. Connect your Puter account to continue.');aiRefreshControls()}).catch(err=>{aiSdkLoad=null;aiMessage(err.message);throw err});
+ return aiSdkLoad;
+}
+aiPanel.addEventListener('toggle',()=>{if(aiPanel.open&&document.getElementById('aiProvider').value==='puter')aiLoadSdk().catch(console.warn);if(aiPanel.open&&document.getElementById('aiProvider').value!=='puter')aiPreparePrompt()});
+aiConsent.addEventListener('change',aiRefreshControls);
+aiConnect.addEventListener('click',async()=>{
+ if(!window.puter?.auth?.signIn){aiMessage('AI service is not ready. Open this section again.');return}
+ if(window.puter.auth.isSignedIn?.()){aiMessage('Your Puter account is already connected.');aiRefreshControls();return}
+ try{
+  aiMessage('Complete Puter sign-in in the popup window.');
+  // Call signIn immediately from the user event, before any await.
+  const signIn=window.puter.auth.signIn();
+  aiBusy=true;aiRefreshControls();
+  await signIn;
+  aiMessage('Connected. Review the consent checkbox and generate when ready.');
+ }catch(err){aiMessage('Puter sign-in failed or was cancelled: '+(err.msg||err.message||err.error||'Unknown error'))}
+ finally{aiBusy=false;aiRefreshControls()}
+});
+function aiOutfitDescription(){
+ const topNames={tee:'short-sleeve T-shirt','tee-jacket':'short-sleeve T-shirt under a tailored jacket',shirt:'collared button-up shirt','shirt-jacket':'collared button-up shirt under a tailored jacket','long-tee':'long-sleeve T-shirt'};
+ const bottomNames={trousers:'tailored trousers','skirt-knee':'knee-length skirt',shorts:'shorts'};
+ const names={top:'top',jacket:'jacket',bottom:'bottom',neck:'neck accessory',tights:'tights'};
+ const parts=dressPieces().map(part=>{
+  const chosen=dressState.denim?.[part];
+  const col=dressColors[dressState.colors[part]]?.hex||'#808080';
+  const pattern=pieceSettings(part).type;
+  return `${names[part]||part}: ${chosen!=null?'real blue denim fabric texture, wash '+(chosen+1):col+' color'}${pattern!=='solid'&&chosen==null?', '+pattern+' print':''}`;
+ });
+ return [`${dressState.gender==='woman'?'Woman':'Man'} model`,topNames[dressState.top]||dressState.top,bottomNames[dressState.bottom]||dressState.bottom,
+  ...parts,`shoes: ${dressState.shoeColor}`,`hair: ${dressState.hair}`,`skin tone: ${dressState.skin}`,
+  dressState.neck!=='none'?`neck accessory: ${dressState.neck}`:'no neck accessory'].join('; ');
+}
+// External provider integration never shares the outfit image automatically.
+// The user opens their own ChatGPT/Gemini session and attaches the PNG manually.
+const aiProvider=document.getElementById('aiProvider');
+const aiExternal=document.getElementById('aiExternal');
+const aiPuter=document.getElementById('aiPuter');
+const aiPromptText=document.getElementById('aiPromptText');
+function aiBuildExternalPrompt(){
+ return `Create a PHOTOREALISTIC full-body fashion editorial photograph based on the outfit illustration I will attach. Do not generate until I have attached the reference image. Preserve the exact outfit: clothing categories, jacket layering, collar, waistline, shoe style, color matching, visible prints and denim textures.\n\nOutfit details: ${aiOutfitDescription()}.\n\nUse one realistic adult fashion model with a natural face and hands, head-to-toe in a bright neutral studio, soft daylight, realistic fabric weave and folds. Keep the jacket open when selected. No illustration, no color swatches, no text, no labels, no watermarks and no additional garments. The attached figurino is the visual reference; match its colors and textures as closely as possible.`;
+}
+let aiPromptBasis='';
+function aiPreparePrompt(force=false){
+ const current=aiOutfitDescription();
+ if(force||aiPromptBasis!==current||!aiPromptText.value){aiPromptText.value=aiBuildExternalPrompt();aiPromptBasis=current}
+}
+function aiSetProvider(){
+ const provider=aiProvider.value;
+ const external=provider!=='puter';
+ aiExternal.classList.toggle('hidden',!external);
+ aiPuter.classList.toggle('hidden',external);
+ const open=document.getElementById('aiExternalOpen');
+ open.textContent=provider==='gemini'?'Open in Gemini':'Open in ChatGPT';
+ document.getElementById('aiExternalHelp').textContent=provider==='gemini'
+  ?'The prompt is copied to the clipboard before Gemini opens. Paste it into Gemini, attach the outfit PNG, and send. Gemini does not reliably support native URL prompt prefilling.'
+  :'ChatGPT opens in a new tab with a prefilled prompt. Attach the outfit PNG and send. If the prompt did not appear (for example, after signing in), paste the copied text.';
+ if(external){aiPreparePrompt();aiMessage('Ready to open '+(provider==='gemini'?'Gemini':'ChatGPT')+' with this outfit.')} else aiLoadSdk().catch(console.warn);
+}
+aiProvider.addEventListener('change',aiSetProvider);
+document.getElementById('aiPromptRefresh').addEventListener('click',()=>{aiPreparePrompt(true);aiMessage('Prompt refreshed from the current outfit.')});
+async function aiCopyPrompt(){
+ aiPreparePrompt();
+ const prompt=aiPromptText.value;
+ try{
+  if(!navigator.clipboard?.writeText)throw new Error('Clipboard API unavailable');
+  await navigator.clipboard.writeText(prompt);
+  return true;
+ }catch(err){
+  aiPromptText.focus();aiPromptText.select();console.warn('Prompt clipboard access unavailable:',err);
+  return false;
+ }
+}
+document.getElementById('aiPromptCopy').addEventListener('click',async()=>{
+ const copied=await aiCopyPrompt();
+ aiMessage(copied?'Prompt copied. Paste it into your chosen AI service.':'Automatic copying is unavailable. Select the prompt text and copy it manually.');
+});
+document.getElementById('aiExternalOpen').addEventListener('click',()=>{
+ if(!outfitCanvas()){aiMessage('Choose a Wada combination and an outfit first.');return}
+ aiPreparePrompt();
+ const text=aiPromptText.value;
+ const provider=aiProvider.value;
+ const url=provider==='gemini'?'https://gemini.google.com/app':'https://chatgpt.com/?q='+encodeURIComponent(text);
+ // Open synchronously from the user click to avoid popup blockers.
+ const tab=window.open(url,'_blank');
+ if(tab)tab.opener=null;
+ // Clipboard fallback works even when a login redirect drops ChatGPT's query parameter.
+ // The promise is started from the same user activation as the open action.
+ aiCopyPrompt().then(copied=>{
+  aiMessage(!tab?'Your browser blocked the new tab. Allow pop-ups, or use Copy prompt and open the AI service manually.':
+   (provider==='gemini'?(copied?'Gemini opened. Paste the copied prompt and attach the outfit PNG.':'Gemini opened. Copy the prompt manually and attach the outfit PNG.'):
+    (copied?'ChatGPT opened. Attach the outfit PNG; if the text is missing, paste the copied prompt.':'ChatGPT opened. Attach the outfit PNG; copy the prompt manually if needed.')));
+ });
+});
+document.getElementById('aiReferenceDownload').addEventListener('click',()=>{
+ const canvas=outfitCanvas();if(!canvas){aiMessage('Choose an outfit first.');return}
+ canvas.toBlob(blob=>{
+  if(!blob){aiMessage('Cannot export the outfit image.');return}
+  saveOutfitBlob(blob);aiMessage('Outfit reference downloaded. Attach it in ChatGPT or Gemini.');
+ },'image/png');
+});
+document.getElementById('aiReferenceCopy').addEventListener('click',async()=>{
+ const canvas=outfitCanvas();if(!canvas){aiMessage('Choose an outfit first.');return}
+ try{
+  if(!navigator.clipboard?.write||typeof ClipboardItem==='undefined')throw new Error('Image clipboard unavailable');
+  const blob=await aiExportOutfitBlob(canvas);
+  await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+  aiMessage('Outfit image copied. Paste it into ChatGPT or Gemini.');
+ }catch(err){
+  console.warn('Outfit image clipboard unsupported:',err);
+  aiMessage('Copying images is not supported here. Use Download outfit PNG and attach the file.');
+ }
+});
+aiSetProvider();
+function aiExportOutfitBlob(canvas){return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('Cannot export the current outfit.')),'image/png'))}
+function aiUpdatePreviousFlag(){
+ if(aiImageSource&&!aiBusy&&aiOutfitSnapshot&&aiOutfitSnapshot!==aiOutfitDescription())aiMessage('The outfit has changed since this preview was generated. Generate again to update it.');
+}
+async function aiDownloadBlob(){
+ if(aiImageBlob)return aiImageBlob;
+ if(!aiImageSource)throw new Error('Generate an image first.');
+ const response=await fetch(aiImageSource,{mode:'cors'});
+ if(!response.ok)throw new Error('Image download is unavailable.');
+ const blob=await response.blob();
+ if(!blob.type.startsWith('image/'))throw new Error('Unexpected image format.');
+ aiImageBlob=blob;return blob;
+}
+function aiSaveBlob(blob){
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='wada-lens-ai-fashion-preview.'+(blob.type==='image/jpeg'?'jpg':'png');document.body.append(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),30000);
+}
+aiGenerate.addEventListener('click',async()=>{
+ if(aiBusy||!aiConsent.checked||!window.puter?.ai?.txt2img||!window.puter.auth?.isSignedIn?.())return;
+ const canvas=outfitCanvas();
+ if(!canvas){aiMessage('Choose a Wada combination and outfit before generating.');return}
+ aiBusy=true;aiRefreshControls();aiMessage('Preparing the outfit reference…');
+ try{
+  const reference=await aiExportOutfitBlob(canvas);
+  const description=aiOutfitDescription();
+  const prompt=`Create a convincing PHOTOREALISTIC full-body fashion editorial photograph using the provided fashion croquis as the reference image. This is a virtual outfit visualization. Preserve the exact clothing categories, garment layers, pose, overall proportions, waistlines, shoe shapes, colors and any printed or denim fabric textures shown in the reference. Outfit details: ${description}. The model should be a natural adult person with realistic facial features and hands, photographed head to toe in a bright neutral studio with soft daylight, high-end e-commerce editorial style, crisp realistic fabric weave and folds, realistic shoes. Keep the jacket open if present. The photo must show only ONE person, no illustrations, no color swatches, no sample palette, no typography, no labels, no watermark, no extra clothing items.`;
+  aiMessage('Generating a realistic fashion photo with Puter. Your AI credits may be used…');
+  const image=await window.puter.ai.txt2img(prompt,{model:'gemini-3.1-flash-image',quality:'1K',ratio:{w:3,h:4},input_image:reference});
+  if(!image?.src)throw new Error('The AI provider returned no image.');
+  aiImageSource=image.src;aiImageBlob=null;aiOutfitSnapshot=description;
+  aiResultImage.src=aiImageSource;aiOpen.href=aiImageSource;aiResult.classList.remove('hidden');
+  aiMessage('AI preview generated. You can save, share, or open the image. Check details carefully; AI may alter the outfit.');
+ }catch(err){
+  console.error('Wada Lens AI image generation failed:',err);
+  const explanation=err?.code==='insufficient_funds'?'Puter credits are insufficient.':(err?.message||err?.msg||String(err));
+  aiMessage('AI preview could not be generated: '+explanation);
+ }finally{aiBusy=false;aiRefreshControls()}
+});
+document.getElementById('aiSave').addEventListener('click',async()=>{
+ try{aiMessage('Preparing AI image download…');aiSaveBlob(await aiDownloadBlob());aiMessage('AI image downloaded.')}
+ catch(err){aiMessage('Direct download is unavailable for this image. Use “Open image” and save it from your browser.');console.warn(err)}
+});
+document.getElementById('aiShare').addEventListener('click',async()=>{
+ if(!aiImageSource)return;
+ try{
+  const blob=await aiDownloadBlob();
+  const file=new File([blob],'wada-lens-ai-fashion-preview.'+(blob.type==='image/jpeg'?'jpg':'png'),{type:blob.type});
+  if(navigator.share&&navigator.canShare?.({files:[file]})){
+   await navigator.share({files:[file],title:'My Wada Lens AI fashion preview',text:'Made with Wada Lens'});
+   aiMessage('AI image shared.');return;
+  }
+  aiSaveBlob(blob);aiMessage('Image sharing is not supported here. The AI image was downloaded for manual sharing.');
+ }catch(err){
+  if(err.name==='AbortError'){aiMessage('Sharing cancelled.');return}
+  aiMessage('Direct sharing is unavailable. Open the image to save and share it manually.');console.warn(err)
+ }
+});
 
 // Collection picker and verified Volume 2 data import.
 
@@ -706,11 +1107,12 @@ function refreshPatternPanel(){if(!dressColors.length)return;const sel=document.
  }
  for(const button of ['drawUndo','drawClear'])document.getElementById(button).classList.toggle('hidden',pattern!=='draw');
 
- document.getElementById('patternHint').textContent=settings.type==='draw'?'Draw with your finger or stylus on the garment. Undo and Clear affect only the selected garment.':settings.type==='solid'?'Solid garment color is selected above.':settings.type==='dots'?'Choose an accent color and adjust dot diameter.':'Choose an accent color and adjust stripe/check size and direction.';
+ const patternHints={solid:'Solid garment color is selected above.',stripes:'Choose an accent color and adjust stripe size and direction.',checks:'Choose an accent color and adjust check size and direction.',dots:'Choose an accent color and adjust dot diameter.',draw:'Draw with your finger or stylus on the garment. Undo and Clear affect only the selected garment.',tiger:'Choose an accent color and adjust pattern size.',leopard:'Choose an accent color and adjust pattern size.',jaguar:'Choose an accent color and adjust pattern size.',wavy:'Choose an accent color and adjust pattern size.',floral:'Choose an accent color and adjust pattern size.',military:'Choose an accent color and adjust pattern size.',paisley:'Choose an accent color and adjust pattern size.',houndstooth:'Choose an accent color and adjust pattern size.'};
+ document.getElementById('patternHint').textContent=patternHints[settings.type]||'Choose an accent color and adjust pattern size.';
  const sw=document.getElementById('patternSwatches');sw.replaceChildren();dressColors.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.className='studio-swatch';b.style.background=c.hex;b.title=c.name;b.setAttribute('aria-label','Pattern color '+c.name);b.setAttribute('aria-pressed',String(settings.accent===i));b.onclick=()=>{settings.accent=i;renderDress()};sw.append(b)})
 }
 document.getElementById('patternPiece').addEventListener('change',e=>{activePiece=e.target.value;renderDress()});
-for(const [id,key] of [['patternType','type'],['patternSize','size'],['patternAngle','angle'],['dotSize','dotSize'],['brushSize','brush']])document.getElementById(id).addEventListener('input',e=>{pieceSettings(activePiece)[key]=['type'].includes(key)?e.target.value:Number(e.target.value);renderDress()});
+for(const [id,key] of [['patternType','type'],['patternSize','size'],['patternAngle','angle'],['dotSize','dotSize'],['brushSize','brush']])document.getElementById(id).addEventListener('input',e=>{pieceSettings(activePiece)[key]=['type'].includes(key)?e.target.value:Number(e.target.value);if(key==='type'&&e.target.value!=='solid')delete dressState.denim[activePiece];renderDress()});
 document.getElementById('drawUndo').addEventListener('click',()=>{(dressState.strokes[activePiece]||[]).pop();drawOutfit()});
 document.getElementById('drawClear').addEventListener('click',()=>{dressState.strokes[activePiece]=[];drawOutfit()});
 
@@ -751,3 +1153,9 @@ document.getElementById('drawClear').addEventListener('click',()=>{dressState.st
  toggle.addEventListener('click',()=>{const show=panel.classList.contains('hidden');panel.classList.toggle('hidden',!show);toggle.setAttribute('aria-expanded',String(show));if(show){paintPicker();search.focus()}});
  search.addEventListener('input',paintPicker);
 })();
+
+// Dress Me additions: colors persist until a different Wada combination is selected.
+document.getElementById('dressCustomAdd')?.addEventListener('click',addDressCustomColor);
+document.getElementById('dressColorTabColors')?.addEventListener('click',()=>selectDressColorTab('colors'));
+document.getElementById('dressColorTabDenim')?.addEventListener('click',()=>selectDressColorTab('denim'));
+loadDenimImages();

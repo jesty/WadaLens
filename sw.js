@@ -1,15 +1,16 @@
-const CACHE='wada-lens-v30-github-pages';
-const FILES=['./','./index.html','./app.js?v=30.0','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
+const CACHE='wada-lens-v37-github-pages';
+const FILES=['./','./index.html','./app.js?v=37.0','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 for(const gender of ['man','woman']){
  for(const part of ['overlay','skin','hair','shoes-ink','top','bottom','shoes',...(gender==='woman'?['jacket','tights']:[])]){
-  FILES.push('./assets/'+gender+'-'+part+'.png?v=30.0');
+  FILES.push('./assets/'+gender+'-'+part+'.png?v=37.0');
  }
 }
+for(let i=1;i<=8;i++)FILES.push('./assets/denim/denim-'+i+'.jpg?v=37.0');
 // Dedicated editorial images and masks are available offline after installation.
-for(const id of ['man-tee-shorts','man-long-tee-trousers','man-tee-jacket-trousers','man-shirt-jeans','woman-shirt-jacket-trousers','woman-long-tee-skirt-knee','woman-tee-jacket-skirt-knee','woman-shirt-jeans','man-tee-trousers','man-shirt-trousers','man-shirt-jacket-trousers','woman-shirt-jacket-skirt-knee','woman-shirt-skirt-knee','woman-tee-skirt-knee','woman-tee-trousers','woman-shirt-trousers']){
- FILES.push('./assets/editorial/'+id+'.png?v=30.0');
+for(const id of ['man-tee-shorts','man-long-tee-trousers','man-tee-jacket-trousers','man-shirt-jeans','woman-shirt-jacket-trousers','woman-tee-jacket-trousers','woman-long-tee-skirt-knee','woman-tee-jacket-skirt-knee','woman-shirt-jeans','man-tee-trousers','man-shirt-trousers','man-shirt-jacket-trousers','woman-shirt-jacket-skirt-knee','woman-shirt-skirt-knee','woman-tee-skirt-knee','woman-tee-trousers','woman-shirt-trousers']){
+ FILES.push('./assets/editorial/'+id+'.png?v=37.0');
  const pieces=id.includes('jacket')?['top','jacket','bottom','shoes']:['top','bottom','shoes'];
- for(const p of [...pieces,'skin','hair'])FILES.push('./assets/editorial/'+id+'-'+p+'-mask.png?v=30.0');
+ for(const p of [...pieces,'skin','hair'])FILES.push('./assets/editorial/'+id+'-'+p+'-mask.png?v=37.0');
 }
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
