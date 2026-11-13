@@ -1,22 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1086" height="1448" viewBox="0 0 1086 1448">
-<!-- Uniform reusable linework for all 159 Wada colors. -->
-<g fill="none" stroke="#302931" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-<path d="M501 192 C481 201 461 208 442 215 Q431 218 428 232 L424 323 Q425 361 418 398 L402 471 Q394 511 388 541 Q404 548 423 549
-M587 192 C609 201 634 208 650 215 Q662 219 665 235 L665 324 Q662 361 671 401 L688 474 Q694 508 699 541 Q683 548 664 549"/>
-<path d="M442 215 Q455 242 470 314 M649 215 Q632 244 617 315
-M457 452 Q452 480 444 491 Q459 507 490 515 Q511 512 522 493 Q532 473 535 448
-M628 452 Q635 479 644 492 Q626 507 596 515 Q576 513 566 491 Q558 474 555 448"/>
-<path d="M485 228 L497 242 L478 260 L519 361 L539 409
-M601 227 L593 241 L611 259 L575 348 L550 409"/>
-<path d="M450 486 L481 493 L475 507 L442 500 M607 493 L638 485 L647 500 L615 508"/>
-<path d="M469 321 Q474 377 457 449 M617 320 Q616 379 628 449" opacity=".65" stroke-width="1.3"/>
-<path d="M490 437 Q498 457 493 488 M596 440 Q589 462 594 486" opacity=".55" stroke-width="1.1"/>
-<circle cx="545" cy="417" r="5.3" stroke-width="2.1"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1086 1448" width="1086" height="1448">
+<!-- Shared jacket detail layer: actual notch-and-fold lapels plus pockets and seams. -->
+<g fill="none" stroke="#29262d" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M501 192 Q507 202 520 220 L503 242 L482 261 Q504 317 524 369 L539 409"/>
+ <path d="M587 192 Q578 202 570 220 L588 241 L610 260 Q587 318 566 370 L550 409"/>
+ <path d="M501 192 L485 228 L495 241 L476 261 L508 336 L539 409"/>
+ <path d="M587 192 L602 227 L591 241 L613 259 L584 335 L550 409"/>
+ <path d="M442 215 Q455 242 470 314 M649 215 Q632 244 617 315"/>
+ <path d="M457 452 Q452 480 444 491 Q459 507 490 515 Q511 512 522 493 Q532 473 535 448"/>
+ <path d="M628 452 Q635 479 644 492 Q626 507 596 515 Q576 513 566 491 Q558 474 555 448"/>
+ <path d="M450 486 L481 493 L475 507 L442 500 M607 493 L638 485 L647 500 L615 508"/>
+ <path d="M625 278 L642 277"/>
+ <circle cx="545" cy="417" r="5.3" stroke-width="2.1"/>
 </g>
-<!-- Fine light lines accentuate the two notched lapels without cutting through the fabric.
-     1.45px: thinner than the previously displayed reference. -->
-<g fill="none" stroke="#faf8f5" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round">
-<path d="M499 198 L489 229 L500 240 L480 260 L526 374"/>
-<path d="M589 198 L598 229 L587 240 L608 260 L561 374"/>
+<g fill="none" stroke="#37313b" stroke-width="1.2" stroke-linecap="round" opacity=".56">
+ <path d="M469 321 Q474 377 457 449 M617 320 Q616 379 628 449 M490 437 Q498 457 493 488 M596 440 Q589 462 594 486"/>
+</g>
+<!-- Delicate pale stitching: 1px, narrower than previous 1.45px outlines. -->
+<g fill="none" stroke="#faf8f5" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" opacity=".8">
+ <path d="M500 198 L488 227 L498 241 L480 260 L513 338"/>
+ <path d="M588 198 L599 227 L588 241 L608 260 L578 338"/>
 </g>
 </svg>

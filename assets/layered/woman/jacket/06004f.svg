@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1086" height="1448" viewBox="0 0 1086 1448">
-<!-- Women's single-breasted jacket: two solid panels, no broken sleeve/torso holes. -->
-<path fill="#06004f" d="M501 192
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1086 1448" width="1086" height="1448">
+<!-- Solid left and right tailoring panels. The V opening remains transparent. -->
+<g fill="#06004f"><path d="M501 192
  C481 201 461 208 442 215
  Q431 218 428 232
  L424 323 Q425 361 418 398
@@ -15,8 +15,7 @@
  Q532 385 520 360
  L492 286
  L478 260
- L492 242 L484 230 L501 192 Z"/>
-<path fill="#06004f" d="M587 192
+ L492 242 L484 230 L501 192 Z"/><path d="M587 192
  C609 201 634 208 650 215
  Q662 219 665 235
  L665 324 Q662 361 671 401
@@ -28,5 +27,26 @@
  Q576 513 566 491
  Q558 474 555 448
  L550 409 Q561 375 575 348
- L601 280 L611 259 L593 241 L602 227 L587 192 Z"/>
+ L601 280 L611 259 L593 241 L602 227 L587 192 Z"/></g>
+<!-- Real, colored folded lapel surfaces. Recoloring works for every palette color.
+     Unlike the old stroke-only solution, the notched rever has visible fabric area. -->
+<g fill="#44407b"><path d="M501 192
+ Q507 202 520 220
+ L503 242
+ L482 261
+ Q504 317 524 369
+ L539 409
+ Q518 360 508 336
+ L476 261
+ L495 241
+ L485 228 Z"/><path d="M587 192
+ Q578 202 570 220
+ L588 241
+ L610 260
+ Q587 318 566 370
+ L550 409
+ Q573 359 584 335
+ L613 259
+ L591 241
+ L602 227 Z"/></g>
 </svg>

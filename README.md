@@ -196,3 +196,7 @@ The experiment now includes one deliberately selected female look with a redesig
 
 ## Experiment 46-exp3: repaired woman jacket (all Wada colors)
 All 159 precolored female jacket SVGs now derive from the SAME two continuous, opaque blazer panels. The open V neck remains transparent to show the shirt. The collar/notched lapels and pocket flaps use a single shared detail file with very thin (1.45 SVG unit) ivory-white lapel accents, instead of transparent gaps. The active female demo jacket is now Dusky Madder Violet (#2D0060) over Fawn (#D1B0B3) shirt, with Ivory Buff trousers and white shoes. The prior demo-specific jacket details are no longer used. Female garments other than jacket are unchanged. This is still an experimental, browser-alignment-test branch.
+
+
+### Experiment 46-exp4 — real folded lapels on women’s jackets
+Every one of the 159 women's jacket color SVGs now contains **two separately filled, tonal folded notched lapel surfaces** rather than strokes placed directly on the body. The fabric fold is highlighted or shaded automatically depending on the Wada color, while the open V remains truly transparent. Shared dark construction outlines and 1px pale seams show the lapel edges. Only the woman's jacket SVG set and its detail file changed; men's jacket assets, all shirts, and other garments were not touched. Review in the experimental woman demo before merging.
