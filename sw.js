@@ -1,4 +1,4 @@
-const CACHE='wada-lens-v45-exp1-github-pages';
+const CACHE='wada-lens-v45-exp2-github-pages';
 const FILES=['./','./index.html','./app.js?v=44.1','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 for(const gender of ['man','woman']){
  for(const part of ['overlay','skin','hair','shoes-ink','top','bottom','shoes',...(gender==='woman'?['jacket','tights']:[])]){

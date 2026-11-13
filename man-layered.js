@@ -23,7 +23,7 @@ function manLayerGarments() {
   return garments;
 }
 function manLayerPath(kind,hex) {
-  return 'assets/layered/man/'+kind+'/'+hex.slice(1)+'.svg?v=45-exp1';
+  return 'assets/layered/man/'+kind+'/'+hex.slice(1)+'.svg?v=45-exp2';
 }
 function manLoadSvgImage(url,temporary=false) {
   if(!temporary && manLayerImageCache.has(url))return manLayerImageCache.get(url);
@@ -88,7 +88,7 @@ async function drawLayeredMan() {
   const [base,colors,details]=await Promise.all([
     loadEditorialLook(baseKey),
     Promise.all(items.map(item=>manLayerImage(item.kind,outfitColor(item.piece)))),
-    Promise.all(items.map(item=>manLoadSvgImage('assets/layered/man/'+item.kind+'/details.svg?v=45-exp1')))
+    Promise.all(items.map(item=>manLoadSvgImage('assets/layered/man/'+item.kind+'/details.svg?v=45-exp2')))
   ]);
   if(nonce!==manLayerRenderNonce || !manLayerActive() || look!==dressState.top)return;
   const preview=document.getElementById('dressPreview');
@@ -106,6 +106,9 @@ async function drawLayeredMan() {
   const ctx=canvas.getContext('2d');
   ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.drawImage(base.base,0,0,canvas.width,canvas.height);
+  // Recolor the visible body before the clothes, keeping collars and lapels on top.
+  if(base.skin)editorialBodyTint(ctx,base.skin,dressState.skin,.96);
+  if(base.hair)editorialBodyTint(ctx,base.hair,dressState.hair,.85);
   for(let n=0;n<items.length;n++){
     const item=items[n],mask=colors[n];
     // A short-sleeved tee stays below the jacket: clip its outer sleeves away
@@ -125,8 +128,6 @@ async function drawLayeredMan() {
     if(underJacket)ctx.restore();
   }
   if(base.shoes)ctx.drawImage(editorialColoredLayer('shoes',base.shoes),0,0);
-  if(base.skin)editorialBodyTint(ctx,base.skin,dressState.skin,.96);
-  if(base.hair)editorialBodyTint(ctx,base.hair,dressState.hair,.85);
   hideOutfitSwatches(ctx);
   canvas.setAttribute('aria-label','Experimental modular male outfit with precolored garment layers');
   preview.classList.toggle('draw-active',garmentPaintMode);
