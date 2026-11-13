@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1086" height="1448" viewBox="0 0 1086 1448">
 <!-- Original approved violet preview: notched lapels, inner fold, seams, pocket flaps,
      two hollow outlined buttons. All coordinates use the SAME registration as the fill. -->
-<g transform="translate(345.5 157.6) scale(.337)" fill="none" stroke="#f8f6fa" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(345.5 157.6) scale(.337)" fill="none" stroke="#000000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
 <!-- Left notched lapel: shoulder-to-notch, notch-to-rever, and folded edge -->
 <path d="M434 172 L395 248 Q390 257 400 260 L460 274 L407 310 Q401 315 408 324 L566 533 Q595 574 606 617"/>
 <!-- Right notched lapel, preserving the asymmetrical hand-drawn reference -->
