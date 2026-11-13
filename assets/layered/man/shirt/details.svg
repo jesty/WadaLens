@@ -1,6 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1086 1448" width="1086" height="1448"><g transform="translate(352 179) scale(.335 .31)" fill="none" stroke="#242528" stroke-linejoin="round" stroke-linecap="round">
-<path d="M451 38 Q473 18 512 20 L620 20 Q650 26 671 78 L690 135 L644 240 L556 165 Q534 150 513 167 L441 244 L401 126 Z" stroke-width="6"/>
-<path d="M455 39 Q481 105 523 164 M669 75 Q623 132 557 165" stroke-width="3.5"/>
+<!-- Two separate pointed collar wings: no horizontal/curved neck bridge crossing the face. -->
+<path d="M451 86 L401 126 L441 244 L513 167" stroke-width="6"/>
+<path d="M671 86 L690 135 L644 240 L556 165" stroke-width="6"/>
+<path d="M451 89 Q473 127 523 164 M671 89 Q623 132 557 165" stroke-width="3.5"/>
 <path d="M520 165 Q540 187 546 212 L546 1360 M575 174 L575 1356" stroke-width="5"/>
 <path d="M160 229 L245 610 Q275 687 285 760 M920 230 L832 599 Q808 689 790 778" stroke-width="3"/>
 <path d="M209 1260 L145 1253 M935 1255 L1047 1255" stroke-width="4"/>

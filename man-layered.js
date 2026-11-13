@@ -23,7 +23,7 @@ function manLayerGarments() {
   return garments;
 }
 function manLayerPath(kind,hex) {
-  return 'assets/layered/man/'+kind+'/'+hex.slice(1)+'.svg?v=45-exp4';
+  return 'assets/layered/man/'+kind+'/'+hex.slice(1)+'.svg?v=45-exp5';
 }
 function manLoadSvgImage(url,temporary=false) {
   if(!temporary && manLayerImageCache.has(url))return manLayerImageCache.get(url);
@@ -85,7 +85,7 @@ function manLayerPatternOverlay(piece,mask) {
    The original templates had different garment edges; the neutral backdrop
    prevents those old edges from showing beside our independent vector shapes. */
 const MAN_LAYER_REGISTRATION={
-  shirt:{dx:6,dy:-3,sx:1.10,sy:1.08},
+  shirt:{dx:3,dy:-29,sx:0.99,sy:1},
   jacket:{dx:0,dy:0,sx:1.035,sy:1.015}
 };
 const manSkinImageCache=new WeakMap();
@@ -194,7 +194,7 @@ async function drawLayeredMan() {
   const [base,colors,details]=await Promise.all([
     loadEditorialLook(baseKey),
     Promise.all(items.map(item=>manLayerImage(item.kind,outfitColor(item.piece)))),
-    Promise.all(items.map(item=>manLoadSvgImage('assets/layered/man/'+item.kind+'/details.svg?v=45-exp4')))
+    Promise.all(items.map(item=>manLoadSvgImage('assets/layered/man/'+item.kind+'/details.svg?v=45-exp5')))
   ]);
   if(nonce!==manLayerRenderNonce || !manLayerActive() || look!==dressState.top)return;
   const preview=document.getElementById('dressPreview');
