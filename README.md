@@ -208,3 +208,7 @@ The women’s jacket has been restructured after review of the user’s jacket r
 
 ### Experiment 46-exp6 — approved single-color female blazer
 All 159 female blazer variants use a shared, fitted, single-color silhouette (including the approved #2D0060 violet); the only transparent body region is the upper V neckline, with the front closed beneath. Proper notched lapels are indicated by very thin shared white line art, not a second fabric color. Hollow outlined buttons, flap pockets and rounded hems follow the reference. All 159 color SVGs plus the single shared details.svg were regenerated; male garments and other female assets were not changed.
+
+
+### Experiment 46-exp7: approved woman blazer directly traced, not redesigned
+The 159 female blazer SVG fills now share the exact polygon outline traced from the approved violet preview (source width 1194×1317), uniformly scaled/registered into the 1086×1448 woman figurine canvas. The notched lapels are separate outline paths from the same approved image, not tinted triangles; deep V neckline is transparent, fabric is one solid color, and the two button circles are unfilled. Male SVG assets are unchanged. This is a geometric trace of the approved preview, not a new invented jacket shape.

@@ -1,25 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1086" height="1448" viewBox="0 0 1086 1448">
-<!-- Delicate off-white construction marks like the approved violet preview. -->
-<g fill="none" stroke="#fbf9fc" stroke-width="1.55" stroke-linejoin="round" stroke-linecap="round">
-  <!-- Notched, fully colored lapels (the pale strokes do not cut the fabric). -->
-  <path d="M501 192 L485 227 L499 242 L480 260 Q512 310 541 371"/>
-  <path d="M587 192 L601 227 L589 242 L607 260 Q574 313 552 371"/>
-  <!-- Inner fold edge remains aligned to the deep, transparent V neckline. -->
-  <path d="M503 202 Q511 220 510 240 Q524 304 542 351"/>
-  <path d="M585 202 Q578 220 578 239 Q561 305 554 351"/>
-  <!-- Single-breasted seam; bottom panels stay rounded and filled. -->
-  <path d="M548 377 Q553 421 547 461 Q542 497 490 515"/>
-  <path d="M548 461 Q554 499 596 515"/>
-  <!-- Flap pockets. -->
-  <path d="M448 482 L477 488 L474 501 Q460 503 438 496"/>
-  <path d="M612 488 L642 482 L651 496 Q630 503 616 501 Z"/>
-  <!-- Two hollow button circles, no painted button fill. -->
-  <circle cx="540" cy="403" r="5" stroke-width="1.9"/>
-  <circle cx="540" cy="450" r="5" stroke-width="1.9"/>
-</g>
-<g fill="none" stroke="#f7f5fa" opacity=".58" stroke-width="1.0" stroke-linecap="round">
-  <path d="M441 215 Q457 247 466 301 M648 215 Q630 247 620 301"/>
-  <path d="M469 320 Q471 386 455 450 M618 320 Q616 386 631 450"/>
-  <path d="M490 435 Q496 473 485 499 M602 435 Q597 473 604 499"/>
-</g>
-</svg>
+<!-- Original approved violet preview: notched lapels, inner fold, seams, pocket flaps,
+     two hollow outlined buttons. All coordinates use the SAME registration as the fill. -->
+<g transform="translate(345.5 157.6) scale(.337)" fill="none" stroke="#f8f6fa" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+<!-- Left notched lapel: shoulder-to-notch, notch-to-rever, and folded edge -->
+<path d="M434 172 L395 248 Q390 257 400 260 L460 274 L407 310 Q401 315 408 324 L566 533 Q595 574 606 617"/>
+<!-- Right notched lapel, preserving the asymmetrical hand-drawn reference -->
+<path d="M754 170 L785 247 Q789 255 781 259 L733 272 L773 310 Q780 315 774 323 L616 529 Q603 545 599 561"/>
+<!-- Closed center front following the reference -->
+<path d="M599 561 Q612 609 610 664 Q613 814 594 947 Q577 1022 529 1049"/>
+<!-- Lower right front edge -->
+<path d="M594 947 Q618 1022 670 1057"/>
+<!-- Slim welt pockets -->
+<path d="M369 791 L475 796 L466 843 Q462 850 447 851 L346 849"/>
+<path d="M810 791 L705 796 L712 841 Q716 848 729 849 L833 847"/>
+<!-- Two deliberately unfilled circle buttons -->
+<circle cx="577" cy="617" r="15.5"/>
+<circle cx="576" cy="798" r="15.5"/>
+</g></svg>
