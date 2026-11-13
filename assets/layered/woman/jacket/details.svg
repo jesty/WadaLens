@@ -1,25 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1086 1448" width="1086" height="1448">
-<g fill="none" stroke="#30262e" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round">
-<path d="M501 192 C481 201 461 208 442 215 Q431 218 428 232 L424 323 Q425 361 418 398 L402 471 Q394 511 388 541 Q404 548 423 549"/>
-<path d="M587 192 C609 201 634 208 650 215 Q662 219 665 235 L665 324 Q662 361 671 401 L688 474 Q694 508 699 541 Q683 548 664 549"/>
-<!-- Folded notch and rever on both sides of the opening. -->
-<path d="M501 192 L485 228 L501 241 L486 258 L510 299 L540 372"/>
-<path d="M587 192 L601 228 L588 241 L605 258 L581 299 L551 372"/>
-<path d="M501 192 Q502 201 514 219 L502 240 L479 260 Q497 294 516 335 L540 372"/>
-<path d="M587 192 Q587 202 575 219 L589 240 L611 260 Q590 299 575 336 L551 372"/>
-<!-- Continuous closed jacket below the neckline. -->
-<path d="M540 372 Q548 401 548 435 Q547 458 535 480 Q520 509 490 515 M548 435 Q546 457 556 481 Q569 510 596 515"/>
-<path d="M442 215 Q455 242 470 314 M649 215 Q632 244 617 315"/>
-<path d="M450 485 L479 489 L473 502 L444 500 M611 490 L640 485 L646 500 L617 502"/>
-<path d="M625 280 L644 278"/>
-<!-- Buttons have hollow, unfilled interiors. -->
-<circle cx="545" cy="399" r="5" stroke-width="1.9"/>
-<circle cx="545" cy="454" r="5" stroke-width="1.9"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1086" height="1448" viewBox="0 0 1086 1448">
+<!-- Delicate off-white construction marks like the approved violet preview. -->
+<g fill="none" stroke="#fbf9fc" stroke-width="1.55" stroke-linejoin="round" stroke-linecap="round">
+  <!-- Notched, fully colored lapels (the pale strokes do not cut the fabric). -->
+  <path d="M501 192 L485 227 L499 242 L480 260 Q512 310 541 371"/>
+  <path d="M587 192 L601 227 L589 242 L607 260 Q574 313 552 371"/>
+  <!-- Inner fold edge remains aligned to the deep, transparent V neckline. -->
+  <path d="M503 202 Q511 220 510 240 Q524 304 542 351"/>
+  <path d="M585 202 Q578 220 578 239 Q561 305 554 351"/>
+  <!-- Single-breasted seam; bottom panels stay rounded and filled. -->
+  <path d="M548 377 Q553 421 547 461 Q542 497 490 515"/>
+  <path d="M548 461 Q554 499 596 515"/>
+  <!-- Flap pockets. -->
+  <path d="M448 482 L477 488 L474 501 Q460 503 438 496"/>
+  <path d="M612 488 L642 482 L651 496 Q630 503 616 501 Z"/>
+  <!-- Two hollow button circles, no painted button fill. -->
+  <circle cx="540" cy="403" r="5" stroke-width="1.9"/>
+  <circle cx="540" cy="450" r="5" stroke-width="1.9"/>
 </g>
-<g fill="none" stroke="#37313b" stroke-width="1.3" stroke-linecap="round" opacity=".6">
-<path d="M467 321 Q470 381 456 451 M618 321 Q617 381 629 451 M487 431 Q492 460 489 491 M601 431 Q596 463 600 491"/>
+<g fill="none" stroke="#f7f5fa" opacity=".58" stroke-width="1.0" stroke-linecap="round">
+  <path d="M441 215 Q457 247 466 301 M648 215 Q630 247 620 301"/>
+  <path d="M469 320 Q471 386 455 450 M618 320 Q616 386 631 450"/>
+  <path d="M490 435 Q496 473 485 499 M602 435 Q597 473 604 499"/>
 </g>
-<g fill="none" stroke="#f8f4f5" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round" opacity=".75">
-<path d="M499 201 L488 228 L499 242 L489 258 L515 301"/>
-<path d="M589 201 L598 228 L590 242 L601 258 L578 301"/>
-</g></svg>
+</svg>

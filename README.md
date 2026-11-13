@@ -204,3 +204,7 @@ Every one of the 159 women's jacket color SVGs now contains **two separately fil
 
 ### Experiment 46-exp5 — complete female jacket front from visual reference
 The women’s jacket has been restructured after review of the user’s jacket reference. The neckline remains open at the top, while the colored fabric now meets at the front button line and closes the former hole in the chest/waist. Folded, notched lapels are full independent colored fabric polygons, with clearly defined dark outlines and fine ivory decorative strokes; buttons remain hollow circles. Minor joining fabric behind the collar notches prevents unwanted transparent triangles. All 159 Wada-colored female jacket SVGs were rebuilt from the identical template. No changes to the male garment SVGs or other female garments.
+
+
+### Experiment 46-exp6 — approved single-color female blazer
+All 159 female blazer variants use a shared, fitted, single-color silhouette (including the approved #2D0060 violet); the only transparent body region is the upper V neckline, with the front closed beneath. Proper notched lapels are indicated by very thin shared white line art, not a second fabric color. Hollow outlined buttons, flap pockets and rounded hems follow the reference. All 159 color SVGs plus the single shared details.svg were regenerated; male garments and other female assets were not changed.
