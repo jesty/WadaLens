@@ -1,7 +1,7 @@
 'use strict';
 // Independent female Wada garment layers: 159 original precolored SVGs per item.
 const USE_LAYERED_WOMAN_RENDER=true;
-const WOMAN_LAYER_VERSION='46-exp11';
+const WOMAN_LAYER_VERSION='46-exp12-sneakers';
 const WOMAN_LAYER_REGISTRATION={
   tee:{dx:0,dy:0,sx:1,sy:1},shirt:{dx:0,dy:0,sx:1,sy:1},
   jacket:{dx:0,dy:0,sx:1,sy:1},trousers:{dx:0,dy:0,sx:1,sy:1},
@@ -50,9 +50,11 @@ function womanLayerImage(kind,color){
  if(!/^#[0-9a-f]{6}$/.test(hex))return Promise.reject(new Error('Invalid garment color'));
  if(womanImageCache.has(key))return womanImageCache.get(key);
  const promise=(async()=>{
-   if(palette.some(c=>c.hex.toLowerCase()===hex))return manLoadSvgImage(womanLayerAsset(kind,hex));
+   // Use one crisp sneaker silhouette for every Wada shade instead of the old boot-like shoe masks.
+   // The SVG retains a replaceable fill, so palette and custom colors behave identically.
+   if(kind!=='shoes'&&palette.some(c=>c.hex.toLowerCase()===hex))return manLoadSvgImage(womanLayerAsset(kind,hex));
    if(!womanTemplateCache.has(kind))womanTemplateCache.set(kind,
-     fetch(womanLayerAsset(kind,'#ffb3f0')).then(r=>{
+     fetch(kind==='shoes'?'assets/layered/woman/shoes/sneaker-base.svg?v='+WOMAN_LAYER_VERSION:womanLayerAsset(kind,'#ffb3f0')).then(r=>{
        if(!r.ok)throw Error('Missing female SVG '+kind);return r.text();
      }));
    const src=(await womanTemplateCache.get(kind)).replace('fill="#ffb3f0"','fill="'+hex+'"');
@@ -81,7 +83,7 @@ async function drawLayeredWoman(){
    loadEditorialLook(baseKey),
    Promise.all(items.map(x=>womanLayerImage(x.kind,outfitColor(x.piece)))),
    Promise.all(items.map(x=>manLoadSvgImage(
-     'assets/layered/woman/'+x.kind+'/'+'details.svg'+'?v='+WOMAN_LAYER_VERSION)))
+     'assets/layered/woman/'+x.kind+'/'+(x.kind==='shoes'?'sneaker-details.svg':'details.svg')+'?v='+WOMAN_LAYER_VERSION)))
  ]);
  if(nonce!==womanRenderNonce||!womanLayerActive()||top!==dressState.top||bottom!==dressState.bottom)return;
  const preview=document.getElementById('dressPreview');
