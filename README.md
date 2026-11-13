@@ -212,3 +212,7 @@ All 159 female blazer variants use a shared, fitted, single-color silhouette (in
 
 ### Experiment 46-exp7: approved woman blazer directly traced, not redesigned
 The 159 female blazer SVG fills now share the exact polygon outline traced from the approved violet preview (source width 1194×1317), uniformly scaled/registered into the 1086×1448 woman figurine canvas. The notched lapels are separate outline paths from the same approved image, not tinted triangles; deep V neckline is transparent, fabric is one solid color, and the two button circles are unfilled. Male SVG assets are unchanged. This is a geometric trace of the approved preview, not a new invented jacket shape.
+
+
+### Experiment 46-exp9 — woman's approved option 1 shirt
+Replaced all 159 precolored women’s shirt SVGs with a consistent fitted, long-sleeve tailored blouse, recreating the selected first shirt concept: separate sharp notched collar flaps, a hollow neck opening (no backing line crossing the model's neck), central placket, five empty outline buttons, black construction seams and cuffs. The same shared `details.svg` is now used in normal outfits and in `?womanDemo=1`; the old `details-demo.svg` is no longer referenced. Female jacket and male clothing assets unchanged. Fine registration still requires visual validation.
