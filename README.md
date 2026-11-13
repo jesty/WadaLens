@@ -184,3 +184,7 @@ All four male looks now align to one canonical `man-tee-trousers` body, avoiding
 
 ### Experiment 6 — user-calibrated registration and footwear crop
 Applied user-confirmed alignment: shirt (dx=3,dy=-29,sx=.99,sy=1), jacket (dx=9,dy=-17,sx=1,sy=1.005), tie (dx=0,dy=-35,sx=1,sy=1), scarf (dx=6,dy=-12,sx=1,sy=1), shoes (identity). Male experimental renderer uses a dedicated lower mask at y=1280 instead of the generic y=1238 swatch crop, exposing the shoe toes and soles while preserving the legacy renderer unchanged for women.
+
+
+## Experiment 46: female modular precolored garments
+Eight independent female garment shapes (tee, shirt, jacket, trousers, knee skirt, shoes, tie, scarf) are now stored as 159 transparent, precolored SVGs each: 1,272 new colored layers plus separate detail files. They use canonical women tee/trouser or tee/skirt illustrations for skin, hair and visible limbs, without any baked-in original garments. Existing polka dots, stripes, denim, free-draw strokes and other patterns remain dynamic and are masked by the corresponding colored layer's alpha. Each garment has independent dx/dy/sx/sy values in \`woman-layered.js\`; use Chrome DevTools for visual calibration. The existing male renderer, woman legacy image assets and \`main\` are untouched. This is an experiment: detailed alignment is not yet user-calibrated.
