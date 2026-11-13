@@ -1,7 +1,7 @@
 'use strict';
 // Independent female Wada garment layers: 159 original precolored SVGs per item.
 const USE_LAYERED_WOMAN_RENDER=true;
-const WOMAN_LAYER_VERSION='46-exp12-sneakers';
+const WOMAN_LAYER_VERSION='46-exp14-full-closed-sneakers';
 const WOMAN_LAYER_REGISTRATION={
   tee:{dx:0,dy:0,sx:1,sy:1},shirt:{dx:-7,dy:-35,sx:1,sy:1},
   jacket:{dx:-2,dy:-21,sx:1,sy:1},trousers:{dx:0,dy:0,sx:1,sy:1},
