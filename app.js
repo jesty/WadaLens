@@ -256,7 +256,7 @@ function renderCombinations(){
 document.getElementById('combinationSize').addEventListener('change',()=>{comboPage=0;renderCombinations()});
 document.getElementById('combinationMore').addEventListener('click',()=>{comboPage++;renderCombinations()});
 document.getElementById('cameraBtn').onclick=()=>document.getElementById('camera').click();document.getElementById('uploadBtn').onclick=()=>document.getElementById('upload').click();['camera','upload'].forEach(id=>document.getElementById(id).addEventListener('change',e=>{takeFile(e.target.files[0]);e.target.value=''}));photo.addEventListener('click',e=>{if(!hasImage)return;let box=canvas.getBoundingClientRect(),x=(e.clientX-box.left)/box.width,y=(e.clientY-box.top)/box.height;if(x<0||x>1||y<0||y>1)return; // canvas rendered with object-fit contain: account for letterboxing
-let ratio=Math.min(box.width/canvas.width,box.height/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio,ox=(box.width-w)/2,oy=(box.height-h)/2;let px=(e.clientX-box.left-ox)/w,py=(e.clientY-box.top-oy)/h;if(px<0||px>1||py<0||py>1)return;if(selectingGray){grayPoint={x:px,y:py};selectingGray=false;photo.classList.remove('pick-gray');document.getElementById('grayBtn').textContent='◉ Recalibrate gray card';let gt=document.getElementById('grayTarget');gt.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';gt.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';gt.classList.add('visible');computeGrayCalibration();analyse();return}point={x:px,y:py};mode='zona';target.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';target.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';target.classList.add('visible');analyse()});document.getElementById('correction').onchange=analyse;document.getElementById('copyBtn').onclick=async()=>{if(!selected)return;let value=selected.name+' '+selected.hex.toUpperCase();try{await navigator.clipboard.writeText(value);document.getElementById('copyBtn').textContent='✓ Copied';setTimeout(()=>document.getElementById('copyBtn').textContent='Copy Wada color',1500)}catch{prompt('Copy color:',value)}};if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=41.0').catch(()=>{});
+let ratio=Math.min(box.width/canvas.width,box.height/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio,ox=(box.width-w)/2,oy=(box.height-h)/2;let px=(e.clientX-box.left-ox)/w,py=(e.clientY-box.top-oy)/h;if(px<0||px>1||py<0||py>1)return;if(selectingGray){grayPoint={x:px,y:py};selectingGray=false;photo.classList.remove('pick-gray');document.getElementById('grayBtn').textContent='◉ Recalibrate gray card';let gt=document.getElementById('grayTarget');gt.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';gt.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';gt.classList.add('visible');computeGrayCalibration();analyse();return}point={x:px,y:py};mode='zona';target.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';target.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';target.classList.add('visible');analyse()});document.getElementById('correction').onchange=analyse;document.getElementById('copyBtn').onclick=async()=>{if(!selected)return;let value=selected.name+' '+selected.hex.toUpperCase();try{await navigator.clipboard.writeText(value);document.getElementById('copyBtn').textContent='✓ Copied';setTimeout(()=>document.getElementById('copyBtn').textContent='Copy Wada color',1500)}catch{prompt('Copy color:',value)}};if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=44.0').catch(()=>{});
 
 // First-run guide stored locally; can be reopened with Help.
 const overlay=document.getElementById('guideOverlay'),helpBtn=document.getElementById('helpBtn'),guideClose=document.getElementById('guideClose');
@@ -274,7 +274,7 @@ let dressComboId=null,dressColors=[];
 let dressColorTab='colors';
 const denimImages=Array(8).fill(null);
 const denimStatus=Array(8).fill(false);
-function loadDenimImages(){for(let i=0;i<8;i++){if(denimStatus[i])continue;denimStatus[i]=true;const im=new Image();im.onload=()=>{denimImages[i]=im;if(Object.values(dressState.denim).includes(i))renderDress()};im.onerror=()=>{denimStatus[i]=false;console.warn('Denim texture missing:',i+1)};im.src='assets/denim/denim-'+(i+1)+'.jpg?v=41.0';}}
+function loadDenimImages(){for(let i=0;i<8;i++){if(denimStatus[i])continue;denimStatus[i]=true;const im=new Image();im.onload=()=>{denimImages[i]=im;if(Object.values(dressState.denim).includes(i))renderDress()};im.onerror=()=>{denimStatus[i]=false;console.warn('Denim texture missing:',i+1)};im.src='assets/denim/denim-'+(i+1)+'.jpg?v=44.0';}}
 function denimFill(ctx,piece){const selected=dressState.denim[piece];if(selected===undefined||selected===null)return false;const im=denimImages[selected];if(!im)return false;const pattern=ctx.createPattern(im,'repeat');if(!pattern)return false;ctx.fillStyle=pattern;return true;}
 
 const SHOE_STYLE_FIXED='sneakers';
@@ -325,7 +325,7 @@ function selectDressColorTab(tab){
  }
  renderDress();
 }
-function openDressMe(id,colors){if(aiImageSource){aiImageSource=null;aiImageBlob=null;aiResult.classList.add('hidden');aiMessage('A new Wada combination was selected. Generate another AI preview for this outfit.')}dressComboId=id;dressColors=colors.slice();dressColorTab='colors';dressState.denim={};dressState.colors={top:0,jacket:Math.min(1,colors.length-1),bottom:Math.min(1,colors.length-1),tights:0,neck:0};dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';const section=document.getElementById('dressSection');section.classList.add('visible');document.getElementById('dressCombinationLabel').textContent='Vol. '+(selected?volumeForColor(selected):1)+' · Combination #'+id;refreshDressPalette();refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();activePiece='top';renderDress();section.scrollIntoView({behavior:'smooth',block:'start'})}
+function openDressMe(id,colors){if(aiImageSource){aiImageSource=null;aiImageBlob=null;aiResult.classList.add('hidden');aiMessage('A new Wada combination was selected. Generate another AI preview for this outfit.')}dressComboId=id;dressColors=colors.slice();dressColorTab='colors';dressState.denim={};dressState.colors={top:0,jacket:Math.min(1,colors.length-1),bottom:Math.min(1,colors.length-1),tights:0,neck:0};dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';const section=document.getElementById('dressSection');section.classList.add('visible');document.getElementById('dressCombinationLabel').textContent='Vol. '+(selected?volumeForColor(selected):1)+' · Combination #'+id;refreshDressPalette();refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();activePiece='top';closeGarmentEditor();garmentPaintMode=false;document.getElementById('dressPaintBanner').hidden=true;refreshGarmentQuickButtons();renderDress();section.scrollIntoView({behavior:'smooth',block:'start'})}
 function refreshDressTops(){const sel=document.getElementById('dressTop'),current=dressState.top;sel.replaceChildren();dressTops[dressState.gender].forEach(([id,label])=>{const opt=document.createElement('option');opt.value=id;opt.textContent=label;sel.append(opt)});const fallback=dressState.gender==='woman'?'tee':'tee';dressState.top=dressTops[dressState.gender].some(o=>o[0]===current)?current:fallback;sel.value=dressState.top}
 function refreshDressBottoms(){const sel=document.getElementById('dressBottom'),current=dressState.bottom;sel.replaceChildren();dressBottoms[dressState.gender].forEach(([id,label])=>{const opt=document.createElement('option');opt.value=id;opt.textContent=label;sel.append(opt)});const fallback=dressState.gender==='woman'?'skirt-knee':'trousers';dressState.bottom=dressBottoms[dressState.gender].some(o=>o[0]===current)?current:fallback;sel.value=dressState.bottom}
 function refreshShoeOptions(){
@@ -360,8 +360,8 @@ function renderDress(){
  aiUpdatePreviousFlag();
  for(const [tab,id] of [['colors','dressColorTabColors'],['denim','dressColorTabDenim']]){const b=document.getElementById(id);if(b){b.setAttribute('aria-selected',String(dressColorTab===tab));b.classList.toggle('active',dressColorTab===tab)}}
  const controls=document.getElementById('dressColorControls');controls.replaceChildren();
- const pieceLabels={top:'Top / inner layer',jacket:'Jacket',bottom:'Bottom',tights:'Tights / stockings',neck:'Neck accessory'};
- dressPieces().forEach(piece=>{
+ const pieceLabels={top:'Top / inner layer',jacket:'Jacket',bottom:isSkirt()?'Skirt':'Trousers',tights:'Tights / stockings',neck:'Neck accessory',shoes:'Shoes'};
+ [activePiece].filter(piece=>piece==='shoes'||dressPieces().includes(piece)).forEach(piece=>{
   const line=document.createElement('div');line.className='dress-color-row';
   const title=document.createElement('p');title.className='dress-color-title';title.textContent=pieceLabels[piece];
   const buttons=document.createElement('div');buttons.className='dress-color-options';
@@ -377,13 +377,14 @@ function renderDress(){
     buttons.append(b);
    }
   }else{
-   (piece==='tights'?dressColors.concat(TIGHTS_EXTRAS):dressColors).forEach((c,i)=>{
+   (piece==='tights'?dressColors.concat(TIGHTS_EXTRAS):piece==='shoes'?[...SHOE_COLORS,...dressColors.filter(c=>!SHOE_COLORS.some(s=>s.hex.toLowerCase()===c.hex.toLowerCase()))]:dressColors).forEach((c,i)=>{
     const b=document.createElement('button');b.type='button';b.className='dress-color-btn';b.style.backgroundColor=c.hex;
     b.title=c.name+' · '+c.hex.toUpperCase();b.setAttribute('aria-label',pieceLabels[piece]+': '+c.name);
-    b.setAttribute('aria-pressed',String(dressState.denim[piece]==null&&(piece==='tights'?(i<dressColors.length?!dressState.tightsColor&&dressState.colors.tights===i:dressState.tightsColor===c.hex):dressState.colors[piece]===i)));
+    b.setAttribute('aria-pressed',String(dressState.denim[piece]==null&&(piece==='shoes'?dressState.shoeColor.toLowerCase()===c.hex.toLowerCase():piece==='tights'?(i<dressColors.length?!dressState.tightsColor&&dressState.colors.tights===i:dressState.tightsColor===c.hex):dressState.colors[piece]===i)));
     b.addEventListener('click',()=>{
      delete dressState.denim[piece];
-     if(piece==='tights'&&i>=dressColors.length){dressState.tightsColor=c.hex;dressState.showTights=true}
+     if(piece==='shoes'){dressState.shoeColor=c.hex}
+     else if(piece==='tights'&&i>=dressColors.length){dressState.tightsColor=c.hex;dressState.showTights=true}
      else{dressState.colors[piece]=i;if(piece==='tights'){dressState.tightsColor=null;dressState.showTights=true}}
      renderDress();
     });buttons.append(b);
@@ -391,13 +392,15 @@ function renderDress(){
   }
   const choice=document.createElement('p');choice.className='dress-color-choice';
   if(dressState.denim[piece]!=null)choice.textContent='Denim · Option '+(dressState.denim[piece]+1);
-  else{const c=piece==='tights'&&dressState.tightsColor?TIGHTS_EXTRAS.find(c=>c.hex===dressState.tightsColor):dressColors[dressState.colors[piece]]||dressColors[0];choice.textContent=c.name+' · '+c.hex.toUpperCase()}
+  else{const c=piece==='shoes'?[...SHOE_COLORS,...dressColors].find(c=>c.hex.toLowerCase()===dressState.shoeColor.toLowerCase())||SHOE_COLORS[0]:piece==='tights'&&dressState.tightsColor?TIGHTS_EXTRAS.find(c=>c.hex===dressState.tightsColor):dressColors[dressState.colors[piece]]||dressColors[0];choice.textContent=c.name+' · '+c.hex.toUpperCase()}
   line.append(title,buttons,choice);controls.append(line);
  });
  refreshShoeColorButtons();refreshHairColorButtons();refreshPatternPanel();drawOutfit();
 }
 // Editorial raster templates: transparent garment apertures + independent grayscale ink overlay.
 const TEMPLATE_SIZE={w:1086,h:1448};
+function hideOutfitSwatches(ctx){ctx.save();ctx.fillStyle='#ffffff';ctx.fillRect(0,1238,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h-1238);ctx.restore()}
+
 const templateAssets={};
 const TEMPLATE_PARTS={man:['top','bottom','shoes'],woman:['top','jacket','bottom','shoes']};
 const TEMPLATE_BOXES={man:{top:[262,1286,420,1366],bottom:[464,1286,622,1366],shoes:[666,1286,822,1366]},woman:{top:[168,1257,325,1343],jacket:[365,1257,522,1343],bottom:[562,1257,719,1343],shoes:[759,1257,916,1343]}};
@@ -547,11 +550,8 @@ async function drawEditorialOriginal(){
   TEMPLATE_PARTS[gender].forEach(piece=>paintGarment(c,assets,piece));
   c.drawImage(recoloredInk(assets),0,0);
   drawNeckLayer(c,gender);
-  const swatches=TEMPLATE_BOXES[gender];
-  for(const [piece,[x1,y1,x2,y2]] of Object.entries(swatches)){
-   c.fillStyle=outfitColor(piece);c.fillRect(x1+4,y1+4,x2-x1-8,y2-y1-8);
-  }
-  preview.classList.toggle('draw-active',pieceSettings(activePiece).type==='draw');
+  hideOutfitSwatches(c);
+  preview.classList.toggle('draw-active',garmentPaintMode);
   document.getElementById('dressStatus').textContent='v15 · Illustrated template · '+(gender==='man'?'T-shirt + trousers':'Shirt + jacket + knee-length skirt');
  }catch(error){document.getElementById('dressStatus').textContent='Figure error: '+error.message;console.error(error)}
 }
@@ -677,13 +677,12 @@ async function drawModularOutfit(){
  // Restore the original face, arms and hairstyle on top of clothing.
  bodyPartFromInk(c,assets,'skin');bodyPartFromInk(c,assets,'hair');
  const shoeLayer=document.createElement('canvas');shoeLayer.width=TEMPLATE_SIZE.w;shoeLayer.height=TEMPLATE_SIZE.h;
- const sc=shoeLayer.getContext('2d');sc.fillStyle=dressState.shoeColor;sc.fillRect(0,0,shoeLayer.width,shoeLayer.height);sc.globalCompositeOperation='destination-in';sc.drawImage(assets.shoes,0,0);c.drawImage(shoeLayer,0,0);
+ const sc=shoeLayer.getContext('2d');const shoeSetting=pieceSettings('shoes');if(denimFill(sc,'shoes')){sc.fillRect(0,0,shoeLayer.width,shoeLayer.height)}else if(shoeSetting.type==='solid'||shoeSetting.type==='draw'){sc.fillStyle=dressState.shoeColor;sc.fillRect(0,0,shoeLayer.width,shoeLayer.height)}else{sc.fillStyle=sc.createPattern(makeFabricTile('shoes'),'repeat')||dressState.shoeColor;sc.fillRect(0,0,shoeLayer.width,shoeLayer.height)}sc.globalCompositeOperation='destination-in';sc.drawImage(assets.shoes,0,0);c.drawImage(shoeLayer,0,0);
  // Retain ink outlines of the original shoes even when their fill is white.
  c.drawImage(assets['shoes-ink'],0,0);
- const swatches=TEMPLATE_BOXES[gender];
- for(const [part,[x1,y1,x2,y2]] of Object.entries(swatches)){if(!denimFill(c,part))c.fillStyle=outfitColor(part);c.fillRect(x1+4,y1+4,x2-x1-8,y2-y1-8)}
+ hideOutfitSwatches(c);
  canvas.setAttribute('aria-label',gender+' fashion figure with '+dressState.top+' and '+dressState.bottom);
- preview.classList.toggle('draw-active',pieceSettings(activePiece).type==='draw');
+ preview.classList.toggle('draw-active',garmentPaintMode);
  document.getElementById('dressStatus').textContent='Simple preview · '+dressState.top.replaceAll('-',' ')+' + '+dressState.bottom.replaceAll('-',' ');
 }
 // V16: individually drawn fashion croquis, no rectangular garment geometry.
@@ -734,7 +733,7 @@ const editorialSwatches = {
 };
 function activeEditorialKey(){return EDITORIAL_LOOKS[[dressState.gender,dressState.top,dressState.bottom].join('|')]||null}
 function loadEditorialPicture(path){
- return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Unable to load '+path));image.src='assets/editorial/'+path+'?v=41.0'})
+ return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Unable to load '+path));image.src='assets/editorial/'+path+'?v=44.0'})
 }
 function loadEditorialLook(key){
  if(editorialAssetCache.has(key))return editorialAssetCache.get(key);
@@ -802,12 +801,9 @@ async function drawNewEditorial(){
  if(assets.skin)editorialBodyTint(c,assets.skin,dressState.skin,.96);else console.warn('Skin mask missing for',key);
  if(assets.hair)editorialBodyTint(c,assets.hair,dressState.hair,.85);
  if(dressState.neck!=='none')drawNeckLayer(c,dressState.gender);
- const boxes=editorialSwatches[key];
- for(const [p,[x,y,w,h]] of Object.entries(boxes)){
-  if(denimFill(c,p)){c.fillRect(x,y,w,h)}else{c.fillStyle=outfitColor(p);c.fillRect(x,y,w,h)}
- }
+ hideOutfitSwatches(c);
  canvas.setAttribute('aria-label','Illustrated '+key.replaceAll('-',' ')+' with colorable clothing');
- preview.classList.toggle('draw-active',pieceSettings(activePiece).type==='draw');
+ preview.classList.toggle('draw-active',garmentPaintMode);
  document.getElementById('dressStatus').textContent='Illustrated template · '+key.replaceAll('-',' ')+' · skin tone: '+(document.getElementById('dressSkin')?.selectedOptions[0]?.textContent||dressState.skin);
 }
 
@@ -821,24 +817,133 @@ async function drawOutfit(){
 
 let drawingPointer=null;
 function canvasCoordinates(e){const rect=e.currentTarget.getBoundingClientRect();return [(e.clientX-rect.left)*TEMPLATE_SIZE.w/rect.width,(e.clientY-rect.top)*TEMPLATE_SIZE.h/rect.height]}
-function templatePointerDown(e){
- const pt=canvasCoordinates(e),boxes=activeEditorialKey()?Object.fromEntries(Object.entries(editorialSwatches[activeEditorialKey()]).map(([piece,[x,y,w,h]])=>[piece,[x,y,x+w,y+h]])):TEMPLATE_BOXES[dressState.gender];
- for(const [piece,[x1,y1,x2,y2]] of Object.entries(boxes)){if(pt[0]>=x1&&pt[0]<=x2&&pt[1]>=y1&&pt[1]<=y2){if(piece==='shoes'){document.getElementById('shoeColors').scrollIntoView({behavior:'smooth',block:'center'});return}activePiece=piece;renderDress();return}}
- if(pieceSettings(activePiece).type!=='draw'||!(activeEditorialKey()?Object.keys(editorialSwatches[activeEditorialKey()]):TEMPLATE_PARTS[dressState.gender]).includes(activePiece))return;
- e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);
- const cfg=pieceSettings(activePiece);
- drawingPointer={id:e.pointerId,piece:activePiece};
- const st={color:dressColors[cfg.accent%dressColors.length]?.hex||'#000000',size:cfg.brush,points:[pt]};
- (dressState.strokes[activePiece]||(dressState.strokes[activePiece]=[])).push(st);
- drawOutfit();
+function garmentAreaFallback(pt){
+ const [x,y]=pt, female=dressState.gender==='woman',jacket=hasJacket();
+ if(y>965&&y<1280&&x>360&&x<720)return 'shoes';
+ if(y>435&&y<1180&&x>(female?400:390)&&x<(female?675:685))return 'bottom';
+ if(jacket&&y>185&&y<610&&x>340&&x<740){if(x<495||x>592)return 'jacket';return 'top'}
+ if(y>190&&y<550&&x>395&&x<690)return 'top';
+ return null;
 }
-function templatePointerMove(e){if(!drawingPointer||drawingPointer.id!==e.pointerId)return;e.preventDefault();const pt=canvasCoordinates(e),ss=dressState.strokes[drawingPointer.piece];if(ss?.length){ss[ss.length-1].points.push(pt);drawOutfit()}}
-function templatePointerUp(e){if(drawingPointer?.id!==e.pointerId)return;drawingPointer=null;drawOutfit()}
+function maskPixel(image,pt){
+ if(!image)return false;
+ try{
+  const cvs=document.createElement('canvas');cvs.width=1;cvs.height=1;const ctx=cvs.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(image,-Math.round(pt[0]),-Math.round(pt[1]),TEMPLATE_SIZE.w,TEMPLATE_SIZE.h);
+  return ctx.getImageData(0,0,1,1).data[3]>55;
+ }catch(e){return null} // file:// readback may be restricted; fall back to geometry.
+}
+async function garmentFromIllustration(pt){
+ const key=activeEditorialKey();
+ try{
+  if(key){const assets=await loadEditorialLook(key);const pieces=['top','jacket','bottom','shoes'].filter(p=>editorialSwatches[key][p]);
+   const hits=pieces.filter(p=>maskPixel(assets[p],pt)===true);
+   if(hits.length){
+    if(hits.includes('shoes')&&pt[1]>880)return 'shoes';
+    // Foreground opening is on top of the jacket; pants are below the jacket.
+    const candidate=hits.includes('top')?'top':hits.includes('jacket')?'jacket':hits.includes('bottom')?'bottom':'shoes';
+    if(candidate==='jacket'&&pt[1]>630)return 'bottom';return candidate;
+   }
+  }else{
+   const assets=await loadTemplate(dressState.gender);
+   const hits=['top','jacket','bottom','shoes'].filter(p=>assets[p]&&maskPixel(assets[p],pt)===true);
+   if(hits.length)return hits.includes('top')?'top':hits.includes('jacket')&&hasJacket()?'jacket':hits.includes('bottom')?'bottom':'shoes';
+  }
+ }catch(e){console.warn('Garment hit test fall back:',e)}
+ return garmentAreaFallback(pt);
+}
+let pendingGarmentTap=null;
+function templatePointerDown(e){
+ if(garmentPaintMode){
+  e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);
+  const pt=canvasCoordinates(e),cfg=pieceSettings(activePiece);
+  drawingPointer={id:e.pointerId,piece:activePiece};
+  (dressState.strokes[activePiece]||(dressState.strokes[activePiece]=[])).push({color:dressColors[cfg.accent%dressColors.length]?.hex||'#111111',size:cfg.brush,points:[pt]});
+  drawOutfit();return;
+ }
+ pendingGarmentTap={id:e.pointerId,pt:canvasCoordinates(e),clientX:e.clientX,clientY:e.clientY};
+}
+function templatePointerMove(e){
+ if(pendingGarmentTap?.id===e.pointerId&&Math.hypot(e.clientX-pendingGarmentTap.clientX,e.clientY-pendingGarmentTap.clientY)>13)pendingGarmentTap=null;
+ if(!drawingPointer||drawingPointer.id!==e.pointerId)return;
+ e.preventDefault();const pt=canvasCoordinates(e),ss=dressState.strokes[drawingPointer.piece];if(ss?.length){ss[ss.length-1].points.push(pt);drawOutfit()}
+}
+async function templatePointerUp(e){
+ if(drawingPointer?.id===e.pointerId){drawingPointer=null;drawOutfit();return}
+ const tap=pendingGarmentTap;pendingGarmentTap=null;
+ if(!tap||tap.id!==e.pointerId||Math.hypot(e.clientX-tap.clientX,e.clientY-tap.clientY)>13)return;
+ const picked=await garmentFromIllustration(tap.pt);
+ if(picked)openGarmentEditor(picked);
+}
 function refreshNeckOptions(){const sel=document.getElementById('dressNeck'),valid=['shirt','shirt-jacket'].includes(dressState.top)?'tie':'scarf';if(dressState.neck!=='none'&&dressState.neck!==valid)dressState.neck=valid;sel.replaceChildren();for(const [value,label] of [['none','None'],[valid,valid==='tie'?'Tie':'Scarf']]){const opt=document.createElement('option');opt.value=value;opt.textContent=label;sel.append(opt)}sel.value=dressState.neck}
-for(const id of ['dressGender','dressTop','dressBottom','dressSkin'])document.getElementById(id).addEventListener('change',e=>{const key={dressGender:'gender',dressTop:'top',dressBottom:'bottom',dressSkin:'skin'}[id];dressState[key]=e.target.value;if(key==='gender'){refreshDressTops();refreshDressBottoms();refreshShoeOptions()}if(key==='top')refreshNeckOptions();dressState.shoeStyle=SHOE_STYLE_FIXED;if(!dressPieces().includes(activePiece))activePiece='top';renderDress()});
-document.getElementById('dressNeck').addEventListener('change',e=>{dressState.neck=e.target.value;if(!dressPieces().includes(activePiece))activePiece='top';renderDress()});
+// v44: all garment controls live in an on-demand, accessible dialog.
+const garmentEditor=document.getElementById('garmentEditor');
+let garmentEditorReturnFocus=null;
+let garmentPaintMode=false;
+const garmentNames={top:'Top / inner layer',jacket:'Jacket',bottom:'Bottom',shoes:'Shoes',tights:'Tights',neck:'Neck accessory'};
+function garmentTitle(piece){return piece==='top'?(dressState.top.startsWith('shirt')?'Shirt':'T-shirt'):piece==='bottom'?(isSkirt()?'Skirt':'Trousers'):garmentNames[piece]||'Garment'}
+function initGarmentEditor(){
+ document.getElementById('garmentEditorCustom').append(document.querySelector('.custom-color-panel'));
+ document.getElementById('shoeColors').closest('.dress-field').classList.add('hidden');
+ const colorSlot=document.getElementById('garmentEditorColors');
+ colorSlot.append(document.querySelector('.dress-color-tabs'),document.getElementById('dressColorControls'));
+ document.getElementById('garmentEditorPatterns').append(document.querySelector('.dress-tools'));
+ document.getElementById('garmentEditorClose').addEventListener('click',closeGarmentEditor);
+ document.getElementById('dressPaintStart').addEventListener('click',()=>{
+  garmentPaintMode=true;closeGarmentEditor();
+  document.getElementById('dressPaintBanner').hidden=false;
+  document.getElementById('dressPaintLabel').textContent='Paint on '+garmentTitle(activePiece);
+  document.getElementById('dressPreview').classList.add('draw-active');
+  document.getElementById('dressPaintDone').focus({preventScroll:true});
+ });
+ document.getElementById('dressPaintDone').addEventListener('click',()=>{
+  garmentPaintMode=false;document.getElementById('dressPaintBanner').hidden=true;
+  document.getElementById('dressPreview').classList.remove('draw-active');openGarmentEditor(activePiece);
+ });
+ document.getElementById('garmentEditorBackdrop').addEventListener('click',closeGarmentEditor);
+ document.addEventListener('keydown',e=>{
+  if(garmentEditor.hidden)return;
+  if(e.key==='Escape'){e.preventDefault();closeGarmentEditor();return}
+  if(e.key==='Tab'){
+   const selectors='button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled])';
+   const focusable=[...garmentEditor.querySelectorAll(selectors)].filter(el=>el.offsetParent!==null);
+   if(!focusable.length)return;
+   const first=focusable[0],last=focusable.at(-1);
+   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+  }
+ });
+ refreshGarmentQuickButtons();
+}
+function refreshGarmentQuickButtons(){
+ const quick=document.getElementById('dressPartQuick');if(!quick)return;
+ quick.replaceChildren();
+ const pcs=[...dressPieces().filter(p=>p!=='tights'&&p!=='neck'),'shoes',...dressPieces().filter(p=>p==='tights'||p==='neck')];
+ pcs.forEach(piece=>{const b=document.createElement('button');b.type='button';b.textContent=garmentTitle(piece);b.setAttribute('aria-label','Edit '+garmentTitle(piece)+' colors and patterns');b.addEventListener('click',()=>openGarmentEditor(piece));quick.append(b)});
+}
+function openGarmentEditor(piece){
+ if(piece!=='shoes'&&!dressPieces().includes(piece))return;
+ if(!dressColors.length)return;
+ if(garmentEditor.hidden)garmentEditorReturnFocus=document.activeElement;
+ garmentPaintMode=false;document.getElementById('dressPaintBanner').hidden=true;
+ activePiece=piece;
+ dressColorTab='colors';
+ garmentEditor.hidden=false;garmentEditor.setAttribute('aria-hidden','false');document.body.classList.add('garment-editor-open');
+ document.getElementById('garmentEditorTitle').textContent=garmentTitle(piece);
+ renderDress();
+ document.getElementById('garmentEditorClose').focus({preventScroll:true});
+}
+function closeGarmentEditor(){
+ if(garmentEditor.hidden)return;
+ garmentEditor.hidden=true;garmentEditor.setAttribute('aria-hidden','true');document.body.classList.remove('garment-editor-open');
+ if(garmentEditorReturnFocus?.isConnected)garmentEditorReturnFocus.focus({preventScroll:true});
+ garmentEditorReturnFocus=null;
+}
+initGarmentEditor();
+for(const id of ['dressGender','dressTop','dressBottom','dressSkin'])document.getElementById(id).addEventListener('change',e=>{const key={dressGender:'gender',dressTop:'top',dressBottom:'bottom',dressSkin:'skin'}[id];dressState[key]=e.target.value;if(key==='gender'){refreshDressTops();refreshDressBottoms();refreshShoeOptions()}if(key==='top')refreshNeckOptions();dressState.shoeStyle=SHOE_STYLE_FIXED;if(activePiece!=='shoes'&&!dressPieces().includes(activePiece))activePiece='top';closeGarmentEditor();refreshGarmentQuickButtons();renderDress()});
+document.getElementById('dressNeck').addEventListener('change',e=>{dressState.neck=e.target.value;if(activePiece!=='shoes'&&!dressPieces().includes(activePiece))activePiece='top';closeGarmentEditor();refreshGarmentQuickButtons();renderDress()});
 const dressShoesEl=document.getElementById('dressShoes');if(dressShoesEl)dressShoesEl.addEventListener('change',e=>{dressState.shoeStyle=e.target.value;drawOutfit()});
-document.getElementById('dressReset').addEventListener('click',()=>{dressState.gender='man';dressState.top='tee';dressState.bottom='trousers';dressState.colors={top:0,jacket:Math.min(1,dressColors.length-1),bottom:Math.min(1,dressColors.length-1),tights:0,neck:0};dressState.skin='#d6a27a';dressState.hair='#4a3426';dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';dressState.shoeStyle=SHOE_STYLE_FIXED;dressState.shoeColor='#ffffff';dressState.denim={};dressState.patterns={};dressState.strokes={};activePiece='top';document.getElementById('dressSkin').value=dressState.skin;document.getElementById('dressGender').value=dressState.gender;refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();renderDress();document.getElementById('dressStatus').textContent='Outfit reset.'});
+document.getElementById('dressReset').addEventListener('click',()=>{dressState.gender='man';dressState.top='tee';dressState.bottom='trousers';dressState.colors={top:0,jacket:Math.min(1,dressColors.length-1),bottom:Math.min(1,dressColors.length-1),tights:0,neck:0};dressState.skin='#d6a27a';dressState.hair='#4a3426';dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';dressState.shoeStyle=SHOE_STYLE_FIXED;dressState.shoeColor='#ffffff';dressState.denim={};dressState.patterns={};dressState.strokes={};activePiece='top';closeGarmentEditor();garmentPaintMode=false;document.getElementById('dressPaintBanner').hidden=true;document.getElementById('dressSkin').value=dressState.skin;document.getElementById('dressGender').value=dressState.gender;refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();refreshGarmentQuickButtons();renderDress();document.getElementById('dressStatus').textContent='Outfit reset.'});
 function outfitFilename(){return 'wada-lens-outfit-'+dressState.gender+'.png'}
 function saveOutfitBlob(blob){
  const url=URL.createObjectURL(blob),a=document.createElement('a');
@@ -1092,12 +1197,12 @@ document.getElementById('aiShare').addEventListener('click',async()=>{
 // Collection picker and verified Volume 2 data import.
 
 let activePiece='top',ongoingStroke=null;
-function refreshPatternPanel(){if(!dressColors.length)return;const sel=document.getElementById('patternPiece'),pcs=dressPieces();if(!pcs.includes(activePiece))activePiece=pcs[0];sel.replaceChildren();const labels={top:'Top / inner layer',jacket:'Jacket',bottom:'Bottom',tights:'Tights / stockings',neck:'Neck accessory'};pcs.forEach(pc=>{const o=document.createElement('option');o.value=pc;o.textContent=labels[pc];sel.append(o)});sel.value=activePiece;const settings=pieceSettings(activePiece);for(const [id,v] of [['patternType',settings.type],['patternSize',settings.size],['patternAngle',settings.angle],['dotSize',settings.dotSize],['brushSize',settings.brush]])document.getElementById(id).value=v;
+function refreshPatternPanel(){if(!dressColors.length)return;const sel=document.getElementById('patternPiece'),pcs=[...dressPieces(),'shoes'];if(!pcs.includes(activePiece))activePiece=pcs[0];sel.replaceChildren();const labels={top:'Top / inner layer',jacket:'Jacket',bottom:isSkirt()?'Skirt':'Trousers',tights:'Tights / stockings',neck:'Neck accessory',shoes:'Shoes'};pcs.forEach(pc=>{const o=document.createElement('option');o.value=pc;o.textContent=labels[pc];sel.append(o)});sel.value=activePiece;const settings=pieceSettings(activePiece);for(const [id,v] of [['patternType',settings.type],['patternSize',settings.size],['patternAngle',settings.angle],['dotSize',settings.dotSize],['brushSize',settings.brush]])document.getElementById(id).value=v;
  for(const [id,v] of [['patternSizeText',settings.size],['dotSizeText',settings.dotSize],['brushSizeText',settings.brush]])document.getElementById(id).textContent=v+' px';
  // Only display settings that apply to the selected pattern.
  const pattern= settings.type;
  for(const [control,visible] of [
-  ['patternSize', pattern==='stripes'||pattern==='checks'],
+  ['patternSize', ['stripes','checks','tiger','leopard','jaguar','wavy','floral','military','paisley','houndstooth'].includes(pattern)],
   ['patternAngle', pattern==='stripes'||pattern==='checks'],
   ['dotSize', pattern==='dots'],
   ['brushSize', pattern==='draw']
@@ -1106,6 +1211,7 @@ function refreshPatternPanel(){if(!dressColors.length)return;const sel=document.
   if(label) label.classList.toggle('hidden',!visible);
  }
  for(const button of ['drawUndo','drawClear'])document.getElementById(button).classList.toggle('hidden',pattern!=='draw');
+ document.getElementById('dressPaintStart').hidden=pattern!=='draw';
 
  const patternHints={solid:'Solid garment color is selected above.',stripes:'Choose an accent color and adjust stripe size and direction.',checks:'Choose an accent color and adjust check size and direction.',dots:'Choose an accent color and adjust dot diameter.',draw:'Draw with your finger or stylus on the garment. Undo and Clear affect only the selected garment.',tiger:'Choose an accent color and adjust pattern size.',leopard:'Choose an accent color and adjust pattern size.',jaguar:'Choose an accent color and adjust pattern size.',wavy:'Choose an accent color and adjust pattern size.',floral:'Choose an accent color and adjust pattern size.',military:'Choose an accent color and adjust pattern size.',paisley:'Choose an accent color and adjust pattern size.',houndstooth:'Choose an accent color and adjust pattern size.'};
  document.getElementById('patternHint').textContent=patternHints[settings.type]||'Choose an accent color and adjust pattern size.';

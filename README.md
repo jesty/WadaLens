@@ -145,3 +145,21 @@ The default option is **ChatGPT**: an external tab opens with the outfit descrip
 - v41: aligned `woman → shirt + jacket → trousers` to the same trouser silhouette used by the other woman trouser looks by reusing the stable bottom mask.
 
 - v41: tightened the woman `T-shirt + jacket + trousers` jacket mask so sleeves stay on the arms, and reused the stable woman trouser mask to remove the distorted side fill.
+
+
+## v43 — Denim texture cleanup
+
+All eight denim textures have been cropped to the fabric itself, removing leftover white UI margins and labels from the source screenshot. The images are opaque JPEG files and are still tiled within the selected garment masks. Existing patterns, custom colors, and AI provider options remain unchanged.
+
+## v43 — Woman jacket / neckline adjustments
+
+- Woman T-shirt + jacket (trousers and skirt): the shirt collar is replaced with the matching T-shirt's round neckline.
+- Woman shirt + jacket + trousers: the jacket mask is shared with the corrected T-shirt + jacket + trousers model.
+- Jacket masks preserve the neck opening so garment color does not spill over the collar.
+- The established trouser/skirt masks are unchanged.
+- Retains all eight denim texture crops from v42.
+
+
+## Garment-first Dress Me editor (v44)
+
+Tap an item on the croquis (or use the accessible garment shortcuts above it) to open a drawer / mobile bottom sheet with color, denim, patterns, Free Draw and custom colors for **that item only**. Shoes are editable from the same drawer. Close with ×, tapping outside or Escape. The original palette, outfit export, social sharing and AI providers remain available.
