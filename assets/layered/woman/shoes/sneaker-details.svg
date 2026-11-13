@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1086" height="1448" viewBox="0 0 1086 1448">
+<!-- Shoe contours and contrasting rubber outsoles remain crisp for light and dark colors. -->
+<g stroke="#29282c" stroke-linejoin="round" stroke-linecap="round">
+<path d="M493 1096 Q503 1097 515 1101 L529 1103 Q534 1113 530 1122 L522 1133 Q516 1141 507 1140 L490 1129 Q484 1123 486 1115 L490 1104 Z" fill="none" stroke-width="2.2"/>
+<path d="M541 1178 Q554 1183 565 1185 L574 1186 Q580 1189 583 1198 L581 1208 Q576 1217 564 1226 L551 1229 Q536 1226 528 1217 Q523 1208 527 1198 L530 1187 Q532 1180 541 1178 Z" fill="none" stroke-width="2.2"/>
+<path d="M488 1124 Q501 1139 513 1143 Q522 1144 528 1128" fill="none" stroke="#f5f2e9" stroke-width="5"/>
+<path d="M488 1124 Q501 1139 513 1143 Q522 1144 528 1128" fill="none" stroke-width="1.7"/>
+<path d="M526 1209 Q535 1228 551 1233 L565 1231 Q580 1221 583 1207" fill="none" stroke="#f5f2e9" stroke-width="6"/>
+<path d="M526 1209 Q535 1228 551 1233 L565 1231 Q580 1221 583 1207" fill="none" stroke-width="1.8"/>
+<!-- Tongues and eyelet panels. -->
+<path d="M498 1102 Q507 1112 501 1127 M514 1104 Q520 1114 515 1129" fill="none" stroke-width="1.5"/>
+<path d="M539 1184 Q543 1198 542 1210 M561 1187 Q564 1200 557 1216" fill="none" stroke-width="1.6"/>
+<!-- Cross-laces. -->
+<path d="M499 1109 L516 1113 M499 1115 L516 1120 M499 1121 L514 1126 M539 1191 L561 1195 M540 1198 L560 1203 M541 1205 L558 1211" fill="none" stroke="#f5f2e9" stroke-width="3.5"/>
+<path d="M499 1109 L516 1113 M499 1115 L516 1120 M499 1121 L514 1126 M539 1191 L561 1195 M540 1198 L560 1203 M541 1205 L558 1211" fill="none" stroke-width=".8"/>
+<!-- Toe caps and side panels. -->
+<path d="M491 1120 Q497 1128 505 1131 M534 1214 Q545 1223 554 1222 M519 1109 Q525 1115 525 1121 M567 1192 Q575 1197 577 1204" fill="none" stroke-width="1.5"/>
+</g></svg>
