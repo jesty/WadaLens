@@ -1,18 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1086" height="1448" viewBox="0 0 1086 1448">
-<!-- Shoe contours and contrasting rubber outsoles remain crisp for light and dark colors. -->
-<g stroke="#29282c" stroke-linejoin="round" stroke-linecap="round">
-<path d="M493 1096 Q503 1097 515 1101 L529 1103 Q534 1113 530 1122 L522 1133 Q516 1141 507 1140 L490 1129 Q484 1123 486 1115 L490 1104 Z" fill="none" stroke-width="2.2"/>
-<path d="M541 1178 Q554 1183 565 1185 L574 1186 Q580 1189 583 1198 L581 1208 Q576 1217 564 1226 L551 1229 Q536 1226 528 1217 Q523 1208 527 1198 L530 1187 Q532 1180 541 1178 Z" fill="none" stroke-width="2.2"/>
-<path d="M488 1124 Q501 1139 513 1143 Q522 1144 528 1128" fill="none" stroke="#f5f2e9" stroke-width="5"/>
-<path d="M488 1124 Q501 1139 513 1143 Q522 1144 528 1128" fill="none" stroke-width="1.7"/>
-<path d="M526 1209 Q535 1228 551 1233 L565 1231 Q580 1221 583 1207" fill="none" stroke="#f5f2e9" stroke-width="6"/>
-<path d="M526 1209 Q535 1228 551 1233 L565 1231 Q580 1221 583 1207" fill="none" stroke-width="1.8"/>
-<!-- Tongues and eyelet panels. -->
-<path d="M498 1102 Q507 1112 501 1127 M514 1104 Q520 1114 515 1129" fill="none" stroke-width="1.5"/>
-<path d="M539 1184 Q543 1198 542 1210 M561 1187 Q564 1200 557 1216" fill="none" stroke-width="1.6"/>
-<!-- Cross-laces. -->
-<path d="M499 1109 L516 1113 M499 1115 L516 1120 M499 1121 L514 1126 M539 1191 L561 1195 M540 1198 L560 1203 M541 1205 L558 1211" fill="none" stroke="#f5f2e9" stroke-width="3.5"/>
-<path d="M499 1109 L516 1113 M499 1115 L516 1120 M499 1121 L514 1126 M539 1191 L561 1195 M540 1198 L560 1203 M541 1205 L558 1211" fill="none" stroke-width=".8"/>
-<!-- Toe caps and side panels. -->
-<path d="M491 1120 Q497 1128 505 1131 M534 1214 Q545 1223 554 1222 M519 1109 Q525 1115 525 1121 M567 1192 Q575 1197 577 1204" fill="none" stroke-width="1.5"/>
+<!-- Closed, ankle-height sneaker, detailed over the complete original shoe footprint. -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path d="M537 1069 Q545 1070 557 1072 L564 1079 L558 1105 L571 1108 L571 1114 L562 1123 L568 1136 L564 1157 L568 1161 L571 1186 L583 1188 L583 1208 Q578 1219 565 1228 L557 1228 Q535 1226 527 1202 L528 1187 L550 1190 L552 1181 L558 1176 L557 1169 L549 1168 L549 1161 L539 1145 L542 1095 Z M491 1097 L529 1100 L533 1104 L533 1115 L516 1141 Q505 1140 490 1123 L490 1115 Z" stroke="#26282b" stroke-width="2.6"/>
+<!-- Padded ankle collar and tongue: distinguish the complete upper from exposed skin. -->
+<path d="M538 1075 Q549 1081 559 1079 M539 1086 Q550 1092 561 1088 M540 1098 Q553 1105 566 1108" stroke="#2b3035" stroke-width="2.3"/>
+<path d="M544 1083 Q551 1104 546 1133 L548 1159 Q551 1171 550 1180" stroke="#414347" stroke-width="1.9"/>
+<path d="M555 1095 Q561 1117 559 1137 L562 1161 Q560 1170 565 1183" stroke="#414347" stroke-width="1.9"/>
+<!-- Long lace panel covers the complete instep rather than only the toe. -->
+<path d="M546 1106 L563 1110 M545 1117 L561 1121 M545 1128 L562 1133 M547 1140 L563 1145 M550 1152 L565 1157 M551 1165 L564 1170" stroke="#f5f3ec" stroke-width="3.6"/>
+<path d="M546 1106 L563 1110 M545 1117 L561 1121 M545 1128 L562 1133 M547 1140 L563 1145 M550 1152 L565 1157 M551 1165 L564 1170" stroke="#36383a" stroke-width=".9"/>
+<!-- Side quarters, toe cap and full rubber sole. -->
+<path d="M536 1120 Q534 1154 548 1170 M566 1138 Q569 1156 571 1179 M532 1194 Q547 1198 562 1190 M534 1206 Q550 1220 565 1215" stroke="#37393b" stroke-width="1.9"/>
+<path d="M529 1197 Q538 1223 556 1228 L565 1228 Q579 1217 583 1206" stroke="#f5f3ec" stroke-width="6"/>
+<path d="M529 1197 Q538 1223 556 1228 L565 1228 Q579 1217 583 1206" stroke="#292b2d" stroke-width="1.9"/>
+<!-- Second closed sneaker: padded collar, tongue, laces and rubber sole. -->
+<path d="M493 1102 Q510 1108 528 1106 M499 1108 Q505 1123 515 1132 M521 1108 Q524 1121 519 1133" stroke="#333538" stroke-width="1.8"/>
+<path d="M501 1110 L524 1115 M501 1116 L523 1121 M505 1123 L521 1127" stroke="#f5f3ec" stroke-width="3.2"/>
+<path d="M501 1110 L524 1115 M501 1116 L523 1121 M505 1123 L521 1127" stroke="#333538" stroke-width=".8"/>
+<path d="M491 1122 Q500 1136 516 1141 L524 1130" stroke="#f5f3ec" stroke-width="5.2"/>
+<path d="M491 1122 Q500 1136 516 1141 L524 1130" stroke="#292b2d" stroke-width="1.7"/>
 </g></svg>
