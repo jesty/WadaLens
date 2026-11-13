@@ -1,26 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1086 1448" width="1086" height="1448">
-<!-- Option 1: clean black linework and an open, transparent neck. No bridge behind the face. -->
-<g fill="none" stroke="#1c1a1b" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
-<!-- Separate left and right pointed notched collar wings -->
-<path d="M523 204 Q517 217 514 235 L527 254 L541 269 L557 289"/>
-<path d="M577 204 Q583 217 590 237 L575 255 L560 273 L557 289"/>
-<path d="M523 204 L545 230 L534 241 Q543 260 557 289"/>
-<path d="M577 204 L569 228 L581 242 Q571 258 557 289"/>
-<!-- Straight button placket and curved shirt hem -->
-<path d="M553 290 Q550 340 550 455 M560 291 L560 454"/>
-<path d="M482 433 Q548 460 611 431"/>
-<!-- Structured shoulder and sleeve seam lines -->
-<path d="M447 221 Q458 250 475 305 M625 211 Q610 246 600 307"/>
-<path d="M426 329 Q433 371 420 403 M660 338 Q648 372 666 404"/>
-<path d="M395 529 Q407 534 425 532 M660 533 Q673 538 688 530"/>
-<!-- Tapered feminine shaping -->
-<path d="M483 310 Q492 353 482 404 M610 310 Q599 357 612 402" opacity=".62" stroke-width="1.5"/>
-<!-- Cuffs -->
-<path d="M395 537 L422 541 M659 542 L686 537"/>
-<!-- Hollow, unfilled circular buttons -->
-<circle cx="556" cy="315" r="3.8" stroke-width="1.9"/>
-<circle cx="556" cy="343" r="3.8" stroke-width="1.9"/>
-<circle cx="556" cy="371" r="3.8" stroke-width="1.9"/>
-<circle cx="556" cy="399" r="3.8" stroke-width="1.9"/>
-<circle cx="556" cy="427" r="3.8" stroke-width="1.9"/>
+<!-- Woman's blouse option 1: crisp fashion flat, with notched open collar and tailored waist. -->
+<g fill="none" stroke="#171417" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+<!-- Outer wing contours: left and right have clear two-step notches -->
+<path d="M514 204 Q503 212 491 233 L510 251 L490 273 Q520 305 544 335"/>
+<path d="M587 204 Q599 214 610 234 L589 252 L611 273 Q583 305 563 335"/>
+<!-- Interior folding edges; V has no bridge across the neck -->
+<path d="M514 204 L528 232 L520 249 L529 273 Q538 293 544 335"/>
+<path d="M587 204 L575 231 L583 251 L580 271 Q571 293 563 335"/>
+<!-- Point of the V and straight, narrow placket -->
+<path d="M544 335 Q551 341 551 348 L551 453 M563 335 Q560 342 560 348 L560 453"/>
+<!-- Shoulder seams and sleeve joins -->
+<path d="M446 221 Q462 245 473 295 M645 225 Q629 251 613 299"/>
+<!-- Wide cuff with distinguishable black seam -->
+<path d="M394 527 Q407 534 428 530 M661 532 Q676 539 686 531"/>
+<!-- Rounded, slightly sculpted blouse hem -->
+<path d="M483 433 Q539 466 611 432"/>
+<!-- Thin arm folds and tailored princess-seam darts -->
+<path d="M431 332 Q432 366 418 405 M657 337 Q647 372 667 405"/>
+</g>
+<g fill="none" stroke="#252025" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+<path d="M484 295 Q496 348 485 397 M606 294 Q599 347 606 395" opacity=".63"/>
+<path d="M401 476 Q408 489 411 510 M673 470 Q676 490 680 510" opacity=".6"/>
+<!-- Visible cuff folds -->
+<path d="M397 541 Q407 545 419 542 M663 545 Q675 548 687 541"/>
+</g>
+<!-- Unfilled button circles; painted interior is the garment's original fabric color. -->
+<g fill="none" stroke="#151317" stroke-width="2.35">
+<circle cx="556" cy="352" r="4.8"/>
+<circle cx="556" cy="374" r="4.8"/>
+<circle cx="556" cy="396" r="4.8"/>
+<circle cx="556" cy="418" r="4.8"/>
+<circle cx="556" cy="440" r="4.8"/>
 </g></svg>

@@ -216,3 +216,7 @@ The 159 female blazer SVG fills now share the exact polygon outline traced from 
 
 ### Experiment 46-exp9 — woman's approved option 1 shirt
 Replaced all 159 precolored women’s shirt SVGs with a consistent fitted, long-sleeve tailored blouse, recreating the selected first shirt concept: separate sharp notched collar flaps, a hollow neck opening (no backing line crossing the model's neck), central placket, five empty outline buttons, black construction seams and cuffs. The same shared `details.svg` is now used in normal outfits and in `?womanDemo=1`; the old `details-demo.svg` is no longer referenced. Female jacket and male clothing assets unchanged. Fine registration still requires visual validation.
+
+
+### Experiment 46-exp10 — refine the approved option 1 women's blouse
+All 159 female shirt SVGs now use a single carefully defined fitted blouse silhouette with conspicuous notched pointed collar wings and the deeper V opening of the original first concept. Black shared detail contours (2.7 SVG units on the main seams), tailored waist and curved hem, visible sleeve cuffs and five hollow outlined buttons are kept separate from the single-color fills. The front neck area is genuinely transparent and has no horizontal bridge over the person's throat. No changes to jacket layers or any male garments.

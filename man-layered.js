@@ -23,7 +23,7 @@ function manLayerGarments() {
   return garments;
 }
 function manLayerPath(kind,hex) {
-  return 'assets/layered/man/'+kind+'/'+hex.slice(1)+'.svg?v=46-exp9';
+  return 'assets/layered/man/'+kind+'/'+hex.slice(1)+'.svg?v=46-exp10';
 }
 function manLoadSvgImage(url,temporary=false) {
   if(!temporary && manLayerImageCache.has(url))return manLayerImageCache.get(url);
@@ -197,7 +197,7 @@ async function drawLayeredMan() {
   const [base,colors,details]=await Promise.all([
     loadEditorialLook(baseKey),
     Promise.all(items.map(item=>manLayerImage(item.kind,outfitColor(item.piece)))),
-    Promise.all(items.map(item=>manLoadSvgImage('assets/layered/man/'+item.kind+'/details.svg?v=46-exp9')))
+    Promise.all(items.map(item=>manLoadSvgImage('assets/layered/man/'+item.kind+'/details.svg?v=46-exp10')))
   ]);
   if(nonce!==manLayerRenderNonce || !manLayerActive() || look!==dressState.top)return;
   const preview=document.getElementById('dressPreview');
