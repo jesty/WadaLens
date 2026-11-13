@@ -23,7 +23,7 @@ function manLayerGarments() {
   return garments;
 }
 function manLayerPath(kind,hex) {
-  return 'assets/layered/man/'+kind+'/'+hex.slice(1)+'.svg?v=45-exp5';
+  return 'assets/layered/man/'+kind+'/'+hex.slice(1)+'.svg?v=45-exp6';
 }
 function manLoadSvgImage(url,temporary=false) {
   if(!temporary && manLayerImageCache.has(url))return manLayerImageCache.get(url);
@@ -86,7 +86,10 @@ function manLayerPatternOverlay(piece,mask) {
    prevents those old edges from showing beside our independent vector shapes. */
 const MAN_LAYER_REGISTRATION={
   shirt:{dx:3,dy:-29,sx:0.99,sy:1},
-  jacket:{dx:0,dy:0,sx:1.035,sy:1.015}
+  jacket:{dx:9,dy:-17,sx:1,sy:1.005},
+  shoes:{dx:0,dy:0,sx:1,sy:1},
+  tie:{dx:0,dy:-35,sx:1,sy:1},
+  scarf:{dx:6,dy:-12,sx:1,sy:1}
 };
 const manSkinImageCache=new WeakMap();
 function manRegisteredPoint(kind,pt){
@@ -194,7 +197,7 @@ async function drawLayeredMan() {
   const [base,colors,details]=await Promise.all([
     loadEditorialLook(baseKey),
     Promise.all(items.map(item=>manLayerImage(item.kind,outfitColor(item.piece)))),
-    Promise.all(items.map(item=>manLoadSvgImage('assets/layered/man/'+item.kind+'/details.svg?v=45-exp5')))
+    Promise.all(items.map(item=>manLoadSvgImage('assets/layered/man/'+item.kind+'/details.svg?v=45-exp6')))
   ]);
   if(nonce!==manLayerRenderNonce || !manLayerActive() || look!==dressState.top)return;
   const preview=document.getElementById('dressPreview');
@@ -245,8 +248,14 @@ async function drawLayeredMan() {
   // Hands and forearms are already tinted on the body UNDER the sleeves.
   // Never paint them again here: that used to create detached, pale hands and
   // falsely place them above the jacket or shirt cuffs.
+  ctx.save();
+  manApplyRegistration(ctx,'shoes');
   manDrawFullShoes(ctx,base);
-  hideOutfitSwatches(ctx);
+  ctx.restore();
+  // The original 1238px crop hid the toe/outsole; keep it only below 1280px.
+  ctx.save();ctx.fillStyle='#ffffff';
+  ctx.fillRect(0,1280,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h-1280);
+  ctx.restore();
   canvas.setAttribute('aria-label','Experimental modular male outfit with precolored garment layers');
   preview.classList.toggle('draw-active',garmentPaintMode);
   document.getElementById('dressStatus').textContent=

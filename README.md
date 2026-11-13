@@ -181,3 +181,6 @@ Male shirt and jacket layers now use per-garment registration transforms, the sh
 
 ### Experiment 4 — consistent male body, hands and complete shoes
 All four male looks now align to one canonical `man-tee-trousers` body, avoiding the previous shirt/jacket template offset. The approved T-shirt SVG and T-shirt-only base draw remain unchanged. For shirt/jacket combinations, an offscreen alpha-isolated body and skin/hair tint are rendered before the independently colored garments, so old white garment outlines no longer double the new drawings. The problematic second hand pass above jacket sleeves has been removed. Full-shoe clipped paths are traced to the canonical source footwear (including the full toe and outsole), and the original lace/sole art is multiplied within their bounds. This remains an experimental branch: verify final silhouette and pattern masks visually before merging.
+
+### Experiment 6 — user-calibrated registration and footwear crop
+Applied user-confirmed alignment: shirt (dx=3,dy=-29,sx=.99,sy=1), jacket (dx=9,dy=-17,sx=1,sy=1.005), tie (dx=0,dy=-35,sx=1,sy=1), scarf (dx=6,dy=-12,sx=1,sy=1), shoes (identity). Male experimental renderer uses a dedicated lower mask at y=1280 instead of the generic y=1238 swatch crop, exposing the shoe toes and soles while preserving the legacy renderer unchanged for women.
