@@ -1,22 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1086" height="1448" viewBox="0 0 1086 1448">
-<!-- Closed, ankle-height sneaker, detailed over the complete original shoe footprint. -->
-<g fill="none" stroke-linecap="round" stroke-linejoin="round">
-<path d="M537 1069 Q545 1070 557 1072 L564 1079 L558 1105 L571 1108 L571 1114 L562 1123 L568 1136 L564 1157 L568 1161 L571 1186 L583 1188 L583 1208 Q578 1219 565 1228 L557 1228 Q535 1226 527 1202 L528 1187 L550 1190 L552 1181 L558 1176 L557 1169 L549 1168 L549 1161 L539 1145 L542 1095 Z M491 1097 L529 1100 L533 1104 L533 1115 L516 1141 Q505 1140 490 1123 L490 1115 Z" stroke="#26282b" stroke-width="2.6"/>
-<!-- Padded ankle collar and tongue: distinguish the complete upper from exposed skin. -->
-<path d="M538 1075 Q549 1081 559 1079 M539 1086 Q550 1092 561 1088 M540 1098 Q553 1105 566 1108" stroke="#2b3035" stroke-width="2.3"/>
-<path d="M544 1083 Q551 1104 546 1133 L548 1159 Q551 1171 550 1180" stroke="#414347" stroke-width="1.9"/>
-<path d="M555 1095 Q561 1117 559 1137 L562 1161 Q560 1170 565 1183" stroke="#414347" stroke-width="1.9"/>
-<!-- Long lace panel covers the complete instep rather than only the toe. -->
-<path d="M546 1106 L563 1110 M545 1117 L561 1121 M545 1128 L562 1133 M547 1140 L563 1145 M550 1152 L565 1157 M551 1165 L564 1170" stroke="#f5f3ec" stroke-width="3.6"/>
-<path d="M546 1106 L563 1110 M545 1117 L561 1121 M545 1128 L562 1133 M547 1140 L563 1145 M550 1152 L565 1157 M551 1165 L564 1170" stroke="#36383a" stroke-width=".9"/>
-<!-- Side quarters, toe cap and full rubber sole. -->
-<path d="M536 1120 Q534 1154 548 1170 M566 1138 Q569 1156 571 1179 M532 1194 Q547 1198 562 1190 M534 1206 Q550 1220 565 1215" stroke="#37393b" stroke-width="1.9"/>
-<path d="M529 1197 Q538 1223 556 1228 L565 1228 Q579 1217 583 1206" stroke="#f5f3ec" stroke-width="6"/>
-<path d="M529 1197 Q538 1223 556 1228 L565 1228 Q579 1217 583 1206" stroke="#292b2d" stroke-width="1.9"/>
-<!-- Second closed sneaker: padded collar, tongue, laces and rubber sole. -->
-<path d="M493 1102 Q510 1108 528 1106 M499 1108 Q505 1123 515 1132 M521 1108 Q524 1121 519 1133" stroke="#333538" stroke-width="1.8"/>
-<path d="M501 1110 L524 1115 M501 1116 L523 1121 M505 1123 L521 1127" stroke="#f5f3ec" stroke-width="3.2"/>
-<path d="M501 1110 L524 1115 M501 1116 L523 1121 M505 1123 L521 1127" stroke="#333538" stroke-width=".8"/>
-<path d="M491 1122 Q500 1136 516 1141 L524 1130" stroke="#f5f3ec" stroke-width="5.2"/>
-<path d="M491 1122 Q500 1136 516 1141 L524 1130" stroke="#292b2d" stroke-width="1.7"/>
+<g stroke-linecap="round" stroke-linejoin="round" fill="none">
+ <path d="M524 1049 Q536 1042 552 1048 Q568 1054 572 1071 L576 1110 Q574 1149 574 1178 Q584 1185 589 1198 L590 1213 Q582 1229 568 1236 Q545 1240 529 1225 Q520 1217 518 1200 L522 1172 Q525 1123 520 1080 Q519 1058 524 1049 Z M483 1071 Q491 1062 504 1066 Q520 1066 531 1075 Q541 1089 540 1107 L535 1130 Q529 1145 514 1152 Q495 1151 480 1138 Q474 1128 476 1112 Q478 1082 483 1071 Z" stroke="#25282d" stroke-width="2.5"/>
+ <!-- Rear/top sneaker: continuous padded collar and fully closed quarter -->
+ <path d="M523 1057 Q541 1052 567 1065 M526 1067 Q544 1063 568 1075 M523 1077 Q540 1083 567 1084" stroke="#3c3b41" stroke-width="2"/>
+ <path d="M533 1080 Q533 1125 537 1168 Q535 1180 529 1192 M558 1088 Q566 1134 562 1173" stroke="#33383c" stroke-width="2"/>
+ <path d="M537 1089 L557 1096 M537 1103 L559 1109 M537 1117 L560 1123 M539 1132 L561 1138 M540 1147 L562 1152 M540 1161 L561 1167" stroke="#f5f2eb" stroke-width="4"/>
+ <path d="M537 1089 L557 1096 M537 1103 L559 1109 M537 1117 L560 1123 M539 1132 L561 1138 M540 1147 L562 1152 M540 1161 L561 1167" stroke="#30343a" stroke-width=".9"/>
+ <path d="M522 1184 Q541 1191 570 1180 M530 1210 Q548 1223 575 1212" stroke="#30343a" stroke-width="2"/>
+ <path d="M519 1207 Q527 1233 548 1239 Q570 1245 584 1227 L590 1212" stroke="#f6f3e9" stroke-width="6.2"/>
+ <path d="M519 1207 Q527 1233 548 1239 Q570 1245 584 1227 L590 1212" stroke="#25282d" stroke-width="1.6"/>
+ <!-- Front/side sneaker: no exposed instep, side wall, heel or opening -->
+ <path d="M485 1077 Q501 1071 526 1083 M486 1086 Q505 1082 532 1094 M485 1090 Q482 1114 488 1125" stroke="#34373b" stroke-width="2"/>
+ <path d="M492 1092 Q498 1111 503 1132 M521 1093 Q525 1110 519 1134" stroke="#37383d" stroke-width="2"/>
+ <path d="M492 1096 L522 1101 M492 1103 L522 1109 M494 1111 L521 1117 M496 1119 L519 1125" stroke="#f5f2eb" stroke-width="3.8"/>
+ <path d="M492 1096 L522 1101 M492 1103 L522 1109 M494 1111 L521 1117 M496 1119 L519 1125" stroke="#30343a" stroke-width=".8"/>
+ <path d="M477 1122 Q485 1144 505 1151 Q523 1159 536 1132" stroke="#f6f3e9" stroke-width="5.8"/>
+ <path d="M477 1122 Q485 1144 505 1151 Q523 1159 536 1132" stroke="#25282d" stroke-width="1.7"/>
 </g></svg>
