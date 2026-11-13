@@ -23,7 +23,7 @@ function manLayerGarments() {
   return garments;
 }
 function manLayerPath(kind,hex) {
-  return 'assets/layered/man/'+kind+'/'+hex.slice(1)+'.svg?v=45-exp2';
+  return 'assets/layered/man/'+kind+'/'+hex.slice(1)+'.svg?v=45-exp3';
 }
 function manLoadSvgImage(url,temporary=false) {
   if(!temporary && manLayerImageCache.has(url))return manLayerImageCache.get(url);
@@ -80,6 +80,90 @@ function manLayerPatternOverlay(piece,mask) {
   c.drawImage(mask,0,0,layer.width,layer.height);
   return layer;
 }
+
+/* Registration in the common 1086×1448 coordinate system.
+   The original templates had different garment edges; the neutral backdrop
+   prevents those old edges from showing beside our independent vector shapes. */
+const MAN_LAYER_REGISTRATION={
+  shirt:{dx:6,dy:-3,sx:1.10,sy:1.08},
+  jacket:{dx:0,dy:0,sx:1.035,sy:1.015}
+};
+const manSkinImageCache=new WeakMap();
+function manRegisteredPoint(kind,pt){
+  const t=MAN_LAYER_REGISTRATION[kind];if(!t)return pt;
+  return [543+(pt[0]-543-t.dx)/t.sx,190+(pt[1]-190-t.dy)/t.sy];
+}
+function manApplyRegistration(ctx,kind){
+  const t=MAN_LAYER_REGISTRATION[kind];if(!t)return;
+  ctx.translate(543+t.dx,190+t.dy);ctx.scale(t.sx,t.sy);ctx.translate(-543,-190);
+}
+function manProtectedSkin(base){
+  if(manSkinImageCache.has(base.base))return manSkinImageCache.get(base.base);
+  const mask=document.createElement('canvas');mask.width=TEMPLATE_SIZE.w;mask.height=TEMPLATE_SIZE.h;
+  const mc=mask.getContext('2d');
+  if(base.skin)mc.drawImage(base.skin,0,0,mask.width,mask.height);
+  if(base.hair)mc.drawImage(base.hair,0,0,mask.width,mask.height);
+  const layer=document.createElement('canvas');layer.width=mask.width;layer.height=mask.height;
+  const lc=layer.getContext('2d');lc.drawImage(base.base,0,0,layer.width,layer.height);
+  lc.globalCompositeOperation='destination-in';lc.drawImage(mask,0,0);
+  manSkinImageCache.set(base.base,layer);return layer;
+}
+function manNeutralBackdrop(ctx,base){
+  // Remove only the old illustrated upper garment. No more doubled collars,
+  // mismatched white outlines or white sleeve remnants beneath the new pieces.
+  ctx.fillStyle='#ffffff';ctx.fillRect(330,174,415,480);
+  ctx.drawImage(manProtectedSkin(base),0,0);
+}
+function manCutShirtNeck(ctx){
+  // Hollow shirt neckline: the bare neck in the underlying model remains visible.
+  // evenodd excludes the center neck opening, but not the pointed collar outlines.
+  ctx.beginPath();ctx.rect(0,0,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h);
+  ctx.moveTo(516,183);ctx.lineTo(569,183);
+  ctx.lineTo(564,201);ctx.lineTo(548,225);ctx.lineTo(536,225);
+  ctx.lineTo(519,204);ctx.closePath();
+  ctx.clip('evenodd');
+}
+function manFullShoePath(){
+  const p=new Path2D();
+  // Rear shoe: heel, instep, lacing and toe, not just the small toe mask.
+  p.moveTo(470,997);p.quadraticCurveTo(494,990,519,1009);
+  p.lineTo(511,1044);p.quadraticCurveTo(507,1067,503,1086);
+  p.lineTo(507,1109);p.quadraticCurveTo(497,1130,478,1127);
+  p.quadraticCurveTo(463,1115,466,1087);p.lineTo(475,1055);p.closePath();
+  // Front shoe.
+  p.moveTo(512,1143);p.quadraticCurveTo(535,1137,558,1144);
+  p.quadraticCurveTo(574,1169,577,1190);p.quadraticCurveTo(585,1217,581,1240);
+  p.quadraticCurveTo(572,1255,545,1254);p.quadraticCurveTo(509,1255,505,1240);
+  p.quadraticCurveTo(501,1216,506,1185);p.closePath();
+  return p;
+}
+function manDrawFullShoes(ctx,base){
+  const path=manFullShoePath(),cfg=pieceSettings('shoes');
+  ctx.save();ctx.clip(path);
+  if(denimFill(ctx,'shoes'))ctx.fillRect(0,0,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h);
+  else if(cfg.type!=='solid'&&cfg.type!=='draw'){
+    const pattern=ctx.createPattern(makeFabricTile('shoes'),'repeat');
+    ctx.fillStyle=pattern||dressState.shoeColor;
+    ctx.fillRect(0,0,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h);
+  }else{
+    ctx.fillStyle=dressState.shoeColor;
+    ctx.fillRect(0,0,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h);
+  }
+  for(const stroke of dressState.strokes.shoes||[]){
+    if(!stroke.points?.length)continue;
+    ctx.strokeStyle=stroke.color;ctx.fillStyle=stroke.color;ctx.lineCap='round';
+    ctx.lineJoin='round';ctx.lineWidth=stroke.size*3.6;ctx.beginPath();
+    ctx.moveTo(...stroke.points[0]);
+    for(const pt of stroke.points.slice(1))ctx.lineTo(...pt);
+    if(stroke.points.length===1)ctx.arc(...stroke.points[0],stroke.size*1.8,0,Math.PI*2);
+    ctx.stroke();
+  }
+  // The original black shoe edges and laces remain visible through the color.
+  ctx.globalCompositeOperation='multiply';
+  ctx.drawImage(base.base,0,0,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h);
+  ctx.restore();
+}
+
 async function drawLayeredMan() {
   const nonce=++manLayerRenderNonce,look=dressState.top;
   const baseKey=look.startsWith('shirt')?(hasJacket()?'man-shirt-jacket-trousers':'man-shirt-trousers'):'man-tee-trousers';
@@ -88,7 +172,7 @@ async function drawLayeredMan() {
   const [base,colors,details]=await Promise.all([
     loadEditorialLook(baseKey),
     Promise.all(items.map(item=>manLayerImage(item.kind,outfitColor(item.piece)))),
-    Promise.all(items.map(item=>manLoadSvgImage('assets/layered/man/'+item.kind+'/details.svg?v=45-exp2')))
+    Promise.all(items.map(item=>manLoadSvgImage('assets/layered/man/'+item.kind+'/details.svg?v=45-exp3')))
   ]);
   if(nonce!==manLayerRenderNonce || !manLayerActive() || look!==dressState.top)return;
   const preview=document.getElementById('dressPreview');
@@ -106,7 +190,8 @@ async function drawLayeredMan() {
   const ctx=canvas.getContext('2d');
   ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.drawImage(base.base,0,0,canvas.width,canvas.height);
-  // Recolor the visible body before the clothes, keeping collars and lapels on top.
+  if(dressState.top.startsWith('shirt')||hasJacket())manNeutralBackdrop(ctx,base);
+  // Recolor skin/hair behind garments.
   if(base.skin)editorialBodyTint(ctx,base.skin,dressState.skin,.96);
   if(base.hair)editorialBodyTint(ctx,base.hair,dressState.hair,.85);
   for(let n=0;n<items.length;n++){
@@ -114,20 +199,27 @@ async function drawLayeredMan() {
     // A short-sleeved tee stays below the jacket: clip its outer sleeves away
     // from the open blazer front without modifying or recoloring the garment file.
     const underJacket=item.piece==='top'&&hasJacket();
+    ctx.save();
     if(underJacket){
-      ctx.save();ctx.beginPath();
-      ctx.moveTo(477,192);ctx.lineTo(612,192);
-      ctx.lineTo(640,343);ctx.lineTo(587,534);
-      ctx.lineTo(481,534);ctx.lineTo(440,343);
+      ctx.beginPath();
+      ctx.moveTo(477,185);ctx.lineTo(616,185);
+      ctx.lineTo(643,344);ctx.lineTo(605,552);
+      ctx.lineTo(469,552);ctx.lineTo(437,344);
       ctx.closePath();ctx.clip();
     }
+    manApplyRegistration(ctx,item.kind);
+    if(item.kind==='shirt'){ctx.save();manCutShirtNeck(ctx);}
     ctx.drawImage(mask,0,0,canvas.width,canvas.height);
     const overlay=manLayerPatternOverlay(item.piece,mask);
     if(overlay)ctx.drawImage(overlay,0,0);
+    if(item.kind==='shirt')ctx.restore();
     ctx.drawImage(details[n],0,0,canvas.width,canvas.height);
-    if(underJacket)ctx.restore();
+    ctx.restore();
   }
-  if(base.shoes)ctx.drawImage(editorialColoredLayer('shoes',base.shoes),0,0);
+  // Preserve hands in front of sleeve cuffs; the lower hands are not clothing.
+  ctx.save();ctx.beginPath();ctx.rect(0,550,TEMPLATE_SIZE.w,230);ctx.clip();
+  ctx.drawImage(manProtectedSkin(base),0,0);ctx.restore();
+  manDrawFullShoes(ctx,base);
   hideOutfitSwatches(ctx);
   canvas.setAttribute('aria-label','Experimental modular male outfit with precolored garment layers');
   preview.classList.toggle('draw-active',garmentPaintMode);
@@ -139,7 +231,7 @@ async function manLayerHitTest(point){
   const garmentItems=manLayerGarments().slice().reverse();
   for(const item of garmentItems){
     const image=await manLayerImage(item.kind,outfitColor(item.piece));
-    if(maskPixel(image,point)===true)return item.piece;
+    if(maskPixel(image,manRegisteredPoint(item.kind,point))===true)return item.piece;
   }
   return null;
 }
