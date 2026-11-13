@@ -1,7 +1,7 @@
 'use strict';
 // Independent female Wada garment layers: 159 original precolored SVGs per item.
 const USE_LAYERED_WOMAN_RENDER=true;
-const WOMAN_LAYER_VERSION='46-exp15-closed-shoes-body-fixes';
+const WOMAN_LAYER_VERSION='46-exp16-female-face-and-full-sneakers';
 const WOMAN_LAYER_REGISTRATION={
   tee:{dx:0,dy:0,sx:1,sy:1},shirt:{dx:-7,dy:-35,sx:1,sy:1},
   jacket:{dx:-2,dy:-21,sx:1,sy:1},trousers:{dx:0,dy:0,sx:1,sy:1},
@@ -76,6 +76,26 @@ function womanProtectedBody(base){
  womanBodyCache.set(base.base,body);return body;
 }
 
+function womanRepairFace(ctx,base){
+ // The editorial skin aperture is incomplete around facial highlights and edges.
+ // Expand its head-only alpha slightly, then tint using MULTIPLY: white gaps
+ // become skin while the original nose, eyes, mouth and linework stay visible.
+ if(!base.skin)return;
+ const mask=document.createElement('canvas');
+ mask.width=TEMPLATE_SIZE.w;mask.height=210;
+ const m=mask.getContext('2d');
+ m.save();m.beginPath();m.rect(0,0,TEMPLATE_SIZE.w,210);m.clip();
+ for(const [dx,dy] of [[0,0],[-10,0],[10,0],[0,-10],[0,10],[-7,-7],[7,-7],[-7,7],[7,7]]){
+   m.drawImage(base.skin,dx,dy,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h);
+ }
+ m.restore();
+ const color=document.createElement('canvas');color.width=TEMPLATE_SIZE.w;color.height=210;
+ const c=color.getContext('2d');c.fillStyle=dressState.skin;c.fillRect(0,0,color.width,color.height);
+ c.globalCompositeOperation='destination-in';c.drawImage(mask,0,0);c.globalCompositeOperation='source-over';
+ ctx.save();ctx.globalCompositeOperation='multiply';
+ ctx.drawImage(color,0,0);ctx.restore();
+}
+
 function womanDrawTeeWaistBridge(ctx){
  // The original T-shirt's scalloped hem leaves a white strip at the trouser waist.
  // Draw a narrow underlap before the actual shirt artwork, matching its selected
@@ -129,6 +149,7 @@ async function drawLayeredWoman(){
  // complete illustrated head BEFORE tinting it, so white mask holes disappear.
  // Stop above the garments: no baked-in shirt or jacket is reintroduced.
  ctx.drawImage(base.base,0,0,TEMPLATE_SIZE.w,193,0,0,TEMPLATE_SIZE.w,193);
+ womanRepairFace(ctx,base);
  if(base.skin)editorialBodyTint(ctx,base.skin,dressState.skin,.96);
  if(base.hair)editorialBodyTint(ctx,base.hair,dressState.hair,.85);
  for(let i=0;i<items.length;i++){
