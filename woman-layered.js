@@ -1,7 +1,7 @@
 'use strict';
 // Independent female Wada garment layers: 159 original precolored SVGs per item.
 const USE_LAYERED_WOMAN_RENDER=true;
-const WOMAN_LAYER_VERSION='46-exp14-full-closed-sneakers';
+const WOMAN_LAYER_VERSION='46-exp15-closed-shoes-body-fixes';
 const WOMAN_LAYER_REGISTRATION={
   tee:{dx:0,dy:0,sx:1,sy:1},shirt:{dx:-7,dy:-35,sx:1,sy:1},
   jacket:{dx:-2,dy:-21,sx:1,sy:1},trousers:{dx:0,dy:0,sx:1,sy:1},
@@ -57,7 +57,7 @@ function womanLayerImage(kind,color){
      fetch(kind==='shoes'?'assets/layered/woman/shoes/sneaker-base.svg?v='+WOMAN_LAYER_VERSION:womanLayerAsset(kind,'#ffb3f0')).then(r=>{
        if(!r.ok)throw Error('Missing female SVG '+kind);return r.text();
      }));
-   const src=(await womanTemplateCache.get(kind)).replace('fill="#ffb3f0"','fill="'+hex+'"');
+   const src=(await womanTemplateCache.get(kind)).replaceAll('fill="#ffb3f0"','fill="'+hex+'"');
    return manLoadSvgImage(URL.createObjectURL(new Blob([src],{type:'image/svg+xml'})),true);
  })();
  womanImageCache.set(key,promise);promise.catch(()=>womanImageCache.delete(key));
@@ -75,6 +75,31 @@ function womanProtectedBody(base){
  c.globalCompositeOperation='destination-in';c.drawImage(mask,0,0);
  womanBodyCache.set(base.base,body);return body;
 }
+
+function womanDrawTeeWaistBridge(ctx){
+ // The original T-shirt's scalloped hem leaves a white strip at the trouser waist.
+ // Draw a narrow underlap before the actual shirt artwork, matching its selected
+ // solid/denim/pattern fabric without affecting garment registration or hit testing.
+ ctx.save();
+ ctx.beginPath();
+ ctx.moveTo(477,406);ctx.lineTo(605,405);
+ ctx.lineTo(608,455);ctx.quadraticCurveTo(545,464,477,451);
+ ctx.closePath();ctx.clip();
+ const settings=pieceSettings('top');
+ if(denimFill(ctx,'top'))ctx.fillRect(472,403,142,65);
+ else if(settings.type==='solid'||settings.type==='draw'){
+   ctx.fillStyle=outfitColor('top');ctx.fillRect(472,403,142,65);
+ }else{
+   const tile=makeFabricTile('top'),pat=ctx.createPattern(tile,'repeat');
+   if(pat?.setTransform){
+     const angle=Number(settings.angle)*Math.PI/180;
+     pat.setTransform(new DOMMatrix([Math.cos(angle),Math.sin(angle),-Math.sin(angle),Math.cos(angle),0,0]));
+   }
+   ctx.fillStyle=pat||outfitColor('top');ctx.fillRect(472,403,142,65);
+ }
+ ctx.restore();
+}
+
 async function drawLayeredWoman(){
  const nonce=++womanRenderNonce,top=dressState.top,bottom=dressState.bottom;
  const baseKey=isSkirt()?'woman-tee-skirt-knee':'woman-tee-trousers';
@@ -100,10 +125,15 @@ async function drawLayeredWoman(){
  const ctx=canvas.getContext('2d');
  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
  ctx.drawImage(womanProtectedBody(base),0,0);
+ // The skin/hair aperture masks omit tiny face pixels. Restore the original
+ // complete illustrated head BEFORE tinting it, so white mask holes disappear.
+ // Stop above the garments: no baked-in shirt or jacket is reintroduced.
+ ctx.drawImage(base.base,0,0,TEMPLATE_SIZE.w,193,0,0,TEMPLATE_SIZE.w,193);
  if(base.skin)editorialBodyTint(ctx,base.skin,dressState.skin,.96);
  if(base.hair)editorialBodyTint(ctx,base.hair,dressState.hair,.85);
  for(let i=0;i<items.length;i++){
    const item=items[i],mask=colors[i];ctx.save();womanApplyRegistration(ctx,item.kind);
+   if(item.kind==='tee')womanDrawTeeWaistBridge(ctx);
    ctx.drawImage(mask,0,0,canvas.width,canvas.height);
    // Same existing dynamic polka dots, stripes, denim, fabrics and Free Draw.
    // Every overlay is clipped to this garment silhouette, never the base.
