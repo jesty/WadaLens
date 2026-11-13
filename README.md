@@ -188,3 +188,7 @@ Applied user-confirmed alignment: shirt (dx=3,dy=-29,sx=.99,sy=1), jacket (dx=9,
 
 ## Experiment 46: female modular precolored garments
 Eight independent female garment shapes (tee, shirt, jacket, trousers, knee skirt, shoes, tie, scarf) are now stored as 159 transparent, precolored SVGs each: 1,272 new colored layers plus separate detail files. They use canonical women tee/trouser or tee/skirt illustrations for skin, hair and visible limbs, without any baked-in original garments. Existing polka dots, stripes, denim, free-draw strokes and other patterns remain dynamic and are masked by the corresponding colored layer's alpha. Each garment has independent dx/dy/sx/sy values in \`woman-layered.js\`; use Chrome DevTools for visual calibration. The existing male renderer, woman legacy image assets and \`main\` are untouched. This is an experiment: detailed alignment is not yet user-calibrated.
+
+
+## Woman test outfit (?womanDemo=1)
+The experiment now includes one deliberately selected female look with a redesigned classic pointed-collar shirt (Fawn \`#D1B0B3\`), fitted single-button blazer with notched lapels (Vinaceous Cinnamon \`#F59994\`), trousers (Ivory Buff \`#EBD999\`) and white shoes (\`#FFFFFF\`). The chosen Wada SVG fills and matching demonstration-specific detail overlays are enabled only when loading the experimental app with \`?womanDemo=1\`. All other 159-color variants keep their existing detail layers. Visual alignment should be checked in a browser and calibrated using \`development/woman-alignment-console.js\`.
