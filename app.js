@@ -812,7 +812,8 @@ async function drawNewEditorial(){
 async function drawOutfit(){
  aiUpdatePreviousFlag();
  try{
-  if(activeEditorialKey()){modularNonce++;renderNonce++;await drawNewEditorial()}
+  if(manLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredMan()}
+   else if(activeEditorialKey()){modularNonce++;renderNonce++;await drawNewEditorial()}
   else{editorialRenderNonce++;renderNonce++;await drawModularOutfit()}
  }catch(e){console.error(e);document.getElementById('dressStatus').textContent='Template unavailable, using simple fallback: '+e.message;editorialRenderNonce++;renderNonce++;await drawModularOutfit()}
 }
@@ -836,6 +837,7 @@ function maskPixel(image,pt){
  }catch(e){return null} // file:// readback may be restricted; fall back to geometry.
 }
 async function garmentFromIllustration(pt){
+  if(manLayerActive()){const picked=await manLayerHitTest(pt);if(picked)return picked;}
  const key=activeEditorialKey();
  try{
   if(key){const assets=await loadEditorialLook(key);const pieces=['top','jacket','bottom','shoes'].filter(p=>editorialSwatches[key][p]);

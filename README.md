@@ -163,3 +163,12 @@ All eight denim textures have been cropped to the fabric itself, removing leftov
 ## Garment-first Dress Me editor (v44)
 
 Tap an item on the croquis (or use the accessible garment shortcuts above it) to open a drawer / mobile bottom sheet with color, denim, patterns, Free Draw and custom colors for **that item only**. Shoes are editable from the same drawer. Close with ×, tapping outside or Escape. The original palette, outfit export, social sharing and AI providers remain available.
+
+
+## Experimental male precolored layers (branch only)
+
+The branch \`experiment/man-precolored-layers\` uses a separate renderer for male T-shirt, shirt, jacket and trouser outfits. All 159 original Wada colors have pre-generated transparent SVG files for trousers, tee, shirt, jacket, tie and scarf (954 solid-color assets); these are aligned to a common 1086×1448 canvas. The new renderer composites the already colored garment files rather than painting large colored rectangles over the editorial model.
+
+Polka dots, stripes, checks, animal prints, floral, paisley, houndstooth, denim and freehand strokes are applied as dynamic overlays clipped by the corresponding exact same garment layer alpha. Custom and imported Volume 2 colors use a fallback generated from the identical vector silhouette. The original women's renderer and all other features are unchanged. Set \`USE_LAYERED_MAN_RENDER\` to \`false\` in \`man-layered.js\` to compare with the existing male renderer.
+
+SVG was chosen instead of duplicate PNGs to keep all 954 precolored assets small, transparent and sharp; the file is still a precolored, independently composited garment layer. These extra 954 images are fetched and cached on demand (not all precached on PWA install). This is experimental: detailed visual alignment, torso/jacket masking and device testing are still required before merging.
