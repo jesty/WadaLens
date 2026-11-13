@@ -1,34 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1086 1448" width="1086" height="1448">
-<!-- Woman's blouse option 1: crisp fashion flat, with notched open collar and tailored waist. -->
-<g fill="none" stroke="#171417" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
-<!-- Outer wing contours: left and right have clear two-step notches -->
-<path d="M514 204 Q503 212 491 233 L510 251 L490 273 Q520 305 544 335"/>
-<path d="M587 204 Q599 214 610 234 L589 252 L611 273 Q583 305 563 335"/>
-<!-- Interior folding edges; V has no bridge across the neck -->
-<path d="M514 204 L528 232 L520 249 L529 273 Q538 293 544 335"/>
-<path d="M587 204 L575 231 L583 251 L580 271 Q571 293 563 335"/>
-<!-- Point of the V and straight, narrow placket -->
-<path d="M544 335 Q551 341 551 348 L551 453 M563 335 Q560 342 560 348 L560 453"/>
-<!-- Shoulder seams and sleeve joins -->
-<path d="M446 221 Q462 245 473 295 M645 225 Q629 251 613 299"/>
-<!-- Wide cuff with distinguishable black seam -->
-<path d="M394 527 Q407 534 428 530 M661 532 Q676 539 686 531"/>
-<!-- Rounded, slightly sculpted blouse hem -->
-<path d="M483 433 Q539 466 611 432"/>
-<!-- Thin arm folds and tailored princess-seam darts -->
-<path d="M431 332 Q432 366 418 405 M657 337 Q647 372 667 405"/>
+<!-- Line details traced from the exact approved pink blouse: traditional pointed collar,
+     centered placket, six hollow button outlines, curved hem and long cuffs.
+     Same registration transform as precolored base asset. -->
+<g transform="translate(340 170) scale(.355 .31)" fill="none" stroke="#111111" stroke-linecap="round" stroke-linejoin="round">
+<path d="M528,100 517,106 504,121 464,192 455,190 398,213 306,243 290,257 273,290 260,339 246,427 219,693 179,956 153,1221 167,1228 218,1233 235,1229 247,1153 284,989 354,610 365,535 356,479 361,478 369,526 391,581 408,637 418,694 419,738 406,798 367,886 342,955 318,1068 371,1103 442,1129 520,1142 616,1144 684,1138 754,1122 822,1093 865,1064 851,993 834,935 776,802 762,741 764,695 777,631 813,526 818,525 838,669 897,990 934,1154 946,1229 959,1233 984,1233 1028,1222 1000,920 965,683 936,398 924,328 910,281 898,259 881,243 791,212 737,189 730,190 696,130 673,103 650,97 612,95Z" stroke-width="3.4"/>
+<g stroke-width="3.7">
+<path d="M511 104 Q504 119 513 167 Q521 213 551 268 Q571 309 595 334 M680 104 Q685 121 674 167 Q658 240 621 294 Q604 320 595 334"/>
+<path d="M515 155 Q594 140 676 155"/>
+<path d="M509 108 Q471 160 448 213 L440 291 L514 239 Q533 223 544 230 Q577 272 595 334"/>
+<path d="M676 108 Q715 166 733 215 L744 289 L667 238 Q648 218 639 226 Q611 271 595 334"/>
+<path d="M514 239 Q536 281 595 334 M667 238 Q643 281 595 334"/>
+<path d="M545 287 Q560 319 569 352 L570 1140 M595 334 Q608 345 613 367 L613 1137"/>
 </g>
-<g fill="none" stroke="#252025" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
-<path d="M484 295 Q496 348 485 397 M606 294 Q599 347 606 395" opacity=".63"/>
-<path d="M401 476 Q408 489 411 510 M673 470 Q676 490 680 510" opacity=".6"/>
-<!-- Visible cuff folds -->
-<path d="M397 541 Q407 545 419 542 M663 545 Q675 548 687 541"/>
+<g stroke-width="3">
+<path d="M291 247 Q327 322 350 479 M889 246 Q857 332 834 477"/>
+<path d="M153 1148 Q196 1161 245 1148 M943 1148 Q987 1162 1027 1146"/>
 </g>
-<!-- Unfilled button circles; painted interior is the garment's original fabric color. -->
-<g fill="none" stroke="#151317" stroke-width="2.35">
-<circle cx="556" cy="352" r="4.8"/>
-<circle cx="556" cy="374" r="4.8"/>
-<circle cx="556" cy="396" r="4.8"/>
-<circle cx="556" cy="418" r="4.8"/>
-<circle cx="556" cy="440" r="4.8"/>
-</g></svg>
+<g stroke-width="2.8">
+<path d="M367 436 Q356 482 366 531 M816 433 Q828 485 819 534"/>
+</g>
+<g stroke-width="2.5">
+<path d="M319 1067 Q442 1150 587 1144 Q740 1146 864 1065"/>
+</g>
+<g stroke="#282124" stroke-width="2.4">
+<path d="M432 554 Q451 655 442 805 M751 554 Q731 675 732 805"/>
+<path d="M360 445 Q372 496 383 550 M817 446 Q799 495 794 550"/>
+</g>
+<g stroke="#0c0b0d" stroke-width="3.4">
+<circle cx="590" cy="373" r="9"/>
+<circle cx="590" cy="485" r="9"/>
+<circle cx="590" cy="596" r="9"/>
+<circle cx="590" cy="713" r="9"/>
+<circle cx="590" cy="830" r="9"/>
+<circle cx="590" cy="955" r="9"/>
+</g>
+</g>
+</svg>

@@ -220,3 +220,7 @@ Replaced all 159 precolored women’s shirt SVGs with a consistent fitted, long-
 
 ### Experiment 46-exp10 — refine the approved option 1 women's blouse
 All 159 female shirt SVGs now use a single carefully defined fitted blouse silhouette with conspicuous notched pointed collar wings and the deeper V opening of the original first concept. Black shared detail contours (2.7 SVG units on the main seams), tailored waist and curved hem, visible sleeve cuffs and five hollow outlined buttons are kept separate from the single-color fills. The front neck area is genuinely transparent and has no horizontal bridge over the person's throat. No changes to jacket layers or any male garments.
+
+
+### Experiment 46-exp11 — approved pink women’s shirt, faithful silhouette trace
+Replaced the previous hand-interpreted blouse with a single silhouette traced directly from the last **user-approved pink shirt image** (1194×1317 source coordinates). All 159 Wada shirts share the same single-color silhouette and the same black line-art details. The collar is a traditional pointed open collar (not the previously invented notched lapel), with the original button placket and **six hollow circle buttons**, curved hem, fitted waist, and long sleeves with cuffs. Its independent fill and shared detail asset use identical transforms to the 1086×1448 figurine space. No female jacket, male garment or main-branch assets are changed.
