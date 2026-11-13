@@ -3,10 +3,10 @@
 const USE_LAYERED_WOMAN_RENDER=true;
 const WOMAN_LAYER_VERSION='46-exp12-sneakers';
 const WOMAN_LAYER_REGISTRATION={
-  tee:{dx:0,dy:0,sx:1,sy:1},shirt:{dx:0,dy:0,sx:1,sy:1},
-  jacket:{dx:0,dy:0,sx:1,sy:1},trousers:{dx:0,dy:0,sx:1,sy:1},
+  tee:{dx:0,dy:0,sx:1,sy:1},shirt:{dx:-7,dy:-35,sx:1,sy:1},
+  jacket:{dx:-2,dy:-21,sx:1,sy:1},trousers:{dx:0,dy:0,sx:1,sy:1},
   skirt:{dx:0,dy:0,sx:1,sy:1},shoes:{dx:0,dy:0,sx:1,sy:1},
-  tie:{dx:0,dy:0,sx:1,sy:1},scarf:{dx:0,dy:0,sx:1,sy:1}
+  tie:{dx:0,dy:0,sx:1,sy:1},scarf:{dx:0,dy:-19,sx:1,sy:1}
 };
 function womanDemoActive(){return new URLSearchParams(location.search).get('womanDemo')==='1'&&dressState.gender==='woman'&&dressState.top==='shirt-jacket';}
 let womanRenderNonce=0;
