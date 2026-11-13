@@ -1,7 +1,7 @@
 'use strict';
 // Independent female Wada garment layers: 159 original precolored SVGs per item.
 const USE_LAYERED_WOMAN_RENDER=true;
-const WOMAN_LAYER_VERSION='46-exp2';
+const WOMAN_LAYER_VERSION='46-exp3';
 const WOMAN_LAYER_REGISTRATION={
   tee:{dx:0,dy:0,sx:1,sy:1},shirt:{dx:0,dy:0,sx:1,sy:1},
   jacket:{dx:0,dy:0,sx:1,sy:1},trousers:{dx:0,dy:0,sx:1,sy:1},
@@ -81,7 +81,7 @@ async function drawLayeredWoman(){
    loadEditorialLook(baseKey),
    Promise.all(items.map(x=>womanLayerImage(x.kind,outfitColor(x.piece)))),
    Promise.all(items.map(x=>manLoadSvgImage(
-     'assets/layered/woman/'+x.kind+'/'+(womanDemoActive()&&['shirt','jacket'].includes(x.kind)?'details-demo.svg':'details.svg')+'?v='+WOMAN_LAYER_VERSION)))
+     'assets/layered/woman/'+x.kind+'/'+(womanDemoActive()&&x.kind==='shirt'?'details-demo.svg':'details.svg')+'?v='+WOMAN_LAYER_VERSION)))
  ]);
  if(nonce!==womanRenderNonce||!womanLayerActive()||top!==dressState.top||bottom!==dressState.bottom)return;
  const preview=document.getElementById('dressPreview');

@@ -192,3 +192,7 @@ Eight independent female garment shapes (tee, shirt, jacket, trousers, knee skir
 
 ## Woman test outfit (?womanDemo=1)
 The experiment now includes one deliberately selected female look with a redesigned classic pointed-collar shirt (Fawn \`#D1B0B3\`), fitted single-button blazer with notched lapels (Vinaceous Cinnamon \`#F59994\`), trousers (Ivory Buff \`#EBD999\`) and white shoes (\`#FFFFFF\`). The chosen Wada SVG fills and matching demonstration-specific detail overlays are enabled only when loading the experimental app with \`?womanDemo=1\`. All other 159-color variants keep their existing detail layers. Visual alignment should be checked in a browser and calibrated using \`development/woman-alignment-console.js\`.
+
+
+## Experiment 46-exp3: repaired woman jacket (all Wada colors)
+All 159 precolored female jacket SVGs now derive from the SAME two continuous, opaque blazer panels. The open V neck remains transparent to show the shirt. The collar/notched lapels and pocket flaps use a single shared detail file with very thin (1.45 SVG unit) ivory-white lapel accents, instead of transparent gaps. The active female demo jacket is now Dusky Madder Violet (#2D0060) over Fawn (#D1B0B3) shirt, with Ivory Buff trousers and white shoes. The prior demo-specific jacket details are no longer used. Female garments other than jacket are unchanged. This is still an experimental, browser-alignment-test branch.
