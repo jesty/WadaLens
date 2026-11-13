@@ -14,8 +14,8 @@ function manLayerActive() {
 function manLayerGarments() {
   const top = dressState.top.startsWith('shirt') ? 'shirt' : 'tee';
   const garments = [
-    {kind:'trousers',piece:'bottom'},
     {kind:top,piece:'top'},
+    {kind:'trousers',piece:'bottom'},
     ...(hasJacket() ? [{kind:'jacket',piece:'jacket'}] : []),
   ];
   if(dressState.neck==='tie' && top==='shirt')garments.push({kind:'tie',piece:'neck'});
