@@ -108,10 +108,21 @@ async function drawLayeredMan() {
   ctx.drawImage(base.base,0,0,canvas.width,canvas.height);
   for(let n=0;n<items.length;n++){
     const item=items[n],mask=colors[n];
+    // A short-sleeved tee stays below the jacket: clip its outer sleeves away
+    // from the open blazer front without modifying or recoloring the garment file.
+    const underJacket=item.piece==='top'&&hasJacket();
+    if(underJacket){
+      ctx.save();ctx.beginPath();
+      ctx.moveTo(477,192);ctx.lineTo(612,192);
+      ctx.lineTo(640,343);ctx.lineTo(587,534);
+      ctx.lineTo(481,534);ctx.lineTo(440,343);
+      ctx.closePath();ctx.clip();
+    }
     ctx.drawImage(mask,0,0,canvas.width,canvas.height);
     const overlay=manLayerPatternOverlay(item.piece,mask);
     if(overlay)ctx.drawImage(overlay,0,0);
     ctx.drawImage(details[n],0,0,canvas.width,canvas.height);
+    if(underJacket)ctx.restore();
   }
   if(base.shoes)ctx.drawImage(editorialColoredLayer('shoes',base.shoes),0,0);
   if(base.skin)editorialBodyTint(ctx,base.skin,dressState.skin,.96);
