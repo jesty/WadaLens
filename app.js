@@ -975,8 +975,11 @@ async function drawOutfit(){
  try{
   if(photoLayerView&&(manLayerActive()||womanLayerActive())){
    modularNonce++;renderNonce++;editorialRenderNonce++;
-   await drawPhotographicLayered();
-   return;
+   try{await drawPhotographicLayered();return}
+   catch(error){
+    console.warn('Photo layers unavailable: using the unchanged illustrated renderer.',error);
+    photoLayerView=false;photoLayerRefreshButton();
+   }
   }
   if(manLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredMan()}
    else if(womanLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredWoman()}
