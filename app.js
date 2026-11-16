@@ -812,26 +812,26 @@ function editorialHairTint(ctx,hairMask,skinMask,color){
  if(!hairMask)return;
  const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
  const hair=portraitMask(hairMask,skinMask);
+ // Every intermediate canvas MUST be alpha-clipped to the hair silhouette:
+ // a blend-mode fill over an unmasked canvas previously painted the entire
+ // page with hair color, hiding the body and background.
+ const details=document.createElement('canvas');details.width=w;details.height=h;
+ const d=details.getContext('2d');
+ d.drawImage(ctx.canvas,0,0,w,h);
+ // Screen replaces original near-black strand ink with the selected hair's
+ // darker shade while leaving bright highlights intact.
+ d.globalCompositeOperation='screen';
+ d.fillStyle=portraitDarken(color,.33);d.fillRect(0,0,w,h);
+ d.globalCompositeOperation='destination-in';d.drawImage(hair,0,0,w,h);
+ d.globalCompositeOperation='source-over';
+
  const layer=document.createElement('canvas');layer.width=w;layer.height=h;
  const c=layer.getContext('2d');
- // Base hair: fully opaque selected color in the isolated hair silhouette.
  c.fillStyle=color;c.fillRect(0,0,w,h);
- c.globalCompositeOperation='destination-in';c.drawImage(hair,0,0);
+ c.globalCompositeOperation='destination-in';c.drawImage(hair,0,0,w,h);
+ c.globalCompositeOperation='multiply';c.drawImage(details,0,0,w,h);
  c.globalCompositeOperation='source-over';
- // Movement, roots and strands from original drawing; they inherit the hair hue.
- // The final lighten pass clamps all black source ink to a dark shade of color.
- const detail=document.createElement('canvas');detail.width=w;detail.height=h;
- const d=detail.getContext('2d');d.drawImage(ctx.canvas,0,0,w,h);
- d.globalCompositeOperation='destination-in';d.drawImage(hair,0,0);
- d.globalCompositeOperation='color';d.fillStyle=color;d.fillRect(0,0,w,h);
- d.globalCompositeOperation='source-over';
- c.globalCompositeOperation='multiply';c.drawImage(detail,0,0);
- c.globalCompositeOperation='lighten';
- const shadow=document.createElement('canvas');shadow.width=w;shadow.height=h;
- const sc=shadow.getContext('2d');sc.fillStyle=portraitDarken(color,.37);sc.fillRect(0,0,w,h);
- sc.globalCompositeOperation='destination-in';sc.drawImage(hair,0,0);
- c.drawImage(shadow,0,0);
- c.globalCompositeOperation='source-over';ctx.drawImage(layer,0,0);
+ ctx.save();ctx.globalCompositeOperation='source-over';ctx.drawImage(layer,0,0);ctx.restore();
 }
 function editorialFaceInk(ctx,base){
  if(!base.skin||!base.base)return;
