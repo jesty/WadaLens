@@ -5,7 +5,7 @@
 let photoLayerView=false;
 let photoLayerRenderNonce=0;
 const photoLayerImages=new Map(),photoLayerBoxes=new WeakMap();
-const PHOTO_LAYERS_VERSION='photo-layer-v2-4';
+const PHOTO_LAYERS_VERSION='photo-layer-v2-5';
 
 function photoLayerImage(kind){
  const name=kind;
@@ -52,22 +52,77 @@ function photoLayerTexture(mask,photo,hex,piece,kind,gender){
  const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
  const dest=photoLayerBounds(mask,kind,true,gender),crop=photoLayerBounds(photo,kind,false,gender);
  if(!dest||!crop)return null;
+ const cfg=pieceSettings(piece);
+ const isDenim=dressState.denim[piece]!=null;
+ const hasPrint=cfg.type!=='solid'&&cfg.type!=='draw';
  const layer=document.createElement('canvas');layer.width=w;layer.height=h;
  const c=layer.getContext('2d');
- // Scale the pre-generated garment photograph into the already registered
- // SVG silhouette. The photograph supplies folds/shading, the SVG supplies alpha.
- c.drawImage(photo,crop.x,crop.y,crop.width,crop.height,
+
+ // Reuse the photo as a light-and-shadow source, but not as an opaque cover
+ // on top of the selected print. This keeps prints visible on realistic folds.
+ const photograph=document.createElement('canvas');photograph.width=w;photograph.height=h;
+ const p=photograph.getContext('2d');
+ p.drawImage(photo,crop.x,crop.y,crop.width,crop.height,
   dest.x,dest.y,dest.width,dest.height);
- // Recolor the photograph but keep its highlights, texture and shadows.
- // Clipping LAST guarantees the color blend cannot paint a background rectangle.
- c.save();c.globalCompositeOperation='color';c.globalAlpha=.98;
- c.fillStyle=hex;c.fillRect(dest.x,dest.y,dest.width,dest.height);c.restore();
- c.globalCompositeOperation='destination-in';c.drawImage(mask,0,0,w,h);
+
+ let patterned=false;
+ if(isDenim){
+  patterned=denimFill(c,piece);
+  if(patterned)c.fillRect(0,0,w,h);
+ }
+ if(!patterned&&hasPrint){
+  const tile=makeFabricTile(piece),pattern=c.createPattern(tile,'repeat');
+  if(pattern?.setTransform){
+   const a=(Number(cfg.angle)||0)*Math.PI/180;
+   pattern.setTransform(new DOMMatrix([Math.cos(a),Math.sin(a),-Math.sin(a),Math.cos(a),0,0]));
+  }
+  c.fillStyle=pattern||hex;c.fillRect(0,0,w,h);
+  patterned=true;
+ }
+
+ if(patterned){
+  // Pattern/denim stays underneath the photographic volume. A soft grayscale
+  // multiply pass restores creases without suppressing printed motifs.
+  const light=document.createElement('canvas');light.width=w;light.height=h;
+  const lc=light.getContext('2d');
+  lc.filter='grayscale(1) contrast(.85) brightness(1.45)';
+  lc.drawImage(photograph,0,0);
+  lc.filter='none';
+  c.save();c.globalCompositeOperation='multiply';c.globalAlpha=.27;
+  c.drawImage(light,0,0);
+  c.restore();
+ }else{
+  // Unprinted photographic garment: keep the selected Wada hue and folds.
+  c.drawImage(photograph,0,0);
+  c.save();c.globalCompositeOperation='color';c.globalAlpha=.98;
+  c.fillStyle=hex;c.fillRect(dest.x,dest.y,dest.width,dest.height);c.restore();
+ }
+ // Final alpha is ALWAYS the original independent, registered garment mask.
+ // No readback is needed (also works with cross-origin preview hosting).
+ c.globalCompositeOperation='destination-in';
+ c.drawImage(mask,0,0,w,h);
  c.globalCompositeOperation='source-over';
- // The existing editor can still apply stripes, dots, denim, and free drawing.
- if(piece!=='shoes'){
-  const pattern=manLayerPatternOverlay(piece,mask);
-  if(pattern)c.drawImage(pattern,0,0,w,h);
+
+ // Free Draw strokes are separate foreground ink, not part of the print
+ // background. Clip them independently to avoid painting outside the garment.
+ const strokes=dressState.strokes[piece]||[];
+ if(strokes.length){
+  const ink=document.createElement('canvas');ink.width=w;ink.height=h;
+  const ic=ink.getContext('2d');ic.lineCap='round';ic.lineJoin='round';
+  for(const stroke of strokes){
+   if(!stroke.points?.length)continue;
+   ic.strokeStyle=stroke.color;ic.fillStyle=stroke.color;
+   ic.lineWidth=stroke.size*3.6;
+   if(stroke.points.length===1){
+    ic.beginPath();ic.arc(stroke.points[0][0],stroke.points[0][1],stroke.size*1.8,0,Math.PI*2);ic.fill();
+   }else{
+    ic.beginPath();ic.moveTo(...stroke.points[0]);
+    for(const pt of stroke.points.slice(1))ic.lineTo(...pt);
+    ic.stroke();
+   }
+  }
+  ic.globalCompositeOperation='destination-in';ic.drawImage(mask,0,0,w,h);
+  c.drawImage(ink,0,0);
  }
  return layer;
 }
