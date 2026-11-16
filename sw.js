@@ -1,5 +1,5 @@
-const CACHE='wada-lens-v46-exp19-github-pages';
-const FILES=['./','./index.html','./app.js?v=46-exp11','./man-layered.js?v=46-exp11','./woman-layered.js?v=46-exp19','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
+const CACHE='wada-lens-v46-exp20-github-pages';
+const FILES=['./','./index.html','./app.js?v=46-exp20','./man-layered.js?v=46-exp20','./woman-layered.js?v=46-exp20','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 for(const gender of ['man','woman']){
  for(const part of ['overlay','skin','hair','shoes-ink','top','bottom','shoes',...(gender==='woman'?['jacket','tights']:[])]){
   FILES.push('./assets/'+gender+'-'+part+'.png?v=44.1');
