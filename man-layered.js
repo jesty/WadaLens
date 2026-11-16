@@ -119,7 +119,8 @@ function manDrawCleanBody(ctx,base){
   ctx.fillRect(0,0,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h);
   ctx.drawImage(manProtectedSkin(base),0,0);
   if(base.skin)editorialBodyTint(ctx,base.skin,dressState.skin,.96);
-  if(base.hair)editorialHairTint(ctx,base.hair,base.skin,dressState.hair,.85);
+  editorialFaceInk(ctx,base);
+  if(base.hair)editorialHairTint(ctx,base.hair,base.skin,dressState.hair);
 }
 function manCutShirtNeck(ctx){
   // Hollow shirt neckline: the bare neck in the underlying model remains visible.
@@ -219,7 +220,8 @@ async function drawLayeredMan() {
     ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(base.base,0,0,canvas.width,canvas.height);
     if(base.skin)editorialBodyTint(ctx,base.skin,dressState.skin,.96);
-    if(base.hair)editorialHairTint(ctx,base.hair,base.skin,dressState.hair,.85);
+    editorialFaceInk(ctx,base);
+    if(base.hair)editorialHairTint(ctx,base.hair,base.skin,dressState.hair);
   }else{
     manDrawCleanBody(ctx,base);
   }
