@@ -9,7 +9,7 @@ const PHOTO_LAYERS_VERSION='photo-layer-v2-1';
 
 function photoLayerImage(kind){
  const name=kind;
- const path='assets/photorealistic-layers/'+name+'.svg?v='+PHOTO_LAYERS_VERSION;
+ const path='assets/photorealistic-layers/'+name+'.webp?v='+PHOTO_LAYERS_VERSION;
  if(!photoLayerImages.has(path)){
   const promise=new Promise((resolve,reject)=>{
    const image=new Image();
