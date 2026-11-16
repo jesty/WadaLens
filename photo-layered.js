@@ -72,6 +72,12 @@ function photoLayerRefreshButton(){
  b.setAttribute('aria-pressed',String(photoLayerView));
  b.title=photoLayerView?'Switch back to the original illustrated model':'Show pre-generated photographic garment layers';
 }
+function photoLayerMaleShoeMask(){
+ // Use the exact same shoe silhouette path as the illustrated male renderer.
+ const mask=document.createElement('canvas');mask.width=TEMPLATE_SIZE.w;mask.height=TEMPLATE_SIZE.h;
+ const c=mask.getContext('2d');c.fillStyle='#fff';c.fill(manFullShoePath());
+ return Promise.resolve(mask);
+}
 async function drawPhotographicLayered(){
  const nonce=++photoLayerRenderNonce;
  const woman=dressState.gender==='woman';
@@ -81,11 +87,12 @@ async function drawPhotographicLayered(){
  if(woman)await drawLayeredWoman();else await drawLayeredMan();
  if(nonce!==photoLayerRenderNonce||!photoLayerView||dressState.gender!==(woman?'woman':'man'))return;
  const items=woman?womanLayerGarments():manLayerGarments();
- const relevant=items.filter(item=>item.kind!=='shoes'||woman);
+ const relevant=woman?items:[...items,{kind:'shoes',piece:'shoes'}];
  const data=await Promise.all(relevant.map(async item=>{
   const hex=item.kind==='shoes'?dressState.shoeColor:outfitColor(item.piece);
   const [mask,photo]=await Promise.all([
-   woman?womanLayerImage(item.kind,hex):manLayerImage(item.kind,hex),
+   woman?womanLayerImage(item.kind,hex):
+    item.kind==='shoes'?photoLayerMaleShoeMask():manLayerImage(item.kind,hex),
    photoLayerImage(item.kind)
   ]);
   return {item,mask,photo,hex};
@@ -106,6 +113,10 @@ async function drawPhotographicLayered(){
    }
    manApplyRegistration(c,item.kind);
   }
+  if(item.kind==='shirt'){
+   if(woman)womanCutShirtNeck(c);else manCutShirtNeck(c);
+  }
+  if(item.kind==='shoes')c.globalAlpha=.7;
   c.drawImage(layer,0,0,canvas.width,canvas.height);
   c.restore();
  }
