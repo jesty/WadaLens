@@ -1,32 +1,44 @@
-# WadaLens · Photographic garment layers v2
+# WadaLens — Photographic garment layers (v2)
 
-This branch starts from `main` and keeps the existing WadaLens illustrated renderer and its exact layer registrations intact.
+**Experimental branch:** `experiment/photorealistic-asset-layers-v2`, created from the merged `main`. The approved illustrated renderer is unchanged.
 
-## Browser test
-Open `index.html?photoLayers=1` on the experimental branch, then choose any original Wada color combination and click **Dress Me**. A button at the **bottom right of the figurine** switches between *Photographic view* and *Illustrated view*.
+## Try in the browser
 
-The button is part of the existing Dress Me UI, not a separate gallery or pre-rendered full outfit. The selected view is recorded in the shareable outfit URL.
+Open `index.html?photoLayers=1` from this branch. Select any Wada combination and click **Dress Me**. The **Photographic view / Illustrated view** button is positioned at the bottom-right corner of the actual figurine preview. Switch views without losing garment colors, textures or options.
 
-## Native photographic sources
-All photo-mode input assets are in `assets/photorealistic-layers/`:
-- `tee.svg` · separate photo cutout
-- `shirt.svg` · separate photo cutout
-- `jacket.svg` · separate photo cutout
-- `trousers.svg` · separate photo cutout
-- `skirt.svg` · separate photo cutout
-- `shoes.svg` · separate shoe photo cutout
-- `tie.svg` · transparent satin weave study
-- `scarf.svg` · transparent silk weave study
-- `manifest.json`
+The view choice is included in the shareable outfit URL; refresh restores it.
 
-These assets have **transparent backgrounds**. Six were extracted from the previously generated photographic garment study and are now completely self-contained (embedded WebP). The tie/scarf photos are synthetic material studies rather than user-supplied photographs.
+## Photographic assets
 
-The renderer loads the appropriate per-garment source and the matching independent 1086×1448 SVG silhouette from the illustrated model, scales the photographic fabric into that silhouette, re-colors it to the currently selected Wada hex preserving highlights and shadows, and clips it to the **original exact alpha mask**. Existing shirt/jacket registration, color controls, pattern tooling, and outfit PNG exports are preserved.
+All assets live in `assets/photorealistic-layers/`, independently from the original illustrated assets. There are exactly **eight WebP files with a genuine alpha channel**:
 
-## Scope and honest limitations
-- **This is an initial photographic-fabric renderer**, not yet a fully photorealistic human model. Face, visible arms, skin and hair remain from the accepted illustrated croquis.
-- The supplied high-resolution example photos were used as visual direction. The first commit uses small self-contained photographic source cutouts already available within the GitHub experiment, **not copies of the uploaded photos**. Therefore textile resolution and seam registration still require a later quality pass.
-- The source photographs are scaled into precise SVG silhouettes, so their **alpha, overlap and registration** match the existing garment geometry, even when the original photographed object's fit differs from the illustrator.
-- The original SVG illustration remains the fallback. No main-branch changes are made here.
+| File | Source |
+|---|---|
+| `tee.webp` | User-provided peach T-shirt, white converted to transparent |
+| `jacket.webp` | User-provided orange blazer, original transparent PNG converted to WebP |
+| `trousers.webp` | User-provided yellow trousers, white converted to transparent |
+| `tie.webp` | User-provided yellow tie, white converted to transparent |
+| `shirt.webp` | Existing photographic shirt reference (upscaled) |
+| `skirt.webp` | Existing photographic skirt reference (upscaled) |
+| `shoes.webp` | Existing photographic sneaker reference (upscaled) |
+| `scarf.webp` | Photo-textured draped silk study using fabric from the T-shirt example |
 
-No generated full-body look is used in this renderer. Each garment is composited independently by Canvas.
+No all-in-one full-body photograph is used in this renderer.
+
+## The overlapping layers
+
+`photo-layered.js` renders each garment photograph separately. For each piece it:
+1. Loads the standalone WebP photograph;
+2. Loads its corresponding existing, already registered 1086×1448 SVG garment silhouette for the current man or woman model;
+3. Maps the photograph's fabric details to that silhouette;
+4. Applies the selected Wada color while retaining photographic folds, light and shadow;
+5. Clips the result **to the original SVG alpha**; and
+6. Draws it with the existing layering/registration rules, so jacket, top, trousers, accessories and shoes can overlap.
+
+The original illustrated renderer and interaction handlers still handle garment selection, Wada palette, skin/hair colors, denim and other fabric patterns.
+
+## Known limitation
+
+This is the first working **photographic clothing** experiment, not a fully photorealistic human. The existing illustrated body, facial features, hands, skin and hair remain visible behind the photo-textured garment layers. Mapping independent source photos into the illustration's precise silhouettes preserves overlap but does not produce physically correct folds around every seam; this is the part to refine after browser testing.
+
+Only this experimental branch is modified. No PR or merge into `main` is included.
