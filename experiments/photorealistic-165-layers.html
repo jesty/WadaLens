@@ -87,14 +87,30 @@ let gender='man',imgs={},selected='jacket',state=clone(defaults);
 function clone(x){return JSON.parse(JSON.stringify(x))}
 function load(path){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>res(img);img.onerror=()=>rej(Error('Cannot load '+path));img.src=path})}
 function layoutBody(){
- // Extract only the head/neck and visible forearms from the source reference.
- // No existing shirt, jacket or trousers from the full photo are drawn.
+ // Extract just the head and neck from the original reference using an alpha
+ // matte, so the *garments themselves* never come from the baked-in photo.
  const img=imgs[gender];if(!img)return;
- const bounds={man:{x:170,y:25,w:260,h:850},woman:{x:170,y:25,w:260,h:850}}[gender];
- function clipped(poly){ctx.save();ctx.beginPath();poly();ctx.clip();ctx.drawImage(img,bounds.x,bounds.y,bounds.w,bounds.h);ctx.restore()}
- clipped(()=>{ctx.ellipse(300,152,91,126,0,0,Math.PI*2)});
- // Neck remains behind the tee and jacket, rather than being drawn above them.
- clipped(()=>{ctx.ellipse(300,224,34,53,0,0,Math.PI*2)});
+ if(!imgs['head-'+gender]){
+  const head=document.createElement('canvas');head.width=W;head.height=300;
+  const h=head.getContext('2d',{willReadFrequently:true});
+  h.drawImage(img,170,25,260,850);
+  const pix=h.getImageData(0,0,W,300);
+  const p=pix.data;
+  for(let y=0;y<300;y++)for(let x=0;x<W;x++){
+   const k=(y*W+x)*4,r=p[k],g=p[k+1],b=p[k+2];
+   const mid=Math.abs(r-g)+Math.abs(g-b)+Math.abs(r-b);
+   const light=Math.min(r,g,b);
+   // Softly remove the near-neutral studio backdrop. The human skin,
+   // dark hair and eyes remain on the head cutout.
+   if(mid<35&&light>195)p[k+3]=0;
+  }
+  h.putImageData(pix,0,0);
+  h.globalCompositeOperation='destination-in';h.fillStyle='#000';
+  h.beginPath();h.ellipse(300,153,95,129,0,0,Math.PI*2);
+  h.ellipse(300,229,39,45,0,0,Math.PI*2);h.fill();
+  imgs['head-'+gender]=head;
+ }
+ ctx.drawImage(imgs['head-'+gender],0,0);
 }
 function drawGarment(id){
  const i=spriteOrder.indexOf(id),set=state[id];if(!set.on||i<0||!imgs.sprite)return;
