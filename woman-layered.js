@@ -174,7 +174,7 @@ async function drawLayeredWoman(){
  ctx.drawImage(base.base,0,0,TEMPLATE_SIZE.w,193,0,0,TEMPLATE_SIZE.w,193);
  womanRepairFace(ctx,base);
  if(base.skin)editorialBodyTint(ctx,base.skin,dressState.skin,.96);
- if(base.hair)editorialBodyTint(ctx,base.hair,dressState.hair,.85);
+ if(base.hair)editorialHairTint(ctx,base.hair,base.skin,dressState.hair,.85);
  for(let i=0;i<items.length;i++){
    const item=items[i],mask=colors[i];ctx.save();womanApplyRegistration(ctx,item.kind);
    if(item.kind==='tee')womanDrawTeeWaistBridge(ctx);
