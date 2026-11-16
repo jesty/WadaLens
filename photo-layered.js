@@ -8,7 +8,7 @@ const photoLayerImages=new Map(),photoLayerBoxes=new WeakMap();
 const PHOTO_LAYERS_VERSION='photo-layer-v2-1';
 
 function photoLayerImage(kind){
- const name={tie:'shirt',scarf:'tee'}[kind]||kind;
+ const name=kind;
  const path='assets/photorealistic-layers/'+name+'.svg?v='+PHOTO_LAYERS_VERSION;
  if(!photoLayerImages.has(path)){
   const promise=new Promise((resolve,reject)=>{
