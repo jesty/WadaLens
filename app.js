@@ -785,6 +785,32 @@ function editorialBodyTint(ctx,mask,color,opacity=0.96){
  ctx.save();ctx.globalCompositeOperation='source-over';ctx.globalAlpha=opacity;
  ctx.drawImage(layer,0,0);ctx.restore();
 }
+
+// Tint hair only where the editorial hair mask does NOT intersect skin.
+// The source hair/skin masks overlap around the forehead and face: previously
+// changing hair color repainted skin even when dressState.skin stayed fixed.
+function editorialHairTint(ctx,hairMask,skinMask,color,opacity=.85){
+ if(!hairMask)return;
+ const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
+ const layer=document.createElement('canvas');layer.width=w;layer.height=h;
+ const c=layer.getContext('2d');
+ c.fillStyle=color;c.fillRect(0,0,w,h);
+ c.globalCompositeOperation='destination-in';
+ c.drawImage(hairMask,0,0,w,h);
+ if(skinMask){
+   c.globalCompositeOperation='destination-out';
+   // Remove all skin pixels (plus a small edge allowance) from the hair tint.
+   // The slight dilation is confined to the head; it does not erase hair elsewhere.
+   c.drawImage(skinMask,0,0,w,h);
+   c.save();c.beginPath();c.rect(0,0,w,240);c.clip();
+   for(const [dx,dy] of [[-8,0],[8,0],[0,-8],[0,8],[-6,-6],[6,-6],[-6,6],[6,6]])
+     c.drawImage(skinMask,dx,dy,w,h);
+   c.restore();
+ }
+ c.globalCompositeOperation='source-over';
+ ctx.save();ctx.globalAlpha=opacity;ctx.drawImage(layer,0,0);ctx.restore();
+}
+
 let editorialRenderNonce=0;
 async function drawNewEditorial(){
  const nonce=++editorialRenderNonce,key=activeEditorialKey(),preview=document.getElementById('dressPreview');
@@ -801,7 +827,7 @@ async function drawNewEditorial(){
  if(assets.shoes)c.drawImage(editorialColoredLayer('shoes',assets.shoes),0,0);
  // The base image remains in full: eyes, nose, hair, hands and natural folds.
  if(assets.skin)editorialBodyTint(c,assets.skin,dressState.skin,.96);else console.warn('Skin mask missing for',key);
- if(assets.hair)editorialBodyTint(c,assets.hair,dressState.hair,.85);
+ if(assets.hair)editorialHairTint(c,assets.hair,assets.skin,dressState.hair,.85);
  if(dressState.neck!=='none')drawNeckLayer(c,dressState.gender);
  hideOutfitSwatches(c);
  canvas.setAttribute('aria-label','Illustrated '+key.replaceAll('-',' ')+' with colorable clothing');
