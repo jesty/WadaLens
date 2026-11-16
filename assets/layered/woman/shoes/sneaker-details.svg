@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1086" height="1448" viewBox="0 0 1086 1448">
+<!-- Cleaner round-toe, full-coverage sneakers: rear shoe first, front shoe above. -->
+<g fill="none" stroke="#272527" stroke-linejoin="round" stroke-linecap="round">
+<!-- Rear outsole: subtle cream rubber, crisp outline -->
+<path d="M474 1127 Q484 1151 503 1156 Q522 1161 535 1134" stroke="#faf6ed" stroke-width="8"/>
+<path d="M474 1127 Q484 1151 503 1156 Q522 1161 535 1134" stroke-width="2.2"/>
+<!-- Rear rounded toe panel and quarter -->
+<path d="M478 1104 Q476 1131 495 1140 Q509 1147 523 1134 M480 1081 Q476 1102 484 1115 M530 1085 Q536 1106 529 1118" stroke-width="1.9"/>
+<path d="M485 1071 Q489 1059 504 1063 Q520 1068 527 1081 Q528 1090 523 1097 M485 1082 Q500 1074 524 1090" stroke-width="2.5"/>
+<!-- Rear lace channel and tongue -->
+<path d="M490 1088 Q497 1104 496 1121 M515 1090 Q519 1106 514 1123" stroke-width="2"/>
+<path d="M491 1091 L515 1096 M490 1099 L515 1104 M491 1107 L514 1112 M493 1115 L513 1120" stroke="#f8f2e9" stroke-width="4"/>
+<path d="M491 1091 L515 1096 M490 1099 L515 1104 M491 1107 L514 1112 M493 1115 L513 1120" stroke-width=".9"/>
+<!-- Front clean toe/sole: cream rim under toe -->
+<path d="M516 1213 Q517 1241 542 1248 Q565 1253 582 1238 Q593 1230 593 1212" stroke="#faf6ed" stroke-width="9"/>
+<path d="M516 1213 Q517 1241 542 1248 Q565 1253 582 1238 Q593 1230 593 1212" stroke-width="2.2"/>
+<!-- Front continuous upper, side panels and rounded toe cap -->
+<path d="M526 1047 C535 1039 549 1039 560 1046 C569 1053 576 1066 578 1084 L577 1141 L581 1176 C590 1185 595 1204 593 1219 C592 1235 576 1246 556 1248 C537 1249 522 1241 516 1228 C512 1218 514 1203 517 1188 L521 1145 L520 1082 C518 1066 520 1055 526 1047 Z" stroke-width="2.4"/>
+<path d="M524 1090 Q521 1140 523 1180 C522 1192 519 1200 517 1211 M572 1097 Q576 1138 574 1182 C581 1194 587 1206 591 1214" stroke-width="1.9"/>
+<path d="M520 1206 C532 1190 541 1183 548 1181 C559 1188 580 1195 589 1214" stroke-width="2.1"/>
+<path d="M530 1217 Q555 1234 582 1219" stroke-width="1.6" opacity=".6"/>
+<!-- Padded collar, clear tongue and shoe opening -->
+<path d="M528 1054 Q539 1044 555 1050 Q567 1055 572 1074 M533 1062 Q542 1057 554 1061 Q564 1064 567 1076" stroke-width="2.5"/>
+<path d="M535 1072 Q536 1112 536 1167 M561 1074 Q567 1114 563 1168" stroke-width="1.7"/>
+<!-- Front laces: spaced across the instep like the men's sneaker -->
+<path d="M537 1082 L559 1087 M537 1095 L560 1100 M538 1108 L561 1113 M538 1121 L562 1126 M539 1134 L562 1139 M539 1147 L561 1152 M540 1160 L561 1165" stroke="#f8f2e9" stroke-width="4"/>
+<path d="M537 1082 L559 1087 M537 1095 L560 1100 M538 1108 L561 1113 M538 1121 L562 1126 M539 1134 L562 1139 M539 1147 L561 1152 M540 1160 L561 1165" stroke-width=".9"/>
+</g>
+</svg>

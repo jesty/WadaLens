@@ -227,7 +227,7 @@ function computeGrayCalibration(){if(!grayPoint)return;let raw=ctx.getImageData(
 function correctPixels(pixels){if(grayGains){const out=new Uint8ClampedArray(pixels);for(let i=0;i<out.length;i+=4)for(let c=0;c<3;c++)out[i+c]=Math.min(255,out[i+c]*grayGains[c]);return out}if(!document.getElementById('correction').checked)return pixels;const sums=[0,0,0];let n=0;for(let i=0;i<pixels.length;i+=4){for(let c=0;c<3;c++)sums[c]+=pixels[i+c];n++}const av=sums.map(v=>v/n),gray=av.reduce((a,b)=>a+b,0)/3,scale=av.map(v=>Math.min(1.45,Math.max(.7,gray/Math.max(1,v))));const out=new Uint8ClampedArray(pixels);for(let i=0;i<out.length;i+=4)for(let c=0;c<3;c++)out[i+c]=Math.min(255,out[i+c]*scale[c]);return out}
 function analyse(){if(!hasImage)return;let raw=ctx.getImageData(0,0,canvas.width,canvas.height),px=correctPixels(raw.data);let rgb;if(mode==='zona'&&point){let x=Math.round(point.x*canvas.width),y=Math.round(point.y*canvas.height),radius=Math.max(5,Math.round(Math.min(canvas.width,canvas.height)*.045));rgb=samplePatch(px,point.x,point.y,radius);}else{ // k-means in Lab: largest perceptual cluster among non-extreme pixels
 let samples=[];let stride=Math.max(2,Math.ceil(Math.sqrt(canvas.width*canvas.height/10000)));for(let y=0;y<canvas.height;y+=stride)for(let x=0;x<canvas.width;x+=stride){let i=(y*canvas.width+x)*4;if(px[i+3]<180)continue;let color=[px[i],px[i+1],px[i+2]],lab=rgbToLab(color);if(lab[0]<5||lab[0]>97)continue;samples.push({rgb:color,lab})}if(!samples.length){rgb=[px[0],px[1],px[2]]}else{let k=Math.min(6,samples.length),centers=[samples[0].lab];for(let c=1;c<k;c++){let best=samples[0],max=-1;for(let s of samples){let d=Math.min(...centers.map(v=>dist(v,s.lab)));if(d>max){max=d;best=s}}centers.push(best.lab.slice())}let groups=[];for(let iteration=0;iteration<9;iteration++){groups=Array.from({length:k},()=>({n:0,lab:[0,0,0],rgb:[0,0,0]}));for(let s of samples){let ci=0,md=Infinity;for(let j=0;j<k;j++){let d=dist(s.lab,centers[j]);if(d<md){md=d;ci=j}}let g=groups[ci];g.n++;for(let c=0;c<3;c++){g.lab[c]+=s.lab[c];g.rgb[c]+=s.rgb[c]}}centers=groups.map((g,i)=>g.n?g.lab.map(v=>v/g.n):centers[i])}groups.sort((a,b)=>b.n-a.n);rgb=groups[0].rgb.map(v=>v/groups[0].n)}}render(rgb)}
-function render(rgb){lastRgb=rgb.slice();const hex=rgbToHex(rgb),lab=rgbToLab(rgb),ranks=getActivePalette().map(c=>({...c,d:dist(c.lab,lab)})).sort((a,b)=>a.d-b.d),top=ranks[0];if(!top){document.getElementById('status').textContent='No colors loaded in this volume. Import Volume 2 JSON or switch back to Volume 1.';return}if(!selected||selected.name!==top.name)comboPage=0;selected=top;if(dressComboId!==null && (!(volumeForColor(top)===2?secondCombinations:historicalCombinations).has(dressComboId)||!(volumeForColor(top)===2?secondCombinations:historicalCombinations).get(dressComboId).some(c=>c.name===top.name))){document.getElementById('dressSection').classList.remove('visible');dressComboId=null}document.getElementById('results').classList.add('show');document.getElementById('analysisLabel').textContent=mode==='wada'?'Wada color selected':mode==='zona'?'Selected area':'Dominant color';document.getElementById('photoSwatch').style.background=hex;document.getElementById('wadaSwatch').style.background=top.hex;document.getElementById('photoName').textContent=mode==='wada'?'Selected Wada color':mode==='zona'?'Sampled area':'Dominant shade';document.getElementById('wadaName').textContent=top.name;document.getElementById('photoHex').textContent=hex.toUpperCase();document.getElementById('wadaHex').textContent=top.hex.toUpperCase();let wrap=document.getElementById('matches');wrap.replaceChildren();ranks.slice(1,5).forEach(item=>{let el=document.createElement('div');el.className='match';let chip=document.createElement('div');chip.className='chip';chip.style.background=item.hex;let mid=document.createElement('div'),name=document.createElement('strong'),sub=document.createElement('small'),d=document.createElement('span');name.textContent=item.name;sub.textContent=item.hex.toUpperCase();d.className='dist';d.textContent='ΔE '+item.d.toFixed(1);mid.append(name,sub);el.append(chip,mid,d);wrap.append(el)});document.getElementById('status').textContent='Closest match: ΔE '+top.d.toFixed(1)+' · '+getActivePalette().length+' colors compared.';renderCombinations()}
+function render(rgb){lastRgb=rgb.slice();const hex=rgbToHex(rgb),lab=rgbToLab(rgb),ranks=getActivePalette().map(c=>({...c,d:dist(c.lab,lab)})).sort((a,b)=>a.d-b.d),top=ranks[0];if(!top){document.getElementById('status').textContent='No colors loaded in this volume. Import Volume 2 JSON or switch back to Volume 1.';return}if(!selected||selected.name!==top.name)comboPage=0;selected=top;if(dressComboId!==null && (!(volumeForColor(top)===2?secondCombinations:historicalCombinations).has(dressComboId)||!(volumeForColor(top)===2?secondCombinations:historicalCombinations).get(dressComboId).some(c=>c.name===top.name))){document.getElementById('dressSection').classList.remove('visible');dressComboId=null}document.getElementById('results').classList.add('show');document.getElementById('analysisLabel').textContent=mode==='wada'?'Wada color selected':mode==='zona'?'Selected area':'Dominant color';document.getElementById('photoSwatch').style.background=hex;document.getElementById('wadaSwatch').style.background=top.hex;document.getElementById('photoName').textContent=mode==='wada'?'Selected Wada color':mode==='zona'?'Sampled area':'Dominant shade';document.getElementById('wadaName').textContent=top.name;document.getElementById('photoHex').textContent=hex.toUpperCase();document.getElementById('wadaHex').textContent=top.hex.toUpperCase();let wrap=document.getElementById('matches');wrap.replaceChildren();ranks.slice(1,5).forEach(item=>{let el=document.createElement('div');el.className='match';let chip=document.createElement('div');chip.className='chip';chip.style.background=item.hex;let mid=document.createElement('div'),name=document.createElement('strong'),sub=document.createElement('small'),d=document.createElement('span');name.textContent=item.name;sub.textContent=item.hex.toUpperCase();d.className='dist';d.textContent='ΔE '+item.d.toFixed(1);mid.append(name,sub);el.append(chip,mid,d);wrap.append(el)});document.getElementById('status').textContent='Closest match: ΔE '+top.d.toFixed(1)+' · '+getActivePalette().length+' colors compared.';renderCombinations();scheduleOutfitUrlSave()}
 let comboPage=0;const COMBO_PAGE_SIZE=8;
 function renderCombinations(){
  const grid=document.getElementById('combinationGrid'),note=document.getElementById('combinationNote'),count=document.getElementById('combinationCount'),more=document.getElementById('combinationMore');
@@ -258,7 +258,7 @@ function renderCombinations(){
 document.getElementById('combinationSize').addEventListener('change',()=>{comboPage=0;renderCombinations()});
 document.getElementById('combinationMore').addEventListener('click',()=>{comboPage++;renderCombinations()});
 document.getElementById('cameraBtn').onclick=()=>document.getElementById('camera').click();document.getElementById('uploadBtn').onclick=()=>document.getElementById('upload').click();['camera','upload'].forEach(id=>document.getElementById(id).addEventListener('change',e=>{takeFile(e.target.files[0]);e.target.value=''}));photo.addEventListener('click',e=>{if(!hasImage)return;let box=canvas.getBoundingClientRect(),x=(e.clientX-box.left)/box.width,y=(e.clientY-box.top)/box.height;if(x<0||x>1||y<0||y>1)return; // canvas rendered with object-fit contain: account for letterboxing
-let ratio=Math.min(box.width/canvas.width,box.height/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio,ox=(box.width-w)/2,oy=(box.height-h)/2;let px=(e.clientX-box.left-ox)/w,py=(e.clientY-box.top-oy)/h;if(px<0||px>1||py<0||py>1)return;if(selectingGray){grayPoint={x:px,y:py};selectingGray=false;photo.classList.remove('pick-gray');document.getElementById('grayBtn').textContent='◉ Recalibrate gray card';let gt=document.getElementById('grayTarget');gt.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';gt.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';gt.classList.add('visible');computeGrayCalibration();analyse();return}point={x:px,y:py};mode='zona';target.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';target.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';target.classList.add('visible');analyse()});document.getElementById('correction').onchange=analyse;document.getElementById('copyBtn').onclick=async()=>{if(!selected)return;let value=selected.name+' '+selected.hex.toUpperCase();try{await navigator.clipboard.writeText(value);document.getElementById('copyBtn').textContent='✓ Copied';setTimeout(()=>document.getElementById('copyBtn').textContent='Copy Wada color',1500)}catch{prompt('Copy color:',value)}};if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=44.1').catch(()=>{});
+let ratio=Math.min(box.width/canvas.width,box.height/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio,ox=(box.width-w)/2,oy=(box.height-h)/2;let px=(e.clientX-box.left-ox)/w,py=(e.clientY-box.top-oy)/h;if(px<0||px>1||py<0||py>1)return;if(selectingGray){grayPoint={x:px,y:py};selectingGray=false;photo.classList.remove('pick-gray');document.getElementById('grayBtn').textContent='◉ Recalibrate gray card';let gt=document.getElementById('grayTarget');gt.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';gt.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';gt.classList.add('visible');computeGrayCalibration();analyse();return}point={x:px,y:py};mode='zona';target.style.left=(e.clientX-photo.getBoundingClientRect().left)+'px';target.style.top=(e.clientY-photo.getBoundingClientRect().top)+'px';target.classList.add('visible');analyse()});document.getElementById('correction').onchange=analyse;document.getElementById('copyBtn').onclick=async()=>{if(!selected)return;let value=selected.name+' '+selected.hex.toUpperCase();try{await navigator.clipboard.writeText(value);document.getElementById('copyBtn').textContent='✓ Copied';setTimeout(()=>document.getElementById('copyBtn').textContent='Copy Wada color',1500)}catch{prompt('Copy color:',value)}};if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=46-exp11').catch(()=>{});
 
 // First-run guide stored locally; can be reopened with Help.
 const overlay=document.getElementById('guideOverlay'),helpBtn=document.getElementById('helpBtn'),guideClose=document.getElementById('guideClose');
@@ -276,11 +276,11 @@ let dressComboId=null,dressColors=[];
 let dressColorTab='colors';
 const denimImages=Array(8).fill(null);
 const denimStatus=Array(8).fill(false);
-function loadDenimImages(){for(let i=0;i<8;i++){if(denimStatus[i])continue;denimStatus[i]=true;const im=new Image();im.onload=()=>{denimImages[i]=im;if(Object.values(dressState.denim).includes(i))renderDress()};im.onerror=()=>{denimStatus[i]=false;console.warn('Denim texture missing:',i+1)};im.src='assets/denim/denim-'+(i+1)+'.jpg?v=44.1';}}
+function loadDenimImages(){for(let i=0;i<8;i++){if(denimStatus[i])continue;denimStatus[i]=true;const im=new Image();im.onload=()=>{denimImages[i]=im;if(Object.values(dressState.denim).includes(i))renderDress()};im.onerror=()=>{denimStatus[i]=false;console.warn('Denim texture missing:',i+1)};im.src='assets/denim/denim-'+(i+1)+'.jpg?v=46-exp11';}}
 function denimFill(ctx,piece){const selected=dressState.denim[piece];if(selected===undefined||selected===null)return false;const im=denimImages[selected];if(!im)return false;const pattern=ctx.createPattern(im,'repeat');if(!pattern)return false;ctx.fillStyle=pattern;return true;}
 
 const SHOE_STYLE_FIXED='sneakers';
-const dressState={gender:'man',top:'tee',bottom:'trousers',colors:{top:0,jacket:1,bottom:1,tights:0,neck:0},skin:'#d6a27a',hair:'#4a3426',shoeStyle:SHOE_STYLE_FIXED,shoeColor:'#ffffff',tightsColor:null,showTights:false,neck:'none',denim:{},patterns:{},strokes:{}};
+const dressState={gender:'man',top:'tee',bottom:'trousers',colors:{top:0,jacket:1,bottom:1,tights:0,neck:0},skin:'#e9bf9b',hair:'#4a3426',shoeStyle:SHOE_STYLE_FIXED,shoeColor:'#ffffff',tightsColor:null,showTights:false,neck:'none',denim:{},patterns:{},strokes:{}};
 const dressTops={
  man:[['tee','T-shirt'],['tee-jacket','T-shirt + jacket'],['shirt','Shirt'],['shirt-jacket','Shirt + jacket']],
  woman:[['tee','T-shirt'],['tee-jacket','T-shirt + jacket'],['shirt','Shirt'],['shirt-jacket','Shirt + jacket']]
@@ -399,6 +399,103 @@ function renderDress(){
  });
  refreshShoeColorButtons();refreshHairColorButtons();refreshPatternPanel();drawOutfit();
 }
+
+let outfitUrlEnabled=false,outfitUrlLoading=false,outfitUrlTimer=null;
+const outfitHex=x=>typeof x==='string'&&/^#[0-9a-f]{6}$/i.test(x);
+function packOutfit(obj){
+ const b=new TextEncoder().encode(JSON.stringify(obj));let str='';
+ for(let i=0;i<b.length;i+=8192)str+=String.fromCharCode(...b.subarray(i,i+8192));
+ return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function unpackOutfit(token){
+ if(!/^[A-Za-z0-9_-]{1,200000}$/.test(token))throw Error('Invalid outfit link');
+ const binary=atob(token.replace(/-/g,'+').replace(/_/g,'/'));
+ return JSON.parse(new TextDecoder().decode(Uint8Array.from(binary,ch=>ch.charCodeAt(0))));
+}
+function outfitUrlState(){
+ return {v:1,rgb:lastRgb,mode,combo:dressComboId,palette:dressColors.map(c=>[c.name,c.hex,!!c.custom]),
+ gender:dressState.gender,top:dressState.top,bottom:dressState.bottom,colors:dressState.colors,
+ skin:dressState.skin,hair:dressState.hair,shoes:dressState.shoeColor,neck:dressState.neck,
+ tights:dressState.tightsColor,showTights:dressState.showTights,denim:dressState.denim,
+ patterns:dressState.patterns,strokes:dressState.strokes,piece:activePiece,tab:dressColorTab,
+ size:document.getElementById('combinationSize').value};
+}
+function flushOutfitUrl(){
+ if(!outfitUrlEnabled||outfitUrlLoading||(!selected&&!dressColors.length))return;
+ try{
+  const url=new URL(location.href);url.searchParams.set('look',packOutfit(outfitUrlState()));
+  if(url.href.length>60000){console.warn('Outfit link exceeds the safe shareable size');return}
+  if(url.href!==location.href)history.replaceState(history.state,'',url.href);
+ }catch(err){console.warn('Cannot save outfit URL',err)}
+}
+function scheduleOutfitUrlSave(){
+ if(!outfitUrlEnabled||outfitUrlLoading)return;
+ clearTimeout(outfitUrlTimer);outfitUrlTimer=setTimeout(flushOutfitUrl,100);
+}
+function restoreOutfitUrl(){
+ const token=new URL(location.href).searchParams.get('look');if(!token)return false;
+ outfitUrlLoading=true;
+ try{
+  const x=unpackOutfit(token);
+  if(x.v!==1||!Array.isArray(x.palette))throw Error('Unsupported outfit link');
+  if(['all','2','3','4'].includes(x.size))document.getElementById('combinationSize').value=x.size;
+  if(Array.isArray(x.rgb)&&x.rgb.length===3&&x.rgb.every(n=>Number.isFinite(n)&&n>=0&&n<=255)){
+   mode=x.mode==='wada'?'wada':'dominante';render(x.rgb);
+  }
+  const pal=x.palette.slice(0,40).filter(c=>Array.isArray(c)&&outfitHex(c[1]))
+   .map(c=>({name:String(c[0]||'Color').slice(0,100),hex:c[1].toLowerCase(),custom:!!c[2]}));
+  if(!pal.length)return true;
+  dressColors=pal;dressComboId=typeof x.combo==='string'||typeof x.combo==='number'?x.combo:null;
+  dressState.gender=x.gender==='woman'?'woman':'man';
+  if(dressTops[dressState.gender].some(t=>t[0]===x.top))dressState.top=x.top;
+  if(dressBottoms[dressState.gender].some(t=>t[0]===x.bottom))dressState.bottom=x.bottom;
+  for(const p of ['top','jacket','bottom','tights','neck'])
+   if(Number.isInteger(x.colors?.[p])&&x.colors[p]>=0&&x.colors[p]<pal.length)dressState.colors[p]=x.colors[p];
+  if(['#f5dcc7','#e9bf9b','#915837'].includes(x.skin))dressState.skin=x.skin;
+  if(HAIR_COLORS.some(c=>c.hex===x.hair))dressState.hair=x.hair;
+  if(outfitHex(x.shoes))dressState.shoeColor=x.shoes.toLowerCase();
+  if(['none','tie','scarf'].includes(x.neck))dressState.neck=x.neck;
+  dressState.showTights=x.showTights===true;
+  dressState.tightsColor=outfitHex(x.tights)?x.tights:null;
+  dressState.denim={};dressState.patterns={};dressState.strokes={};
+  const pieces=['top','jacket','bottom','tights','neck','shoes'];
+  for(const p of pieces){
+   const den=x.denim?.[p];
+   if(Number.isInteger(den)&&den>=0&&den<8)dressState.denim[p]=den;
+   const cfg=x.patterns?.[p];
+   if(cfg&&typeof cfg==='object'&&!Array.isArray(cfg)){
+    const allowed=['solid','draw','stripes','checks','dots','tiger','leopard','jaguar','wavy','floral','military','paisley','houndstooth'];
+    const num=(v,def,min,max)=>Number.isFinite(v)?Math.max(min,Math.min(max,v)):def;
+    dressState.patterns[p]={type:allowed.includes(cfg.type)?cfg.type:'solid',size:num(cfg.size,10,3,200),
+     angle:num(cfg.angle,0,-360,360),dotSize:num(cfg.dotSize,10,2,100),
+     accent:num(cfg.accent,0,0,pal.length-1),brush:num(cfg.brush,8,1,100)};
+   }
+   if(Array.isArray(x.strokes?.[p]))dressState.strokes[p]=x.strokes[p].slice(0,100)
+    .filter(t=>t&&outfitHex(t.color)&&Number.isFinite(t.size)&&Array.isArray(t.points))
+    .map(t=>({color:t.color,size:Math.max(1,Math.min(100,t.size)),points:t.points.slice(0,1500)
+     .filter(pt=>Array.isArray(pt)&&pt.length===2&&pt.every(n=>Number.isFinite(n)&&n>=0&&n<=1500))}));
+  }
+  document.getElementById('dressGender').value=dressState.gender;
+  document.getElementById('dressSkin').value=dressState.skin;
+  refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();
+  dressColorTab=x.tab==='denim'?'denim':'colors';
+  activePiece=pieces.includes(x.piece)?x.piece:'top';
+  document.getElementById('dressSection').classList.add('visible');
+  document.getElementById('dressCombinationLabel').textContent=dressComboId!=null?'Shared combination #'+dressComboId:'Shared outfit';
+  refreshDressPalette();refreshGarmentQuickButtons();renderDress();
+  return true;
+ }catch(err){console.warn('Could not restore outfit URL',err);return false}
+ finally{outfitUrlLoading=false}
+}
+async function copyOutfitUrl(){
+ clearTimeout(outfitUrlTimer);flushOutfitUrl();
+ const btn=document.getElementById('dressCopyLink');
+ try{if(!navigator.clipboard?.writeText)throw Error('No clipboard');
+  await navigator.clipboard.writeText(location.href);
+  btn.textContent='✓ Link copied';setTimeout(()=>btn.textContent='Copy outfit link',1800);
+ }catch(err){prompt('Copy outfit link:',location.href)}
+}
+
 // Editorial raster templates: transparent garment apertures + independent grayscale ink overlay.
 const TEMPLATE_SIZE={w:1086,h:1448};
 function hideOutfitSwatches(ctx){ctx.save();ctx.fillStyle='#ffffff';ctx.fillRect(0,1238,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h-1238);ctx.restore()}
@@ -735,7 +832,7 @@ const editorialSwatches = {
 };
 function activeEditorialKey(){return EDITORIAL_LOOKS[[dressState.gender,dressState.top,dressState.bottom].join('|')]||null}
 function loadEditorialPicture(path){
- return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Unable to load '+path));image.src='assets/editorial/'+path+'?v=44.1'})
+ return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Unable to load '+path));image.src='assets/editorial/'+path+'?v=46-exp11'})
 }
 function loadEditorialLook(key){
  if(editorialAssetCache.has(key))return editorialAssetCache.get(key);
@@ -785,6 +882,65 @@ function editorialBodyTint(ctx,mask,color,opacity=0.96){
  ctx.save();ctx.globalCompositeOperation='source-over';ctx.globalAlpha=opacity;
  ctx.drawImage(layer,0,0);ctx.restore();
 }
+
+// Portrait compositor: four independent logical layers, all derived from the
+// existing editorial assets. No generated palette image copies and no pixel readback.
+function portraitMask(hair,skin){
+ const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
+ const layer=document.createElement('canvas');layer.width=w;layer.height=h;
+ const c=layer.getContext('2d');
+ c.drawImage(hair,0,0,w,h);
+ if(skin){
+   c.globalCompositeOperation='destination-out';
+   c.drawImage(skin,0,0,w,h);
+   // Allow for mask antialiasing along the hairline, without affecting the hair elsewhere.
+   c.save();c.beginPath();c.rect(0,0,w,245);c.clip();
+   for(const [dx,dy] of [[-5,0],[5,0],[0,-5],[0,5]])
+     c.drawImage(skin,dx,dy,w,h);
+   c.restore();
+ }
+ c.globalCompositeOperation='source-over';
+ return layer;
+}
+function portraitDarken(hex,ratio=.33){
+ const v=hexChannels(hex);return '#'+v.map(c=>Math.max(0,Math.round(c*(1-ratio))).toString(16).padStart(2,'0')).join('');
+}
+function editorialHairTint(ctx,hairMask,skinMask,color){
+ if(!hairMask)return;
+ const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
+ const hair=portraitMask(hairMask,skinMask);
+ // Every intermediate canvas MUST be alpha-clipped to the hair silhouette:
+ // a blend-mode fill over an unmasked canvas previously painted the entire
+ // page with hair color, hiding the body and background.
+ const details=document.createElement('canvas');details.width=w;details.height=h;
+ const d=details.getContext('2d');
+ d.drawImage(ctx.canvas,0,0,w,h);
+ // Screen replaces original near-black strand ink with the selected hair's
+ // darker shade while leaving bright highlights intact.
+ d.globalCompositeOperation='screen';
+ d.fillStyle=portraitDarken(color,.33);d.fillRect(0,0,w,h);
+ d.globalCompositeOperation='destination-in';d.drawImage(hair,0,0,w,h);
+ d.globalCompositeOperation='source-over';
+
+ const layer=document.createElement('canvas');layer.width=w;layer.height=h;
+ const c=layer.getContext('2d');
+ c.fillStyle=color;c.fillRect(0,0,w,h);
+ c.globalCompositeOperation='destination-in';c.drawImage(hair,0,0,w,h);
+ c.globalCompositeOperation='multiply';c.drawImage(details,0,0,w,h);
+ c.globalCompositeOperation='source-over';
+ ctx.save();ctx.globalCompositeOperation='source-over';ctx.drawImage(layer,0,0);ctx.restore();
+}
+function editorialFaceInk(ctx,base){
+ if(!base.skin||!base.base)return;
+ const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
+ const ink=document.createElement('canvas');ink.width=w;ink.height=245;
+ const c=ink.getContext('2d');c.drawImage(base.base,0,0);
+ c.globalCompositeOperation='destination-in';c.drawImage(base.skin,0,0,w,h);
+ // Restore facial outlines after skin tint. Hair is excluded by its own layer.
+ ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.60;
+ ctx.drawImage(ink,0,0);ctx.restore();
+}
+
 let editorialRenderNonce=0;
 async function drawNewEditorial(){
  const nonce=++editorialRenderNonce,key=activeEditorialKey(),preview=document.getElementById('dressPreview');
@@ -801,7 +957,8 @@ async function drawNewEditorial(){
  if(assets.shoes)c.drawImage(editorialColoredLayer('shoes',assets.shoes),0,0);
  // The base image remains in full: eyes, nose, hair, hands and natural folds.
  if(assets.skin)editorialBodyTint(c,assets.skin,dressState.skin,.96);else console.warn('Skin mask missing for',key);
- if(assets.hair)editorialBodyTint(c,assets.hair,dressState.hair,.85);
+ editorialFaceInk(c,assets);
+ if(assets.hair)editorialHairTint(c,assets.hair,assets.skin,dressState.hair);
  if(dressState.neck!=='none')drawNeckLayer(c,dressState.gender);
  hideOutfitSwatches(c);
  canvas.setAttribute('aria-label','Illustrated '+key.replaceAll('-',' ')+' with colorable clothing');
@@ -811,8 +968,11 @@ async function drawNewEditorial(){
 
 async function drawOutfit(){
  aiUpdatePreviousFlag();
+ scheduleOutfitUrlSave();
  try{
-  if(activeEditorialKey()){modularNonce++;renderNonce++;await drawNewEditorial()}
+  if(manLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredMan()}
+   else if(womanLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredWoman()}
+   else if(activeEditorialKey()){modularNonce++;renderNonce++;await drawNewEditorial()}
   else{editorialRenderNonce++;renderNonce++;await drawModularOutfit()}
  }catch(e){console.error(e);document.getElementById('dressStatus').textContent='Template unavailable, using simple fallback: '+e.message;editorialRenderNonce++;renderNonce++;await drawModularOutfit()}
 }
@@ -836,6 +996,8 @@ function maskPixel(image,pt){
  }catch(e){return null} // file:// readback may be restricted; fall back to geometry.
 }
 async function garmentFromIllustration(pt){
+  if(manLayerActive()){const picked=await manLayerHitTest(pt);if(picked)return picked;}
+  if(womanLayerActive()){const picked=await womanLayerHitTest(pt);if(picked)return picked;}
  const key=activeEditorialKey();
  try{
   if(key){const assets=await loadEditorialLook(key);const pieces=['top','jacket','bottom','shoes'].filter(p=>editorialSwatches[key][p]);
@@ -945,7 +1107,7 @@ initGarmentEditor();
 for(const id of ['dressGender','dressTop','dressBottom','dressSkin'])document.getElementById(id).addEventListener('change',e=>{const key={dressGender:'gender',dressTop:'top',dressBottom:'bottom',dressSkin:'skin'}[id];dressState[key]=e.target.value;if(key==='gender'){refreshDressTops();refreshDressBottoms();refreshShoeOptions()}if(key==='top')refreshNeckOptions();dressState.shoeStyle=SHOE_STYLE_FIXED;if(activePiece!=='shoes'&&!dressPieces().includes(activePiece))activePiece='top';closeGarmentEditor();refreshGarmentQuickButtons();renderDress()});
 document.getElementById('dressNeck').addEventListener('change',e=>{dressState.neck=e.target.value;if(activePiece!=='shoes'&&!dressPieces().includes(activePiece))activePiece='top';closeGarmentEditor();refreshGarmentQuickButtons();renderDress()});
 const dressShoesEl=document.getElementById('dressShoes');if(dressShoesEl)dressShoesEl.addEventListener('change',e=>{dressState.shoeStyle=e.target.value;drawOutfit()});
-document.getElementById('dressReset').addEventListener('click',()=>{dressState.gender='man';dressState.top='tee';dressState.bottom='trousers';dressState.colors={top:0,jacket:Math.min(1,dressColors.length-1),bottom:Math.min(1,dressColors.length-1),tights:0,neck:0};dressState.skin='#d6a27a';dressState.hair='#4a3426';dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';dressState.shoeStyle=SHOE_STYLE_FIXED;dressState.shoeColor='#ffffff';dressState.denim={};dressState.patterns={};dressState.strokes={};activePiece='top';closeGarmentEditor();garmentPaintMode=false;document.getElementById('dressPaintBanner').hidden=true;document.getElementById('dressSkin').value=dressState.skin;document.getElementById('dressGender').value=dressState.gender;refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();refreshGarmentQuickButtons();renderDress();document.getElementById('dressStatus').textContent='Outfit reset.'});
+document.getElementById('dressReset').addEventListener('click',()=>{dressState.gender='man';dressState.top='tee';dressState.bottom='trousers';dressState.colors={top:0,jacket:Math.min(1,dressColors.length-1),bottom:Math.min(1,dressColors.length-1),tights:0,neck:0};dressState.skin='#e9bf9b';dressState.hair='#4a3426';dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';dressState.shoeStyle=SHOE_STYLE_FIXED;dressState.shoeColor='#ffffff';dressState.denim={};dressState.patterns={};dressState.strokes={};activePiece='top';closeGarmentEditor();garmentPaintMode=false;document.getElementById('dressPaintBanner').hidden=true;document.getElementById('dressSkin').value=dressState.skin;document.getElementById('dressGender').value=dressState.gender;refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();refreshGarmentQuickButtons();renderDress();document.getElementById('dressStatus').textContent='Outfit reset.'});
 function outfitFilename(){return 'wada-lens-outfit-'+dressState.gender+'.png'}
 function saveOutfitBlob(blob){
  const url=URL.createObjectURL(blob),a=document.createElement('a');
@@ -1267,3 +1429,37 @@ document.getElementById('dressCustomAdd')?.addEventListener('click',addDressCust
 document.getElementById('dressColorTabColors')?.addEventListener('click',()=>selectDressColorTab('colors'));
 document.getElementById('dressColorTabDenim')?.addEventListener('click',()=>selectDressColorTab('denim'));
 loadDenimImages();
+
+/* Optional one-look preview, active ONLY with ?womanDemo=1 on experiment.
+   Selects real Wada colors and displays independently colored female vectors. */
+function openWomanExperimentalDemo(){
+  const names=['Fawn','Dusky Madder Violet','Ivory Buff'];
+  const selectedColors=names.map(name=>palette.find(c=>c.name===name));
+  if(selectedColors.some(x=>!x)){console.warn('Woman demo: palette colors missing');return;}
+  dressColors=selectedColors;
+  dressComboId='woman-demo';
+  dressState.gender='woman';
+  dressState.top='shirt-jacket';
+  dressState.bottom='trousers';
+  dressState.colors={top:0,jacket:1,bottom:2,tights:0,neck:0};
+  dressState.shoeColor='#ffffff';
+  dressState.neck='none';
+  dressState.denim={};dressState.patterns={};dressState.strokes={};
+  dressState.showTights=false;dressState.tightsColor=null;
+  const section=document.getElementById('dressSection');
+  section.classList.add('visible');
+  document.getElementById('dressCombinationLabel').textContent=
+    'WOMAN DEMO · Shirt Fawn · Jacket Dusky Madder Violet · Trousers Ivory Buff · White shoes';
+  document.getElementById('dressGender').value='woman';
+  refreshDressPalette();refreshDressTops();refreshDressBottoms();
+  refreshShoeOptions();refreshNeckOptions();refreshGarmentQuickButtons();
+  renderDress();
+  section.scrollIntoView({block:'start'});
+}
+if(!restoreOutfitUrl()&&new URLSearchParams(location.search).get('womanDemo')==='1')
+  queueMicrotask(openWomanExperimentalDemo);
+outfitUrlEnabled=true;
+document.getElementById('dressCopyLink').addEventListener('click',copyOutfitUrl);
+document.getElementById('combinationSize').addEventListener('change',scheduleOutfitUrlSave);
+window.addEventListener('pagehide',()=>{clearTimeout(outfitUrlTimer);flushOutfitUrl()});
+window.addEventListener('popstate',restoreOutfitUrl);

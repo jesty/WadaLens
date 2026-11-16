@@ -163,3 +163,64 @@ All eight denim textures have been cropped to the fabric itself, removing leftov
 ## Garment-first Dress Me editor (v44)
 
 Tap an item on the croquis (or use the accessible garment shortcuts above it) to open a drawer / mobile bottom sheet with color, denim, patterns, Free Draw and custom colors for **that item only**. Shoes are editable from the same drawer. Close with ×, tapping outside or Escape. The original palette, outfit export, social sharing and AI providers remain available.
+
+
+## Experimental male precolored layers (branch only)
+
+The branch \`experiment/man-precolored-layers\` uses a separate renderer for male T-shirt, shirt, jacket and trouser outfits. All 159 original Wada colors have pre-generated transparent SVG files for trousers, tee, shirt, jacket, tie and scarf (954 solid-color assets); these are aligned to a common 1086×1448 canvas. The new renderer composites the already colored garment files rather than painting large colored rectangles over the editorial model.
+
+Polka dots, stripes, checks, animal prints, floral, paisley, houndstooth, denim and freehand strokes are applied as dynamic overlays clipped by the corresponding exact same garment layer alpha. Custom and imported Volume 2 colors use a fallback generated from the identical vector silhouette. The original women's renderer and all other features are unchanged. Set \`USE_LAYERED_MAN_RENDER\` to \`false\` in \`man-layered.js\` to compare with the existing male renderer.
+
+SVG was chosen instead of duplicate PNGs to keep all 954 precolored assets small, transparent and sharp; the file is still a precolored, independently composited garment layer. These extra 954 images are fetched and cached on demand (not all precached on PWA install). This is experimental: detailed visual alignment, torso/jacket masking and device testing are still required before merging.
+
+### Approved shirt and jacket designs (experiment 2)
+The first approved single-breasted blazer and second approved classic shirt have been rebuilt as aligned transparent, precolored SVG garment layers for all 159 Wada colors. The new blazer includes shaped notch lapels, chest welt pocket, two front flap pockets, seam details, and two unfilled button outlines; the shirt includes a pointed collar, button placket and six unfilled button outlines. Their source silhouettes were traced and simplified from the approved artwork and aligned to the 1086×1448 male canvas. The original approved concept PNGs are not embedded; this is an SVG adaptation for compositing. Detail drawings are separate from color fills. Skin and hair recoloring now happens behind the garment layers. Review the alignment on the branch before merging.
+
+### Experiment 3: registration and shoes
+Male shirt and jacket layers now use per-garment registration transforms, the shirt's upper neck fill is cut away so skin is visible, and old garment outlines on the baked-in editorial base are neutralized before compositing independent layers. The hand regions are restored above cuff layers. Shoe color and patterns now use a full two-shoe vector clipping path with original lace/outline texture applied on top, replacing the old toe-only shoes mask. The tee SVG is unchanged. Check edge alignment and footwear silhouettes on real devices before merging.
+
+### Experiment 4 — consistent male body, hands and complete shoes
+All four male looks now align to one canonical `man-tee-trousers` body, avoiding the previous shirt/jacket template offset. The approved T-shirt SVG and T-shirt-only base draw remain unchanged. For shirt/jacket combinations, an offscreen alpha-isolated body and skin/hair tint are rendered before the independently colored garments, so old white garment outlines no longer double the new drawings. The problematic second hand pass above jacket sleeves has been removed. Full-shoe clipped paths are traced to the canonical source footwear (including the full toe and outsole), and the original lace/sole art is multiplied within their bounds. This remains an experimental branch: verify final silhouette and pattern masks visually before merging.
+
+### Experiment 6 — user-calibrated registration and footwear crop
+Applied user-confirmed alignment: shirt (dx=3,dy=-29,sx=.99,sy=1), jacket (dx=9,dy=-17,sx=1,sy=1.005), tie (dx=0,dy=-35,sx=1,sy=1), scarf (dx=6,dy=-12,sx=1,sy=1), shoes (identity). Male experimental renderer uses a dedicated lower mask at y=1280 instead of the generic y=1238 swatch crop, exposing the shoe toes and soles while preserving the legacy renderer unchanged for women.
+
+
+## Experiment 46: female modular precolored garments
+Eight independent female garment shapes (tee, shirt, jacket, trousers, knee skirt, shoes, tie, scarf) are now stored as 159 transparent, precolored SVGs each: 1,272 new colored layers plus separate detail files. They use canonical women tee/trouser or tee/skirt illustrations for skin, hair and visible limbs, without any baked-in original garments. Existing polka dots, stripes, denim, free-draw strokes and other patterns remain dynamic and are masked by the corresponding colored layer's alpha. Each garment has independent dx/dy/sx/sy values in \`woman-layered.js\`; use Chrome DevTools for visual calibration. The existing male renderer, woman legacy image assets and \`main\` are untouched. This is an experiment: detailed alignment is not yet user-calibrated.
+
+
+## Woman test outfit (?womanDemo=1)
+The experiment now includes one deliberately selected female look with a redesigned classic pointed-collar shirt (Fawn \`#D1B0B3\`), fitted single-button blazer with notched lapels (Vinaceous Cinnamon \`#F59994\`), trousers (Ivory Buff \`#EBD999\`) and white shoes (\`#FFFFFF\`). The chosen Wada SVG fills and matching demonstration-specific detail overlays are enabled only when loading the experimental app with \`?womanDemo=1\`. All other 159-color variants keep their existing detail layers. Visual alignment should be checked in a browser and calibrated using \`development/woman-alignment-console.js\`.
+
+
+## Experiment 46-exp3: repaired woman jacket (all Wada colors)
+All 159 precolored female jacket SVGs now derive from the SAME two continuous, opaque blazer panels. The open V neck remains transparent to show the shirt. The collar/notched lapels and pocket flaps use a single shared detail file with very thin (1.45 SVG unit) ivory-white lapel accents, instead of transparent gaps. The active female demo jacket is now Dusky Madder Violet (#2D0060) over Fawn (#D1B0B3) shirt, with Ivory Buff trousers and white shoes. The prior demo-specific jacket details are no longer used. Female garments other than jacket are unchanged. This is still an experimental, browser-alignment-test branch.
+
+
+### Experiment 46-exp4 — real folded lapels on women’s jackets
+Every one of the 159 women's jacket color SVGs now contains **two separately filled, tonal folded notched lapel surfaces** rather than strokes placed directly on the body. The fabric fold is highlighted or shaded automatically depending on the Wada color, while the open V remains truly transparent. Shared dark construction outlines and 1px pale seams show the lapel edges. Only the woman's jacket SVG set and its detail file changed; men's jacket assets, all shirts, and other garments were not touched. Review in the experimental woman demo before merging.
+
+
+### Experiment 46-exp5 — complete female jacket front from visual reference
+The women’s jacket has been restructured after review of the user’s jacket reference. The neckline remains open at the top, while the colored fabric now meets at the front button line and closes the former hole in the chest/waist. Folded, notched lapels are full independent colored fabric polygons, with clearly defined dark outlines and fine ivory decorative strokes; buttons remain hollow circles. Minor joining fabric behind the collar notches prevents unwanted transparent triangles. All 159 Wada-colored female jacket SVGs were rebuilt from the identical template. No changes to the male garment SVGs or other female garments.
+
+
+### Experiment 46-exp6 — approved single-color female blazer
+All 159 female blazer variants use a shared, fitted, single-color silhouette (including the approved #2D0060 violet); the only transparent body region is the upper V neckline, with the front closed beneath. Proper notched lapels are indicated by very thin shared white line art, not a second fabric color. Hollow outlined buttons, flap pockets and rounded hems follow the reference. All 159 color SVGs plus the single shared details.svg were regenerated; male garments and other female assets were not changed.
+
+
+### Experiment 46-exp7: approved woman blazer directly traced, not redesigned
+The 159 female blazer SVG fills now share the exact polygon outline traced from the approved violet preview (source width 1194×1317), uniformly scaled/registered into the 1086×1448 woman figurine canvas. The notched lapels are separate outline paths from the same approved image, not tinted triangles; deep V neckline is transparent, fabric is one solid color, and the two button circles are unfilled. Male SVG assets are unchanged. This is a geometric trace of the approved preview, not a new invented jacket shape.
+
+
+### Experiment 46-exp9 — woman's approved option 1 shirt
+Replaced all 159 precolored women’s shirt SVGs with a consistent fitted, long-sleeve tailored blouse, recreating the selected first shirt concept: separate sharp notched collar flaps, a hollow neck opening (no backing line crossing the model's neck), central placket, five empty outline buttons, black construction seams and cuffs. The same shared `details.svg` is now used in normal outfits and in `?womanDemo=1`; the old `details-demo.svg` is no longer referenced. Female jacket and male clothing assets unchanged. Fine registration still requires visual validation.
+
+
+### Experiment 46-exp10 — refine the approved option 1 women's blouse
+All 159 female shirt SVGs now use a single carefully defined fitted blouse silhouette with conspicuous notched pointed collar wings and the deeper V opening of the original first concept. Black shared detail contours (2.7 SVG units on the main seams), tailored waist and curved hem, visible sleeve cuffs and five hollow outlined buttons are kept separate from the single-color fills. The front neck area is genuinely transparent and has no horizontal bridge over the person's throat. No changes to jacket layers or any male garments.
+
+
+### Experiment 46-exp11 — approved pink women’s shirt, faithful silhouette trace
+Replaced the previous hand-interpreted blouse with a single silhouette traced directly from the last **user-approved pink shirt image** (1194×1317 source coordinates). All 159 Wada shirts share the same single-color silhouette and the same black line-art details. The collar is a traditional pointed open collar (not the previously invented notched lapel), with the original button placket and **six hollow circle buttons**, curved hem, fitted waist, and long sleeves with cuffs. Its independent fill and shared detail asset use identical transforms to the 1086×1448 figurine space. No female jacket, male garment or main-branch assets are changed.
