@@ -2,7 +2,7 @@
   "version": 1,
   "volume": 1,
   "combination": 165,
-  "status": "photographic concept assets - not yet aligned for live avatar compositing",
+  "status": "native garment sprite plus full-body pre-rendered experimental looks in Dress Me",
   "palette": [
     {
       "name": "Cameo Pink",
@@ -30,12 +30,12 @@
   ],
   "sprite": {
     "file": "garments-165.webp",
-    "width": 990,
-    "height": 195,
+    "width": 1320,
+    "height": 260,
     "columns": 6,
     "cell": {
-      "width": 165,
-      "height": 195
+      "width": 220,
+      "height": 260
     },
     "order": [
       "tee",
@@ -47,9 +47,22 @@
     ]
   },
   "caveats": [
-    "Assets are photographic experiments with light/shadow, not flat exact RGB pixel matches.",
-    "Individual foreground garments are not registered to the original WadaLens fashion body poses.",
-    "No changes were made to the existing interactive illustrated renderer.",
-    "Generated sneaker photos remain white as a neutral accessory."
-  ]
+    "Only Combination #165 is enabled for native photographic preview.",
+    "Whole-body photographic looks are fixed, pre-rendered images; they cannot be dynamically recolored or separately dressed yet.",
+    "Other garment/skin/hair/customization choices automatically return to the editable illustrated renderer.",
+    "Native garment sprite images are available for inspecting fabric details; they are not registered to the exact model pose.",
+    "Photographic pixels include real shading; their sampled RGB does not equal the source Wada color at every pixel."
+  ],
+  "looks": {
+    "man": "man-look.webp",
+    "woman": "woman-look.webp",
+    "preset": {
+      "top": "tee",
+      "jacket": true,
+      "bottom": "trousers",
+      "shoes": "white",
+      "skin": "medium",
+      "hair": "dark brown"
+    }
+  }
 }
