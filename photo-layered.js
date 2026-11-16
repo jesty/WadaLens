@@ -5,7 +5,7 @@
 let photoLayerView=false;
 let photoLayerRenderNonce=0;
 const photoLayerImages=new Map(),photoLayerBoxes=new WeakMap();
-const PHOTO_LAYERS_VERSION='photo-layer-v2-2';
+const PHOTO_LAYERS_VERSION='photo-layer-v2-4';
 
 function photoLayerImage(kind){
  const name=kind;
@@ -22,29 +22,35 @@ function photoLayerImage(kind){
  }
  return photoLayerImages.get(path);
 }
-function photoLayerBounds(image){
- if(photoLayerBoxes.has(image))return photoLayerBoxes.get(image);
+// Bounds are determined without getImageData: CDN-hosted assets can taint
+// canvases on preview hosts even while displaying normally.
+const PHOTO_LAYER_TARGET_BOXES={
+ man:{tee:[374,195,382,354],shirt:[374,175,382,410],jacket:[357,169,402,465],
+ trousers:[421,527,275,686],tie:[504,193,83,355],scarf:[441,185,211,220],shoes:[470,1030,150,245]},
+ woman:{tee:[390,186,308,349],shirt:[385,176,330,410],jacket:[356,165,392,466],
+ trousers:[426,516,255,711],skirt:[432,400,208,400],tie:[504,193,83,355],
+ scarf:[445,182,206,228],shoes:[465,1035,155,230]}
+};
+const PHOTO_LAYER_SOURCE_INSETS={
+ tee:[.08,.07,.84,.76],shirt:[.10,.07,.80,.79],jacket:[.04,.07,.92,.84],
+ trousers:[.19,.06,.62,.88],skirt:[.14,.08,.72,.76],
+ tie:[.30,.10,.40,.82],scarf:[.10,.08,.80,.82],shoes:[.07,.14,.86,.73]
+};
+function photoLayerBounds(image,kind,isMask,gender){
  const w=image.naturalWidth||image.width,h=image.naturalHeight||image.height;
- const cvs=document.createElement('canvas');cvs.width=w;cvs.height=h;
- const cx=cvs.getContext('2d',{willReadFrequently:true});
- cx.drawImage(image,0,0,w,h);
- const pixels=cx.getImageData(0,0,w,h).data;
- let left=w,right=-1,top=h,bottom=-1;
- const step=w>600?3:1;
- for(let y=0;y<h;y+=step)for(let x=0;x<w;x+=step){
-  if(pixels[(y*w+x)*4+3]<32)continue;
-  left=Math.min(left,x);right=Math.max(right,x);
-  top=Math.min(top,y);bottom=Math.max(bottom,y);
+ if(!w||!h)return null;
+ if(isMask){
+  const box=PHOTO_LAYER_TARGET_BOXES[gender]?.[kind];
+  if(!box)throw new Error('No registration box for '+gender+' '+kind);
+  return {x:box[0],y:box[1],width:box[2],height:box[3]};
  }
- const bounds=right<0?null:{x:Math.max(0,left-step),y:Math.max(0,top-step),
-  width:Math.min(w,right+step)-Math.max(0,left-step),
-  height:Math.min(h,bottom+step)-Math.max(0,top-step)};
- photoLayerBoxes.set(image,bounds);
- return bounds;
+ const inset=PHOTO_LAYER_SOURCE_INSETS[kind]||[0,0,1,1];
+ return {x:Math.round(inset[0]*w),y:Math.round(inset[1]*h),
+  width:Math.round(inset[2]*w),height:Math.round(inset[3]*h)};
 }
-function photoLayerTexture(mask,photo,hex,piece){
+function photoLayerTexture(mask,photo,hex,piece,kind,gender){
  const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
- const dest=photoLayerBounds(mask),crop=photoLayerBounds(photo);
+ const dest=photoLayerBounds(mask,kind,true,gender),crop=photoLayerBounds(photo,kind,false,gender);
  if(!dest||!crop)return null;
  const layer=document.createElement('canvas');layer.width=w;layer.height=h;
  const c=layer.getContext('2d');
@@ -102,7 +108,7 @@ async function drawPhotographicLayered(){
  if(!canvas)return;
  const c=canvas.getContext('2d');
  for(const {item,mask,photo,hex} of data){
-  const layer=photoLayerTexture(mask,photo,hex,item.piece);
+  const layer=photoLayerTexture(mask,photo,hex,item.piece,item.kind,woman?'woman':'man');
   if(!layer)continue;
   c.save();
   if(woman)womanApplyRegistration(c,item.kind);
