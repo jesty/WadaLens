@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>WadaLens · Photorealistic Combination #165</title>
+<style>
+:root{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#302b32;background:#f5f2f1}
+*{box-sizing:border-box}body{margin:0}button,a{font:inherit}button{cursor:pointer}
+.wrap{max-width:1240px;margin:auto;padding:24px clamp(16px,4vw,52px) 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.brand{font-size:19px;font-weight:850;letter-spacing:-.05em}.brand i{font-weight:500;font-family:Georgia,serif;color:#915b78}
+header a,.actions a,.actions button{border:1px solid #ded6d9;border-radius:11px;padding:11px 14px;text-decoration:none;color:inherit;background:white}
+.eyebrow{text-transform:uppercase;color:#7d6474;letter-spacing:.15em;font-size:11px;font-weight:750;margin:45px 0 10px}
+h1{font-size:clamp(30px,5vw,54px);letter-spacing:-.055em;line-height:1.09;margin:0 0 14px}
+.lede{line-height:1.65;color:#655b64;max-width:650px;margin:0 0 22px}
+.palette{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 28px}.tone{display:flex;gap:9px;align-items:center;padding:8px 11px;background:white;border:1px solid #e6e0e1;border-radius:12px;font-size:12px}.dot{width:26px;height:26px;border:1px solid #0001;border-radius:8px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px}
+.stage{background:#eeebea;border:1px solid #e0dadd;border-radius:20px;min-height:520px;position:relative;overflow:hidden}
+.stage img{display:block;margin:0 auto;width:auto;max-width:100%;height:min(74vh,750px);object-fit:contain;filter:drop-shadow(0 14px 22px #2c18271a)}
+.stage .loading{position:absolute;left:12px;bottom:12px;font-size:11px;color:#695e68;background:#fff9;padding:7px 10px;border-radius:8px}
+.sidebar{display:flex;flex-direction:column;gap:16px}
+.panel{border:1px solid #e4dce0;background:#fff;border-radius:16px;padding:16px}
+.panel strong{font-size:13px}.selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}
+.selector button{padding:11px;border:1px solid #ddd6dc;background:#faf8f9;border-radius:9px;font-weight:650}
+.selector button[aria-pressed=true]{background:#4f2e44;color:white;border-color:#4f2e44}
+.panel p{font-size:12px;line-height:1.7;color:#696068;margin:10px 0 0}
+.actions{display:flex;flex-direction:column;gap:9px}
+.actions a,.actions button{text-align:center;font-weight:650;min-height:44px}
+.actions .primary{background:#4f2e44;color:white;border-color:#4f2e44}
+.assets{margin-top:32px}.assets h2{font-size:18px}.catalogue{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px}
+.asset{background:white;border:1px solid #e8e0e3;border-radius:12px;padding:8px;text-align:center;min-width:0}
+.thumbnail{height:150px;background-image:url('../assets/photorealistic/combination-165/garments-165.webp');background-size:calc(100% * 6) 150px;background-repeat:no-repeat;background-position-y:0}
+.asset span{display:block;font-size:11px;font-weight:650;color:#60555d}
+small{display:block;color:#756b73;line-height:1.6;margin-top:18px}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.stage{min-height:380px}.stage img{height:min(62vh,580px)}.catalogue{grid-template-columns:repeat(3,minmax(0,1fr))}.thumbnail{height:120px;background-size:600% 120px}}
+@media(prefers-reduced-motion:no-preference){.stage img{transition:opacity .17s ease}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header><div class="brand">Wada<i>Lens.</i></div><a href="../index.html?photo165=1">Open in Dress Me</a></header>
+<p class="eyebrow">Native pre-generated photos · Volume I</p>
+<h1>Combination #165<br>Photorealistic experiment</h1>
+<p class="lede">Try the two photographic fashion models in the browser, then open the same preset in WadaLens Dress Me. This test is isolated from the illustrated renderer on <code>main</code>.</p>
+<div class="palette">
+<div class="tone"><span class="dot" style="background:#e6adcf"></span><span>Cameo Pink<br><b>#E6ADCF</b></span></div>
+<div class="tone"><span class="dot" style="background:#ff4dc9"></span><span>Spinel Red<br><b>#FF4DC9</b></span></div>
+<div class="tone"><span class="dot" style="background:#5c2c45"></span><span>Vistoris Lake<br><b>#5C2C45</b></span></div>
+</div>
+<div class="layout">
+<section class="stage" aria-label="Full-body photographic preview">
+<img id="model" src="../assets/photorealistic/combination-165/man-look.webp" alt="Male photographic model wearing the Combination 165 outfit" width="688" height="750">
+<div class="loading" id="status" aria-live="polite">Man · Cameo Pink top, Spinel Red jacket, Vistoris Lake trousers</div>
+</section>
+<aside class="sidebar">
+<div class="panel"><strong>Choose the model</strong><div class="selector" role="group" aria-label="Model">
+<button id="man" type="button" aria-pressed="true">Man</button>
+<button id="woman" type="button" aria-pressed="false">Woman</button>
+</div><p>The same palette is rendered for both models, with fixed studio photography and white sneakers.</p></div>
+<div class="panel"><strong>Outfit preset</strong><p>T-shirt + open jacket, trousers, white sneakers. Changes to other garments and colors are available in illustrated mode.</p></div>
+<div class="actions">
+<a class="primary" id="openDress" href="../index.html?photo165=1">Try this look in WadaLens</a>
+<a id="download" href="../assets/photorealistic/combination-165/man-look.webp" download="wadalens-165-man.webp">Download model image</a>
+<button id="copy" type="button">Copy preview link</button>
+</div>
+</aside></div>
+<section class="assets"><h2>Pre-generated garment catalogue</h2>
+<div class="catalogue" id="catalogue"></div>
+<small>These six garment images are individual photographic cutouts. They are for visual reference and are not yet pixel-registered to the full-body photographs. The full-body images are fixed presets, not dynamically composited clothing.</small>
+</section></main>
+<script>
+(()=>{'use strict';
+const genders=['man','woman'],name={man:'Man',woman:'Woman'};
+const model=document.getElementById('model'),download=document.getElementById('download'),status=document.getElementById('status');
+function show(gender){
+ if(!genders.includes(gender))gender='man';
+ const path='../assets/photorealistic/combination-165/'+gender+'-look.webp';
+ model.src=path;
+ model.alt=name[gender]+' photographic fashion model in Wada Combination 165';
+ download.href=path;download.download='wadalens-165-'+gender+'.webp';
+ for(const g of genders)document.getElementById(g).setAttribute('aria-pressed',String(g===gender));
+ status.textContent=name[gender]+' · Cameo Pink top, Spinel Red jacket, Vistoris Lake trousers';
+ const url=new URL(location.href);url.searchParams.set('gender',gender);
+ history.replaceState(null,'',url);
+ const app=new URL('../index.html',location.href);app.searchParams.set('photo165','1');app.searchParams.set('gender',gender);
+ document.getElementById('openDress').href=app.href;
+}
+for(const g of genders)document.getElementById(g).addEventListener('click',()=>show(g));
+model.addEventListener('error',()=>{status.textContent='Image unavailable. Check that the branch assets have been deployed.'});
+const labels=['T-shirt','Shirt','Jacket','Trousers','Skirt','Sneakers'],grid=document.getElementById('catalogue');
+labels.forEach((label,i)=>{const tile=document.createElement('div');tile.className='asset';
+const pic=document.createElement('div');pic.className='thumbnail';
+pic.style.backgroundPosition=(i*20)+'% 0';
+const text=document.createElement('span');text.textContent=label;tile.append(pic,text);grid.append(tile)});
+document.getElementById('copy').addEventListener('click',async e=>{
+ try{await navigator.clipboard.writeText(location.href);e.currentTarget.textContent='✓ Link copied'}
+ catch{prompt('Copy this link:',location.href)}
+});
+window.addEventListener('popstate',()=>show(new URL(location.href).searchParams.get('gender')));
+show(new URL(location.href).searchParams.get('gender')||'man');
+})();
+</script>
+</body>
+</html>
