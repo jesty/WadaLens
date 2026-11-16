@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "format": "photographic alpha cutouts",
+  "resolution": {
+    "width": 220,
+    "height": 260
+  },
+  "garments": [
+    "tee",
+    "shirt",
+    "jacket",
+    "trousers",
+    "skirt",
+    "shoes"
+  ],
+  "description": "Photorealistic fabric photo assets. Full-canvas garment silhouette masks are taken from the unchanged layered WadaLens SVG images at render time. Each SVG embeds its original photo so no reference to an external experiment branch remains.",
+  "notes": [
+    "Photo sources are alpha-cutout studies and do not independently align to the croquis. The renderer scales these within the existing precise 1086x1448 SVG silhouettes.",
+    "User-provided examples inspired the texture, but were not incorporated into this repository because their original files are not yet importable through the GitHub connector."
+  ]
+}
