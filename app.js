@@ -417,7 +417,7 @@ function outfitUrlState(){
  gender:dressState.gender,top:dressState.top,bottom:dressState.bottom,colors:dressState.colors,
  skin:dressState.skin,hair:dressState.hair,shoes:dressState.shoeColor,neck:dressState.neck,
  tights:dressState.tightsColor,showTights:dressState.showTights,denim:dressState.denim,
- patterns:dressState.patterns,strokes:dressState.strokes,piece:activePiece,tab:dressColorTab,
+ patterns:dressState.patterns,strokes:dressState.strokes,piece:activePiece,tab:dressColorTab,photoLayer:photoLayerView,
  size:document.getElementById('combinationSize').value};
 }
 function flushOutfitUrl(){
@@ -446,6 +446,7 @@ function restoreOutfitUrl(){
    .map(c=>({name:String(c[0]||'Color').slice(0,100),hex:c[1].toLowerCase(),custom:!!c[2]}));
   if(!pal.length)return true;
   dressColors=pal;dressComboId=typeof x.combo==='string'||typeof x.combo==='number'?x.combo:null;
+  photoLayerView=x.photoLayer===true;
   dressState.gender=x.gender==='woman'?'woman':'man';
   if(dressTops[dressState.gender].some(t=>t[0]===x.top))dressState.top=x.top;
   if(dressBottoms[dressState.gender].some(t=>t[0]===x.bottom))dressState.bottom=x.bottom;
@@ -969,7 +970,14 @@ async function drawNewEditorial(){
 async function drawOutfit(){
  aiUpdatePreviousFlag();
  scheduleOutfitUrlSave();
+ photoLayerRefreshButton();
+ if(!photoLayerView)photoLayerRenderNonce++;
  try{
+  if(photoLayerView&&(manLayerActive()||womanLayerActive())){
+   modularNonce++;renderNonce++;editorialRenderNonce++;
+   await drawPhotographicLayered();
+   return;
+  }
   if(manLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredMan()}
    else if(womanLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredWoman()}
    else if(activeEditorialKey()){modularNonce++;renderNonce++;await drawNewEditorial()}
@@ -1463,3 +1471,13 @@ document.getElementById('dressCopyLink').addEventListener('click',copyOutfitUrl)
 document.getElementById('combinationSize').addEventListener('change',scheduleOutfitUrlSave);
 window.addEventListener('pagehide',()=>{clearTimeout(outfitUrlTimer);flushOutfitUrl()});
 window.addEventListener('popstate',restoreOutfitUrl);
+
+// One-click photo / illustration switch, scoped to the current outfit preview.
+photoLayerView=photoLayerView||new URLSearchParams(location.search).get('photoLayers')==='1';
+photoLayerRefreshButton();
+document.getElementById('photoLayerToggle').addEventListener('click',()=>{
+ photoLayerView=!photoLayerView;
+ photoLayerRenderNonce++;
+ photoLayerRefreshButton();
+ renderDress();
+});
