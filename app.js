@@ -227,7 +227,7 @@ function computeGrayCalibration(){if(!grayPoint)return;let raw=ctx.getImageData(
 function correctPixels(pixels){if(grayGains){const out=new Uint8ClampedArray(pixels);for(let i=0;i<out.length;i+=4)for(let c=0;c<3;c++)out[i+c]=Math.min(255,out[i+c]*grayGains[c]);return out}if(!document.getElementById('correction').checked)return pixels;const sums=[0,0,0];let n=0;for(let i=0;i<pixels.length;i+=4){for(let c=0;c<3;c++)sums[c]+=pixels[i+c];n++}const av=sums.map(v=>v/n),gray=av.reduce((a,b)=>a+b,0)/3,scale=av.map(v=>Math.min(1.45,Math.max(.7,gray/Math.max(1,v))));const out=new Uint8ClampedArray(pixels);for(let i=0;i<out.length;i+=4)for(let c=0;c<3;c++)out[i+c]=Math.min(255,out[i+c]*scale[c]);return out}
 function analyse(){if(!hasImage)return;let raw=ctx.getImageData(0,0,canvas.width,canvas.height),px=correctPixels(raw.data);let rgb;if(mode==='zona'&&point){let x=Math.round(point.x*canvas.width),y=Math.round(point.y*canvas.height),radius=Math.max(5,Math.round(Math.min(canvas.width,canvas.height)*.045));rgb=samplePatch(px,point.x,point.y,radius);}else{ // k-means in Lab: largest perceptual cluster among non-extreme pixels
 let samples=[];let stride=Math.max(2,Math.ceil(Math.sqrt(canvas.width*canvas.height/10000)));for(let y=0;y<canvas.height;y+=stride)for(let x=0;x<canvas.width;x+=stride){let i=(y*canvas.width+x)*4;if(px[i+3]<180)continue;let color=[px[i],px[i+1],px[i+2]],lab=rgbToLab(color);if(lab[0]<5||lab[0]>97)continue;samples.push({rgb:color,lab})}if(!samples.length){rgb=[px[0],px[1],px[2]]}else{let k=Math.min(6,samples.length),centers=[samples[0].lab];for(let c=1;c<k;c++){let best=samples[0],max=-1;for(let s of samples){let d=Math.min(...centers.map(v=>dist(v,s.lab)));if(d>max){max=d;best=s}}centers.push(best.lab.slice())}let groups=[];for(let iteration=0;iteration<9;iteration++){groups=Array.from({length:k},()=>({n:0,lab:[0,0,0],rgb:[0,0,0]}));for(let s of samples){let ci=0,md=Infinity;for(let j=0;j<k;j++){let d=dist(s.lab,centers[j]);if(d<md){md=d;ci=j}}let g=groups[ci];g.n++;for(let c=0;c<3;c++){g.lab[c]+=s.lab[c];g.rgb[c]+=s.rgb[c]}}centers=groups.map((g,i)=>g.n?g.lab.map(v=>v/g.n):centers[i])}groups.sort((a,b)=>b.n-a.n);rgb=groups[0].rgb.map(v=>v/groups[0].n)}}render(rgb)}
-function render(rgb){lastRgb=rgb.slice();const hex=rgbToHex(rgb),lab=rgbToLab(rgb),ranks=getActivePalette().map(c=>({...c,d:dist(c.lab,lab)})).sort((a,b)=>a.d-b.d),top=ranks[0];if(!top){document.getElementById('status').textContent='No colors loaded in this volume. Import Volume 2 JSON or switch back to Volume 1.';return}if(!selected||selected.name!==top.name)comboPage=0;selected=top;if(dressComboId!==null && (!(volumeForColor(top)===2?secondCombinations:historicalCombinations).has(dressComboId)||!(volumeForColor(top)===2?secondCombinations:historicalCombinations).get(dressComboId).some(c=>c.name===top.name))){document.getElementById('dressSection').classList.remove('visible');dressComboId=null}document.getElementById('results').classList.add('show');document.getElementById('analysisLabel').textContent=mode==='wada'?'Wada color selected':mode==='zona'?'Selected area':'Dominant color';document.getElementById('photoSwatch').style.background=hex;document.getElementById('wadaSwatch').style.background=top.hex;document.getElementById('photoName').textContent=mode==='wada'?'Selected Wada color':mode==='zona'?'Sampled area':'Dominant shade';document.getElementById('wadaName').textContent=top.name;document.getElementById('photoHex').textContent=hex.toUpperCase();document.getElementById('wadaHex').textContent=top.hex.toUpperCase();let wrap=document.getElementById('matches');wrap.replaceChildren();ranks.slice(1,5).forEach(item=>{let el=document.createElement('div');el.className='match';let chip=document.createElement('div');chip.className='chip';chip.style.background=item.hex;let mid=document.createElement('div'),name=document.createElement('strong'),sub=document.createElement('small'),d=document.createElement('span');name.textContent=item.name;sub.textContent=item.hex.toUpperCase();d.className='dist';d.textContent='ΔE '+item.d.toFixed(1);mid.append(name,sub);el.append(chip,mid,d);wrap.append(el)});document.getElementById('status').textContent='Closest match: ΔE '+top.d.toFixed(1)+' · '+getActivePalette().length+' colors compared.';renderCombinations()}
+function render(rgb){lastRgb=rgb.slice();const hex=rgbToHex(rgb),lab=rgbToLab(rgb),ranks=getActivePalette().map(c=>({...c,d:dist(c.lab,lab)})).sort((a,b)=>a.d-b.d),top=ranks[0];if(!top){document.getElementById('status').textContent='No colors loaded in this volume. Import Volume 2 JSON or switch back to Volume 1.';return}if(!selected||selected.name!==top.name)comboPage=0;selected=top;if(dressComboId!==null && (!(volumeForColor(top)===2?secondCombinations:historicalCombinations).has(dressComboId)||!(volumeForColor(top)===2?secondCombinations:historicalCombinations).get(dressComboId).some(c=>c.name===top.name))){document.getElementById('dressSection').classList.remove('visible');dressComboId=null}document.getElementById('results').classList.add('show');document.getElementById('analysisLabel').textContent=mode==='wada'?'Wada color selected':mode==='zona'?'Selected area':'Dominant color';document.getElementById('photoSwatch').style.background=hex;document.getElementById('wadaSwatch').style.background=top.hex;document.getElementById('photoName').textContent=mode==='wada'?'Selected Wada color':mode==='zona'?'Sampled area':'Dominant shade';document.getElementById('wadaName').textContent=top.name;document.getElementById('photoHex').textContent=hex.toUpperCase();document.getElementById('wadaHex').textContent=top.hex.toUpperCase();let wrap=document.getElementById('matches');wrap.replaceChildren();ranks.slice(1,5).forEach(item=>{let el=document.createElement('div');el.className='match';let chip=document.createElement('div');chip.className='chip';chip.style.background=item.hex;let mid=document.createElement('div'),name=document.createElement('strong'),sub=document.createElement('small'),d=document.createElement('span');name.textContent=item.name;sub.textContent=item.hex.toUpperCase();d.className='dist';d.textContent='ΔE '+item.d.toFixed(1);mid.append(name,sub);el.append(chip,mid,d);wrap.append(el)});document.getElementById('status').textContent='Closest match: ΔE '+top.d.toFixed(1)+' · '+getActivePalette().length+' colors compared.';renderCombinations();scheduleOutfitUrlSave()}
 let comboPage=0;const COMBO_PAGE_SIZE=8;
 function renderCombinations(){
  const grid=document.getElementById('combinationGrid'),note=document.getElementById('combinationNote'),count=document.getElementById('combinationCount'),more=document.getElementById('combinationMore');
@@ -399,6 +399,103 @@ function renderDress(){
  });
  refreshShoeColorButtons();refreshHairColorButtons();refreshPatternPanel();drawOutfit();
 }
+
+let outfitUrlEnabled=false,outfitUrlLoading=false,outfitUrlTimer=null;
+const outfitHex=x=>typeof x==='string'&&/^#[0-9a-f]{6}$/i.test(x);
+function packOutfit(obj){
+ const b=new TextEncoder().encode(JSON.stringify(obj));let str='';
+ for(let i=0;i<b.length;i+=8192)str+=String.fromCharCode(...b.subarray(i,i+8192));
+ return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function unpackOutfit(token){
+ if(!/^[A-Za-z0-9_-]{1,200000}$/.test(token))throw Error('Invalid outfit link');
+ const binary=atob(token.replace(/-/g,'+').replace(/_/g,'/'));
+ return JSON.parse(new TextDecoder().decode(Uint8Array.from(binary,ch=>ch.charCodeAt(0))));
+}
+function outfitUrlState(){
+ return {v:1,rgb:lastRgb,mode,combo:dressComboId,palette:dressColors.map(c=>[c.name,c.hex,!!c.custom]),
+ gender:dressState.gender,top:dressState.top,bottom:dressState.bottom,colors:dressState.colors,
+ skin:dressState.skin,hair:dressState.hair,shoes:dressState.shoeColor,neck:dressState.neck,
+ tights:dressState.tightsColor,showTights:dressState.showTights,denim:dressState.denim,
+ patterns:dressState.patterns,strokes:dressState.strokes,piece:activePiece,tab:dressColorTab,
+ size:document.getElementById('combinationSize').value};
+}
+function flushOutfitUrl(){
+ if(!outfitUrlEnabled||outfitUrlLoading||(!selected&&!dressColors.length))return;
+ try{
+  const url=new URL(location.href);url.searchParams.set('look',packOutfit(outfitUrlState()));
+  if(url.href.length>60000){console.warn('Outfit link exceeds the safe shareable size');return}
+  if(url.href!==location.href)history.replaceState(history.state,'',url.href);
+ }catch(err){console.warn('Cannot save outfit URL',err)}
+}
+function scheduleOutfitUrlSave(){
+ if(!outfitUrlEnabled||outfitUrlLoading)return;
+ clearTimeout(outfitUrlTimer);outfitUrlTimer=setTimeout(flushOutfitUrl,100);
+}
+function restoreOutfitUrl(){
+ const token=new URL(location.href).searchParams.get('look');if(!token)return false;
+ outfitUrlLoading=true;
+ try{
+  const x=unpackOutfit(token);
+  if(x.v!==1||!Array.isArray(x.palette))throw Error('Unsupported outfit link');
+  if(['all','2','3','4'].includes(x.size))document.getElementById('combinationSize').value=x.size;
+  if(Array.isArray(x.rgb)&&x.rgb.length===3&&x.rgb.every(n=>Number.isFinite(n)&&n>=0&&n<=255)){
+   mode=x.mode==='wada'?'wada':'dominante';render(x.rgb);
+  }
+  const pal=x.palette.slice(0,40).filter(c=>Array.isArray(c)&&outfitHex(c[1]))
+   .map(c=>({name:String(c[0]||'Color').slice(0,100),hex:c[1].toLowerCase(),custom:!!c[2]}));
+  if(!pal.length)return true;
+  dressColors=pal;dressComboId=typeof x.combo==='string'||typeof x.combo==='number'?x.combo:null;
+  dressState.gender=x.gender==='woman'?'woman':'man';
+  if(dressTops[dressState.gender].some(t=>t[0]===x.top))dressState.top=x.top;
+  if(dressBottoms[dressState.gender].some(t=>t[0]===x.bottom))dressState.bottom=x.bottom;
+  for(const p of ['top','jacket','bottom','tights','neck'])
+   if(Number.isInteger(x.colors?.[p])&&x.colors[p]>=0&&x.colors[p]<pal.length)dressState.colors[p]=x.colors[p];
+  if(['#f5dcc7','#e9bf9b','#915837'].includes(x.skin))dressState.skin=x.skin;
+  if(HAIR_COLORS.some(c=>c.hex===x.hair))dressState.hair=x.hair;
+  if(outfitHex(x.shoes))dressState.shoeColor=x.shoes.toLowerCase();
+  if(['none','tie','scarf'].includes(x.neck))dressState.neck=x.neck;
+  dressState.showTights=x.showTights===true;
+  dressState.tightsColor=outfitHex(x.tights)?x.tights:null;
+  dressState.denim={};dressState.patterns={};dressState.strokes={};
+  const pieces=['top','jacket','bottom','tights','neck','shoes'];
+  for(const p of pieces){
+   const den=x.denim?.[p];
+   if(Number.isInteger(den)&&den>=0&&den<8)dressState.denim[p]=den;
+   const cfg=x.patterns?.[p];
+   if(cfg&&typeof cfg==='object'&&!Array.isArray(cfg)){
+    const allowed=['solid','draw','stripes','checks','dots','tiger','leopard','jaguar','wavy','floral','military','paisley','houndstooth'];
+    const num=(v,def,min,max)=>Number.isFinite(v)?Math.max(min,Math.min(max,v)):def;
+    dressState.patterns[p]={type:allowed.includes(cfg.type)?cfg.type:'solid',size:num(cfg.size,10,3,200),
+     angle:num(cfg.angle,0,-360,360),dotSize:num(cfg.dotSize,10,2,100),
+     accent:num(cfg.accent,0,0,pal.length-1),brush:num(cfg.brush,8,1,100)};
+   }
+   if(Array.isArray(x.strokes?.[p]))dressState.strokes[p]=x.strokes[p].slice(0,100)
+    .filter(t=>t&&outfitHex(t.color)&&Number.isFinite(t.size)&&Array.isArray(t.points))
+    .map(t=>({color:t.color,size:Math.max(1,Math.min(100,t.size)),points:t.points.slice(0,1500)
+     .filter(pt=>Array.isArray(pt)&&pt.length===2&&pt.every(n=>Number.isFinite(n)&&n>=0&&n<=1500))}));
+  }
+  document.getElementById('dressGender').value=dressState.gender;
+  document.getElementById('dressSkin').value=dressState.skin;
+  refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();
+  dressColorTab=x.tab==='denim'?'denim':'colors';
+  activePiece=pieces.includes(x.piece)?x.piece:'top';
+  document.getElementById('dressSection').classList.add('visible');
+  document.getElementById('dressCombinationLabel').textContent=dressComboId!=null?'Shared combination #'+dressComboId:'Shared outfit';
+  refreshDressPalette();refreshGarmentQuickButtons();renderDress();
+  return true;
+ }catch(err){console.warn('Could not restore outfit URL',err);return false}
+ finally{outfitUrlLoading=false}
+}
+async function copyOutfitUrl(){
+ clearTimeout(outfitUrlTimer);flushOutfitUrl();
+ const btn=document.getElementById('dressCopyLink');
+ try{if(!navigator.clipboard?.writeText)throw Error('No clipboard');
+  await navigator.clipboard.writeText(location.href);
+  btn.textContent='✓ Link copied';setTimeout(()=>btn.textContent='Copy outfit link',1800);
+ }catch(err){prompt('Copy outfit link:',location.href)}
+}
+
 // Editorial raster templates: transparent garment apertures + independent grayscale ink overlay.
 const TEMPLATE_SIZE={w:1086,h:1448};
 function hideOutfitSwatches(ctx){ctx.save();ctx.fillStyle='#ffffff';ctx.fillRect(0,1238,TEMPLATE_SIZE.w,TEMPLATE_SIZE.h-1238);ctx.restore()}
@@ -871,6 +968,7 @@ async function drawNewEditorial(){
 
 async function drawOutfit(){
  aiUpdatePreviousFlag();
+ scheduleOutfitUrlSave();
  try{
   if(manLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredMan()}
    else if(womanLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredWoman()}
@@ -1358,5 +1456,10 @@ function openWomanExperimentalDemo(){
   renderDress();
   section.scrollIntoView({block:'start'});
 }
-if(new URLSearchParams(location.search).get('womanDemo')==='1')
+if(!restoreOutfitUrl()&&new URLSearchParams(location.search).get('womanDemo')==='1')
   queueMicrotask(openWomanExperimentalDemo);
+outfitUrlEnabled=true;
+document.getElementById('dressCopyLink').addEventListener('click',copyOutfitUrl);
+document.getElementById('combinationSize').addEventListener('change',scheduleOutfitUrlSave);
+window.addEventListener('pagehide',()=>{clearTimeout(outfitUrlTimer);flushOutfitUrl()});
+window.addEventListener('popstate',restoreOutfitUrl);
