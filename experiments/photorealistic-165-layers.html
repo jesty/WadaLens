@@ -68,19 +68,19 @@ const ROOT='../assets/photorealistic/combination-165/';
 const W=600,H=900;
 const defaults={
  'skin':{x:0,y:0,w:600,h:900,on:true},
- 'tee':{x:0,y:5,w:340,h:335,on:true},
- 'shirt':{x:0,y:5,w:345,h:345,on:false},
- 'jacket':{x:0,y:5,w:390,h:360,on:true},
+ 'tee':{x:0,y:5,w:235,h:275,on:true},
+ 'shirt':{x:0,y:5,w:240,h:280,on:false},
+ 'jacket':{x:0,y:5,w:260,h:295,on:true},
  'trousers':{x:0,y:0,w:310,h:465,on:true},
  'skirt':{x:0,y:0,w:338,h:460,on:false},
- 'sneakers':{x:0,y:0,w:330,h:136,on:true}
+ 'sneakers':{x:0,y:0,w:190,h:100,on:true}
 };
 const names={skin:'Head / visible skin',tee:'T-shirt',shirt:'Shirt',jacket:'Jacket',trousers:'Trousers',skirt:'Skirt',sneakers:'Sneakers'};
 const order=['skin','tee','shirt','jacket','trousers','skirt','sneakers'];
 const spriteOrder=['tee','shirt','jacket','trousers','skirt','sneakers'];
 const positions={
- man:{tee:[300,365],shirt:[300,365],jacket:[300,365],trousers:[300,642],skirt:[300,650],sneakers:[300,855]},
- woman:{tee:[300,370],shirt:[300,370],jacket:[300,370],trousers:[300,642],skirt:[300,650],sneakers:[300,855]}
+ man:{tee:[300,346],shirt:[300,346],jacket:[300,349],trousers:[300,640],skirt:[300,650],sneakers:[300,850]},
+ woman:{tee:[300,351],shirt:[300,351],jacket:[300,355],trousers:[300,640],skirt:[300,650],sneakers:[300,850]}
 };
 const canvas=document.getElementById('output'),ctx=canvas.getContext('2d'),reference=document.getElementById('reference');
 let gender='man',imgs={},selected='jacket',state=clone(defaults);
@@ -102,15 +102,15 @@ function layoutBody(){
    const light=Math.min(r,g,b);
    // Softly remove the near-neutral studio backdrop. The human skin,
    // dark hair and eyes remain on the head cutout.
-   if(mid<35&&light>195)p[k+3]=0;
+   if((mid<35&&light>195)||(y>155&&r>g+35&&b>g+18&&r>140))p[k+3]=0;
   }
   h.putImageData(pix,0,0);
   h.globalCompositeOperation='destination-in';h.fillStyle='#000';
-  h.beginPath();h.ellipse(300,153,95,129,0,0,Math.PI*2);
-  h.ellipse(300,229,39,45,0,0,Math.PI*2);h.fill();
+  h.beginPath();h.ellipse(300,117,86,106,0,0,Math.PI*2);
+  h.ellipse(300,203,30,31,0,0,Math.PI*2);h.fill();
   imgs['head-'+gender]=head;
  }
- ctx.drawImage(imgs['head-'+gender],0,0);
+ ctx.drawImage(imgs['head-'+gender],state.skin.x,state.skin.y);
 }
 function drawGarment(id){
  const i=spriteOrder.indexOf(id),set=state[id];if(!set.on||i<0||!imgs.sprite)return;
