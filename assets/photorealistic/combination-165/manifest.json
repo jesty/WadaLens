@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "volume": 1,
+  "combination": 165,
+  "status": "photographic concept assets - not yet aligned for live avatar compositing",
+  "palette": [
+    {
+      "name": "Cameo Pink",
+      "hex": "#e6adcf",
+      "used_for": [
+        "tee",
+        "shirt"
+      ]
+    },
+    {
+      "name": "Spinel Red",
+      "hex": "#ff4dc9",
+      "used_for": [
+        "jacket"
+      ]
+    },
+    {
+      "name": "Vistoris Lake",
+      "hex": "#5c2c45",
+      "used_for": [
+        "trousers",
+        "skirt"
+      ]
+    }
+  ],
+  "sprite": {
+    "file": "garments-165.webp",
+    "width": 990,
+    "height": 195,
+    "columns": 6,
+    "cell": {
+      "width": 165,
+      "height": 195
+    },
+    "order": [
+      "tee",
+      "shirt",
+      "jacket",
+      "trousers",
+      "skirt",
+      "sneakers"
+    ]
+  },
+  "caveats": [
+    "Assets are photographic experiments with light/shadow, not flat exact RGB pixel matches.",
+    "Individual foreground garments are not registered to the original WadaLens fashion body poses.",
+    "No changes were made to the existing interactive illustrated renderer.",
+    "Generated sneaker photos remain white as a neutral accessory."
+  ]
+}
