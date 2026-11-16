@@ -280,7 +280,7 @@ function loadDenimImages(){for(let i=0;i<8;i++){if(denimStatus[i])continue;denim
 function denimFill(ctx,piece){const selected=dressState.denim[piece];if(selected===undefined||selected===null)return false;const im=denimImages[selected];if(!im)return false;const pattern=ctx.createPattern(im,'repeat');if(!pattern)return false;ctx.fillStyle=pattern;return true;}
 
 const SHOE_STYLE_FIXED='sneakers';
-const dressState={gender:'man',top:'tee',bottom:'trousers',colors:{top:0,jacket:1,bottom:1,tights:0,neck:0},skin:'#d6a27a',hair:'#4a3426',shoeStyle:SHOE_STYLE_FIXED,shoeColor:'#ffffff',tightsColor:null,showTights:false,neck:'none',denim:{},patterns:{},strokes:{}};
+const dressState={gender:'man',top:'tee',bottom:'trousers',colors:{top:0,jacket:1,bottom:1,tights:0,neck:0},skin:'#e9bf9b',hair:'#4a3426',shoeStyle:SHOE_STYLE_FIXED,shoeColor:'#ffffff',tightsColor:null,showTights:false,neck:'none',denim:{},patterns:{},strokes:{}};
 const dressTops={
  man:[['tee','T-shirt'],['tee-jacket','T-shirt + jacket'],['shirt','Shirt'],['shirt-jacket','Shirt + jacket']],
  woman:[['tee','T-shirt'],['tee-jacket','T-shirt + jacket'],['shirt','Shirt'],['shirt-jacket','Shirt + jacket']]
@@ -786,29 +786,62 @@ function editorialBodyTint(ctx,mask,color,opacity=0.96){
  ctx.drawImage(layer,0,0);ctx.restore();
 }
 
-// Tint hair only where the editorial hair mask does NOT intersect skin.
-// The source hair/skin masks overlap around the forehead and face: previously
-// changing hair color repainted skin even when dressState.skin stayed fixed.
-function editorialHairTint(ctx,hairMask,skinMask,color,opacity=.85){
- if(!hairMask)return;
+// Portrait compositor: four independent logical layers, all derived from the
+// existing editorial assets. No generated palette image copies and no pixel readback.
+function portraitMask(hair,skin){
  const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
  const layer=document.createElement('canvas');layer.width=w;layer.height=h;
  const c=layer.getContext('2d');
- c.fillStyle=color;c.fillRect(0,0,w,h);
- c.globalCompositeOperation='destination-in';
- c.drawImage(hairMask,0,0,w,h);
- if(skinMask){
+ c.drawImage(hair,0,0,w,h);
+ if(skin){
    c.globalCompositeOperation='destination-out';
-   // Remove all skin pixels (plus a small edge allowance) from the hair tint.
-   // The slight dilation is confined to the head; it does not erase hair elsewhere.
-   c.drawImage(skinMask,0,0,w,h);
-   c.save();c.beginPath();c.rect(0,0,w,240);c.clip();
-   for(const [dx,dy] of [[-8,0],[8,0],[0,-8],[0,8],[-6,-6],[6,-6],[-6,6],[6,6]])
-     c.drawImage(skinMask,dx,dy,w,h);
+   c.drawImage(skin,0,0,w,h);
+   // Allow for mask antialiasing along the hairline, without affecting the hair elsewhere.
+   c.save();c.beginPath();c.rect(0,0,w,245);c.clip();
+   for(const [dx,dy] of [[-5,0],[5,0],[0,-5],[0,5]])
+     c.drawImage(skin,dx,dy,w,h);
    c.restore();
  }
  c.globalCompositeOperation='source-over';
- ctx.save();ctx.globalAlpha=opacity;ctx.drawImage(layer,0,0);ctx.restore();
+ return layer;
+}
+function portraitDarken(hex,ratio=.33){
+ const v=hexChannels(hex);return '#'+v.map(c=>Math.max(0,Math.round(c*(1-ratio))).toString(16).padStart(2,'0')).join('');
+}
+function editorialHairTint(ctx,hairMask,skinMask,color){
+ if(!hairMask)return;
+ const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
+ const hair=portraitMask(hairMask,skinMask);
+ const layer=document.createElement('canvas');layer.width=w;layer.height=h;
+ const c=layer.getContext('2d');
+ // Base hair: fully opaque selected color in the isolated hair silhouette.
+ c.fillStyle=color;c.fillRect(0,0,w,h);
+ c.globalCompositeOperation='destination-in';c.drawImage(hair,0,0);
+ c.globalCompositeOperation='source-over';
+ // Movement, roots and strands from original drawing; they inherit the hair hue.
+ // The final lighten pass clamps all black source ink to a dark shade of color.
+ const detail=document.createElement('canvas');detail.width=w;detail.height=h;
+ const d=detail.getContext('2d');d.drawImage(ctx.canvas,0,0,w,h);
+ d.globalCompositeOperation='destination-in';d.drawImage(hair,0,0);
+ d.globalCompositeOperation='color';d.fillStyle=color;d.fillRect(0,0,w,h);
+ d.globalCompositeOperation='source-over';
+ c.globalCompositeOperation='multiply';c.drawImage(detail,0,0);
+ c.globalCompositeOperation='lighten';
+ const shadow=document.createElement('canvas');shadow.width=w;shadow.height=h;
+ const sc=shadow.getContext('2d');sc.fillStyle=portraitDarken(color,.37);sc.fillRect(0,0,w,h);
+ sc.globalCompositeOperation='destination-in';sc.drawImage(hair,0,0);
+ c.drawImage(shadow,0,0);
+ c.globalCompositeOperation='source-over';ctx.drawImage(layer,0,0);
+}
+function editorialFaceInk(ctx,base){
+ if(!base.skin||!base.base)return;
+ const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
+ const ink=document.createElement('canvas');ink.width=w;ink.height=245;
+ const c=ink.getContext('2d');c.drawImage(base.base,0,0);
+ c.globalCompositeOperation='destination-in';c.drawImage(base.skin,0,0,w,h);
+ // Restore facial outlines after skin tint. Hair is excluded by its own layer.
+ ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.60;
+ ctx.drawImage(ink,0,0);ctx.restore();
 }
 
 let editorialRenderNonce=0;
@@ -827,7 +860,8 @@ async function drawNewEditorial(){
  if(assets.shoes)c.drawImage(editorialColoredLayer('shoes',assets.shoes),0,0);
  // The base image remains in full: eyes, nose, hair, hands and natural folds.
  if(assets.skin)editorialBodyTint(c,assets.skin,dressState.skin,.96);else console.warn('Skin mask missing for',key);
- if(assets.hair)editorialHairTint(c,assets.hair,assets.skin,dressState.hair,.85);
+ editorialFaceInk(c,assets);
+ if(assets.hair)editorialHairTint(c,assets.hair,assets.skin,dressState.hair);
  if(dressState.neck!=='none')drawNeckLayer(c,dressState.gender);
  hideOutfitSwatches(c);
  canvas.setAttribute('aria-label','Illustrated '+key.replaceAll('-',' ')+' with colorable clothing');
@@ -975,7 +1009,7 @@ initGarmentEditor();
 for(const id of ['dressGender','dressTop','dressBottom','dressSkin'])document.getElementById(id).addEventListener('change',e=>{const key={dressGender:'gender',dressTop:'top',dressBottom:'bottom',dressSkin:'skin'}[id];dressState[key]=e.target.value;if(key==='gender'){refreshDressTops();refreshDressBottoms();refreshShoeOptions()}if(key==='top')refreshNeckOptions();dressState.shoeStyle=SHOE_STYLE_FIXED;if(activePiece!=='shoes'&&!dressPieces().includes(activePiece))activePiece='top';closeGarmentEditor();refreshGarmentQuickButtons();renderDress()});
 document.getElementById('dressNeck').addEventListener('change',e=>{dressState.neck=e.target.value;if(activePiece!=='shoes'&&!dressPieces().includes(activePiece))activePiece='top';closeGarmentEditor();refreshGarmentQuickButtons();renderDress()});
 const dressShoesEl=document.getElementById('dressShoes');if(dressShoesEl)dressShoesEl.addEventListener('change',e=>{dressState.shoeStyle=e.target.value;drawOutfit()});
-document.getElementById('dressReset').addEventListener('click',()=>{dressState.gender='man';dressState.top='tee';dressState.bottom='trousers';dressState.colors={top:0,jacket:Math.min(1,dressColors.length-1),bottom:Math.min(1,dressColors.length-1),tights:0,neck:0};dressState.skin='#d6a27a';dressState.hair='#4a3426';dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';dressState.shoeStyle=SHOE_STYLE_FIXED;dressState.shoeColor='#ffffff';dressState.denim={};dressState.patterns={};dressState.strokes={};activePiece='top';closeGarmentEditor();garmentPaintMode=false;document.getElementById('dressPaintBanner').hidden=true;document.getElementById('dressSkin').value=dressState.skin;document.getElementById('dressGender').value=dressState.gender;refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();refreshGarmentQuickButtons();renderDress();document.getElementById('dressStatus').textContent='Outfit reset.'});
+document.getElementById('dressReset').addEventListener('click',()=>{dressState.gender='man';dressState.top='tee';dressState.bottom='trousers';dressState.colors={top:0,jacket:Math.min(1,dressColors.length-1),bottom:Math.min(1,dressColors.length-1),tights:0,neck:0};dressState.skin='#e9bf9b';dressState.hair='#4a3426';dressState.tightsColor=null;dressState.showTights=false;dressState.neck='none';dressState.shoeStyle=SHOE_STYLE_FIXED;dressState.shoeColor='#ffffff';dressState.denim={};dressState.patterns={};dressState.strokes={};activePiece='top';closeGarmentEditor();garmentPaintMode=false;document.getElementById('dressPaintBanner').hidden=true;document.getElementById('dressSkin').value=dressState.skin;document.getElementById('dressGender').value=dressState.gender;refreshDressTops();refreshDressBottoms();refreshShoeOptions();refreshNeckOptions();refreshGarmentQuickButtons();renderDress();document.getElementById('dressStatus').textContent='Outfit reset.'});
 function outfitFilename(){return 'wada-lens-outfit-'+dressState.gender+'.png'}
 function saveOutfitBlob(blob){
  const url=URL.createObjectURL(blob),a=document.createElement('a');
