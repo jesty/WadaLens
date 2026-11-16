@@ -43,3 +43,15 @@ No other combinations or the stable `main` branch were modified. Browser-level r
 - The photo mode is a **fixed photographic preset** for each model. Recoloring clothes, changing the hairstyle, or combining items independently is still handled by the original illustrated renderer; the photographic garment sprite is a reference catalogue and not yet registered to the model's pose.
 
 You can preview branch pages through a static branch-hosting service such as raw.githack, since GitHub Pages normally publishes its configured deployment branch rather than this experimental branch. Never merge this experiment into `main` before checking both models in a browser.
+
+## Test: composizione fotografica a livelli
+
+Apri [**Layer compositor #165**](photorealistic-165-layers.html) per un test Canvas dove i capi **non sono parte della foto finale**: la T-shirt, la camicia, la giacca, i pantaloni, la gonna e le sneakers vengono ritagliati dai sei slot dell'atlante WebP trasparente e disegnati individualmente in ordine.
+
+- Il modello può essere uomo o donna.
+- Ogni livello si può accendere/spegnere; T-shirt e camicia, pantaloni e gonna sono alternative.
+- Sono disponibili slider di posizione X/Y e scala per valutare la registrazione degli asset e un download del risultato composito.
+- A destra viene mostrata la **foto completa di riferimento**, che non è dipinta sul Canvas come outfit di base. Il volto/collo e alcuni frammenti di pelle sono invece estratti dal modello di riferimento come livello del corpo.
+- **Limite dichiarato**: gli asset fotografici sono stati generati come capi autonomi e non su una posa comune. Quindi incastri, braccia, mani e scarpe non sono ancora realistici. La prova serve a verificare la fattibilità del rendering per livelli e identificare le correzioni necessarie prima di produrre asset registrati.
+
+Il test non modifica il renderer illustrato stabile e non cambia il look fotografico completo già disponibile.
