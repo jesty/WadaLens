@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "format": "photographic alpha cutouts",
   "resolution": {
     "width": 220,
@@ -11,11 +11,18 @@
     "jacket",
     "trousers",
     "skirt",
-    "shoes"
+    "shoes",
+    "tie",
+    "scarf"
   ],
   "description": "Photorealistic fabric photo assets. Full-canvas garment silhouette masks are taken from the unchanged layered WadaLens SVG images at render time. Each SVG embeds its original photo so no reference to an external experiment branch remains.",
   "notes": [
-    "Photo sources are alpha-cutout studies and do not independently align to the croquis. The renderer scales these within the existing precise 1086x1448 SVG silhouettes.",
-    "User-provided examples inspired the texture, but were not incorporated into this repository because their original files are not yet importable through the GitHub connector."
-  ]
+    "The browser composites each garment as a separate transparent layer.",
+    "Six base photographic cutouts are derived from the previous experiment and embedded in independent self-contained SVG assets.",
+    "Tie and scarf are generated satin/silk texture studies.",
+    "The supplied high-resolution example pictures inspired this experiment but are not the original files committed to GitHub.",
+    "Human body, skin and face remain illustrated in this first garment-layer test."
+  ],
+  "alignment": "Photo sources are clipped to WadaLens's existing registered SVG garment silhouettes, so the output alpha exactly matches the original garment shapes.",
+  "recolor": "Selected Wada colors are applied as a color blend preserving photo texture, highlights and shadows."
 }
