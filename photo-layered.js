@@ -5,7 +5,7 @@
 let photoLayerView=false;
 let photoLayerRenderNonce=0;
 const photoLayerImages=new Map(),photoLayerBoxes=new WeakMap();
-const PHOTO_LAYERS_VERSION='photo-layer-v2-5';
+const PHOTO_LAYERS_VERSION='photo-layer-v2-6';
 
 function photoLayerImage(kind){
  const name=kind;
@@ -52,67 +52,42 @@ function photoLayerTexture(mask,photo,hex,piece,kind,gender){
  const w=TEMPLATE_SIZE.w,h=TEMPLATE_SIZE.h;
  const dest=photoLayerBounds(mask,kind,true,gender),crop=photoLayerBounds(photo,kind,false,gender);
  if(!dest||!crop)return null;
- const cfg=pieceSettings(piece);
- const isDenim=dressState.denim[piece]!=null;
- const hasPrint=cfg.type!=='solid'&&cfg.type!=='draw';
  const layer=document.createElement('canvas');layer.width=w;layer.height=h;
  const c=layer.getContext('2d');
-
- // Reuse the photo as a light-and-shadow source, but not as an opaque cover
- // on top of the selected print. This keeps prints visible on realistic folds.
- const photograph=document.createElement('canvas');photograph.width=w;photograph.height=h;
- const p=photograph.getContext('2d');
- p.drawImage(photo,crop.x,crop.y,crop.width,crop.height,
+ const settings=pieceSettings(piece);
+ // First draw the photorealistic garment; preserve its fabric volume.
+ c.drawImage(photo,crop.x,crop.y,crop.width,crop.height,
   dest.x,dest.y,dest.width,dest.height);
-
- let patterned=false;
- if(isDenim){
-  patterned=denimFill(c,piece);
-  if(patterned)c.fillRect(0,0,w,h);
- }
- if(!patterned&&hasPrint){
-  const tile=makeFabricTile(piece),pattern=c.createPattern(tile,'repeat');
-  if(pattern?.setTransform){
-   const a=(Number(cfg.angle)||0)*Math.PI/180;
-   pattern.setTransform(new DOMMatrix([Math.cos(a),Math.sin(a),-Math.sin(a),Math.cos(a),0,0]));
-  }
-  c.fillStyle=pattern||hex;c.fillRect(0,0,w,h);
-  patterned=true;
- }
-
- if(patterned){
-  // Pattern/denim stays underneath the photographic volume. A soft grayscale
-  // multiply pass restores creases without suppressing printed motifs.
-  const light=document.createElement('canvas');light.width=w;light.height=h;
-  const lc=light.getContext('2d');
-  lc.filter='grayscale(1) contrast(.85) brightness(1.45)';
-  lc.drawImage(photograph,0,0);
-  lc.filter='none';
-  c.save();c.globalCompositeOperation='multiply';c.globalAlpha=.27;
-  c.drawImage(light,0,0);
-  c.restore();
- }else{
-  // Unprinted photographic garment: keep the selected Wada hue and folds.
-  c.drawImage(photograph,0,0);
-  c.save();c.globalCompositeOperation='color';c.globalAlpha=.98;
-  c.fillStyle=hex;c.fillRect(dest.x,dest.y,dest.width,dest.height);c.restore();
- }
- // Final alpha is ALWAYS the original independent, registered garment mask.
- // No readback is needed (also works with cross-origin preview hosting).
- c.globalCompositeOperation='destination-in';
- c.drawImage(mask,0,0,w,h);
+ c.save();c.globalCompositeOperation='color';c.globalAlpha=.95;
+ c.fillStyle=hex;c.fillRect(dest.x,dest.y,dest.width,dest.height);c.restore();
+ c.globalCompositeOperation='destination-in';c.drawImage(mask,0,0,w,h);
  c.globalCompositeOperation='source-over';
 
- // Free Draw strokes are separate foreground ink, not part of the print
- // background. Clip them independently to avoid painting outside the garment.
+ // The photograph MUST be below the fabric print. The previous prototype
+ // composited the print as a background, making it invisible against the
+ // photographed garment. Overlay the original editor's already clipped pattern
+ // AFTER the photograph so the actual selected stripes/checks/dots show up.
+ const hasPrint=settings.type!=='solid'&&settings.type!=='draw';
+ const hasDenim=dressState.denim[piece]!=null;
+ if(hasPrint||hasDenim){
+  const pattern=manLayerPatternOverlay(piece,mask);
+  if(pattern){
+   c.save();
+   c.globalCompositeOperation='source-atop';
+   c.globalAlpha=.85;
+   c.drawImage(pattern,0,0,w,h);
+   c.restore();
+  }
+ }
+
+ // Put freehand strokes on top of the photographic texture, never behind it.
  const strokes=dressState.strokes[piece]||[];
  if(strokes.length){
   const ink=document.createElement('canvas');ink.width=w;ink.height=h;
   const ic=ink.getContext('2d');ic.lineCap='round';ic.lineJoin='round';
   for(const stroke of strokes){
    if(!stroke.points?.length)continue;
-   ic.strokeStyle=stroke.color;ic.fillStyle=stroke.color;
-   ic.lineWidth=stroke.size*3.6;
+   ic.strokeStyle=stroke.color;ic.fillStyle=stroke.color;ic.lineWidth=stroke.size*3.6;
    if(stroke.points.length===1){
     ic.beginPath();ic.arc(stroke.points[0][0],stroke.points[0][1],stroke.size*1.8,0,Math.PI*2);ic.fill();
    }else{
@@ -121,8 +96,9 @@ function photoLayerTexture(mask,photo,hex,piece,kind,gender){
     ic.stroke();
    }
   }
-  ic.globalCompositeOperation='destination-in';ic.drawImage(mask,0,0,w,h);
-  c.drawImage(ink,0,0);
+  ic.globalCompositeOperation='destination-in';
+  ic.drawImage(mask,0,0,w,h);
+  c.drawImage(ink,0,0,w,h);
  }
  return layer;
 }
@@ -182,6 +158,12 @@ async function drawPhotographicLayered(){
   c.restore();
  }
  canvas.setAttribute('aria-label','Photographically textured independent '+dressState.gender+' garments');
+ const activePatterns=relevant.map(({piece})=>{
+  const cfg=pieceSettings(piece),denim=dressState.denim[piece]!=null;
+  const strokes=(dressState.strokes[piece]||[]).length;
+  return (denim||cfg.type!=='solid'||strokes)?piece+': '+(denim?'denim':cfg.type)+(strokes?' + drawing':''):null;
+ }).filter(Boolean);
  document.getElementById('dressStatus').textContent=
-  'Photographic view · independent alpha-clipped clothing images · experimental';
+  'Photographic view v6 · '+(activePatterns.length?activePatterns.join(' · '):'solid fabric')+
+  ' · texture + visible pattern overlay';
 }
