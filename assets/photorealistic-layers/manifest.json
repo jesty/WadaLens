@@ -1,10 +1,6 @@
 {
-  "version": 2,
-  "format": "photographic alpha cutouts",
-  "resolution": {
-    "width": 220,
-    "height": 260
-  },
+  "version": 3,
+  "format": "standalone WebP photographs with alpha",
   "garments": [
     "tee",
     "shirt",
@@ -15,14 +11,31 @@
     "tie",
     "scarf"
   ],
-  "description": "Photorealistic fabric photo assets. Full-canvas garment silhouette masks are taken from the unchanged layered WadaLens SVG images at render time. Each SVG embeds its original photo so no reference to an external experiment branch remains.",
-  "notes": [
-    "The browser composites each garment as a separate transparent layer.",
-    "Six base photographic cutouts are derived from the previous experiment and embedded in independent self-contained SVG assets.",
-    "Tie and scarf are generated satin/silk texture studies.",
-    "The supplied high-resolution example pictures inspired this experiment but are not the original files committed to GitHub.",
-    "Human body, skin and face remain illustrated in this first garment-layer test."
-  ],
-  "alignment": "Photo sources are clipped to WadaLens's existing registered SVG garment silhouettes, so the output alpha exactly matches the original garment shapes.",
-  "recolor": "Selected Wada colors are applied as a color blend preserving photo texture, highlights and shadows."
+  "alignment": "Each photo is fitted into the exact registered original SVG alpha silhouette at render time; all layers share the 1086x1448 canvas.",
+  "recolor": "Photos have their original folds/shadows; Canvas blends the current Wada garment color and clips the result to the original garment alpha.",
+  "files": {
+    "tee": "tee.webp",
+    "shirt": "shirt.webp",
+    "jacket": "jacket.webp",
+    "trousers": "trousers.webp",
+    "skirt": "skirt.webp",
+    "shoes": "shoes.webp",
+    "tie": "tie.webp",
+    "scarf": "scarf.webp"
+  },
+  "sources": {
+    "tee": "user-provided peach T-shirt photo, white background segmented to alpha",
+    "jacket": "user-provided orange blazer PNG, original alpha retained",
+    "trousers": "user-provided yellow trousers photo, white background segmented to alpha",
+    "tie": "user-provided yellow tie photo, white background segmented to alpha",
+    "shirt": "pre-existing WadaLens photographic shirt study, enlarged as transparent image",
+    "skirt": "pre-existing WadaLens photographic skirt study, enlarged as transparent image",
+    "shoes": "pre-existing WadaLens photographic sneaker study, enlarged as transparent image",
+    "scarf": "synthetic photo-textured material study made using user-provided T-shirt fabric photograph"
+  },
+  "limitations": [
+    "Photographic fabric is aligned to the original 2D silhouette, not physically simulated cloth.",
+    "Facial features, hair, exposed skin and base body stay illustrated in this v2 preview.",
+    "Original user example photos were not entirely independent pose-matched garments; high-resolution texture is remapped into the WadaLens geometry."
+  ]
 }
