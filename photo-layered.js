@@ -5,7 +5,7 @@
 let photoLayerView=false;
 let photoLayerRenderNonce=0;
 const photoLayerImages=new Map(),photoLayerBoxes=new WeakMap();
-const PHOTO_LAYERS_VERSION='photo-layer-v2-1';
+const PHOTO_LAYERS_VERSION='photo-layer-v2-2';
 
 function photoLayerImage(kind){
  const name=kind;
