@@ -1,6 +1,8 @@
-const CACHE='wada-lens-v46-exp24-github-pages';
-const FILES=['./','./index.html','./app.js?v=46-exp24','./man-layered.js?v=46-exp21','./woman-layered.js?v=46-exp21','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
+const CACHE='wada-lens-v46-exp25-github-pages';
+const FILES=['./','./index.html','./app.js?v=46-exp25','./man-layered.js?v=46-exp21','./woman-layered.js?v=46-exp21','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 // Native photographic #165 assets (the rest of Dress Me stays illustrated).
+FILES.push('./experiments/photorealistic-165-live.html');
+FILES.push('./assets/photorealistic/combination-165/manifest.json');
 for(const asset of ['man-look.webp','woman-look.webp','garments-165.webp']){
  FILES.push('./assets/photorealistic/combination-165/'+asset);
 }
