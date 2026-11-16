@@ -273,6 +273,8 @@ document.getElementById('correction').addEventListener('change',()=>{if(grayGain
 
 // Dress Me: editorial raster templates and modular garment masks, with Wada colors and patterns.
 let dressComboId=null,dressColors=[];
+let photo165Mode=false;
+const photo165ImageCache=new Map();
 let dressColorTab='colors';
 const denimImages=Array(8).fill(null);
 const denimStatus=Array(8).fill(false);
@@ -397,7 +399,7 @@ function renderDress(){
   else{const c=piece==='shoes'?[...SHOE_COLORS,...dressColors].find(c=>c.hex.toLowerCase()===dressState.shoeColor.toLowerCase())||SHOE_COLORS[0]:piece==='tights'&&dressState.tightsColor?TIGHTS_EXTRAS.find(c=>c.hex===dressState.tightsColor):dressColors[dressState.colors[piece]]||dressColors[0];choice.textContent=c.name+' · '+c.hex.toUpperCase()}
   line.append(title,buttons,choice);controls.append(line);
  });
- refreshShoeColorButtons();refreshHairColorButtons();refreshPatternPanel();drawOutfit();
+ refreshShoeColorButtons();refreshHairColorButtons();refreshPatternPanel();photo165RefreshControls();drawOutfit();
 }
 
 let outfitUrlEnabled=false,outfitUrlLoading=false,outfitUrlTimer=null;
@@ -417,7 +419,7 @@ function outfitUrlState(){
  gender:dressState.gender,top:dressState.top,bottom:dressState.bottom,colors:dressState.colors,
  skin:dressState.skin,hair:dressState.hair,shoes:dressState.shoeColor,neck:dressState.neck,
  tights:dressState.tightsColor,showTights:dressState.showTights,denim:dressState.denim,
- patterns:dressState.patterns,strokes:dressState.strokes,piece:activePiece,tab:dressColorTab,
+ patterns:dressState.patterns,strokes:dressState.strokes,piece:activePiece,tab:dressColorTab,photo165:photo165Mode,
  size:document.getElementById('combinationSize').value};
 }
 function flushOutfitUrl(){
@@ -446,6 +448,7 @@ function restoreOutfitUrl(){
    .map(c=>({name:String(c[0]||'Color').slice(0,100),hex:c[1].toLowerCase(),custom:!!c[2]}));
   if(!pal.length)return true;
   dressColors=pal;dressComboId=typeof x.combo==='string'||typeof x.combo==='number'?x.combo:null;
+  photo165Mode=Number(dressComboId)===165&&x.photo165===true;
   dressState.gender=x.gender==='woman'?'woman':'man';
   if(dressTops[dressState.gender].some(t=>t[0]===x.top))dressState.top=x.top;
   if(dressBottoms[dressState.gender].some(t=>t[0]===x.bottom))dressState.bottom=x.bottom;
@@ -966,9 +969,109 @@ async function drawNewEditorial(){
  document.getElementById('dressStatus').textContent='Illustrated template · '+key.replaceAll('-',' ')+' · skin tone: '+(document.getElementById('dressSkin')?.selectedOptions[0]?.textContent||dressState.skin);
 }
 
+
+/* Photo #165: native pre-rendered WebP look, tested separately from the
+   editable illustrated garment layers. The photo is an immutable full outfit,
+   NOT a fake dynamic recoloring of an unregistered photographic cutout. */
+function photo165Available(){return Number(dressComboId)===165}
+function photo165PresetMatches(){
+ if(!photo165Available()||dressState.top!=='tee-jacket'||dressState.bottom!=='trousers')return false;
+ if(dressColor('top').toLowerCase()!=='#e6adcf'||
+    dressColor('jacket').toLowerCase()!=='#ff4dc9'||
+    dressColor('bottom').toLowerCase()!=='#5c2c45')return false;
+ if(dressState.shoeColor.toLowerCase()!=='#ffffff'||
+    dressState.skin!=='#e9bf9b'||dressState.hair!=='#4a3426'||
+    dressState.neck!=='none'||dressState.showTights)return false;
+ if(Object.keys(dressState.denim).length)return false;
+ if(Object.values(dressState.patterns).some(p=>p&&p.type!=='solid'))return false;
+ if(Object.values(dressState.strokes).some(st=>st?.length))return false;
+ return true;
+}
+function photo165RefreshControls(){
+ const panel=document.getElementById('photo165Control');
+ if(!panel)return;
+ const available=photo165Available();
+ panel.hidden=!available;
+ if(!available)return;
+ const match=photo165PresetMatches();
+ const button=document.getElementById('photo165Toggle');
+ button.textContent=!photo165Mode?'Try photorealistic #165':match?'Back to illustration':'Restore photo #165 preset';
+ button.setAttribute('aria-pressed',String(photo165Mode&&match));
+ document.getElementById('photo165Hint').textContent=
+  photo165Mode&&match
+   ?'Pre-generated native photograph · T-shirt, jacket, trousers and white sneakers. Switch gender to compare the two models.'
+   :photo165Mode
+    ?'This customization is not present in the photographic set. The editable illustration is shown until you restore the photo preset.'
+    :'Preview the pre-generated, complete photographic look. Other garment variations remain editable in illustrated mode.';
+}
+function photo165ApplyPreset(){
+ if(!photo165Available())return;
+ dressState.top='tee-jacket';dressState.bottom='trousers';dressState.neck='none';
+ dressState.skin='#e9bf9b';dressState.hair='#4a3426';dressState.shoeColor='#ffffff';
+ dressState.tightsColor=null;dressState.showTights=false;
+ dressState.denim={};dressState.patterns={};dressState.strokes={};
+ for(const [part,hex] of [['top','#e6adcf'],['jacket','#ff4dc9'],['bottom','#5c2c45']]){
+  const index=dressColors.findIndex(c=>c.hex.toLowerCase()===hex);
+  if(index!==-1)dressState.colors[part]=index;
+ }
+ document.getElementById('dressSkin').value=dressState.skin;
+ refreshDressTops();refreshDressBottoms();refreshNeckOptions();refreshGarmentQuickButtons();
+ renderDress();
+}
+function photo165LoadImage(gender){
+ const path='assets/photorealistic/combination-165/'+gender+'-look.webp?v=photo165-1';
+ if(!photo165ImageCache.has(path)){
+  const promise=new Promise((resolve,reject)=>{
+   const img=new Image();
+   img.onload=()=>resolve(img);
+   img.onerror=()=>reject(new Error('Unable to load photographic model '+gender));
+   img.src=path;
+  });
+  photo165ImageCache.set(path,promise);
+  promise.catch(()=>photo165ImageCache.delete(path));
+ }
+ return photo165ImageCache.get(path);
+}
+let photo165RenderNonce=0;
+async function drawPhotographic165(){
+ const generation=++photo165RenderNonce,gender=dressState.gender;
+ const image=await photo165LoadImage(gender);
+ if(generation!==photo165RenderNonce||!photo165Mode||!photo165PresetMatches()||dressState.gender!==gender)return;
+ const preview=document.getElementById('dressPreview');
+ let canvas=preview.querySelector('canvas');
+ if(!canvas?.dataset.photo165){
+  preview.replaceChildren();canvas=document.createElement('canvas');
+  canvas.className='fashion-template';canvas.setAttribute('role','img');
+  canvas.dataset.photo165='1';preview.append(canvas);
+ }
+ canvas.width=TEMPLATE_SIZE.w;canvas.height=TEMPLATE_SIZE.h;
+ const ctx=canvas.getContext('2d');ctx.fillStyle='#f3f2f0';ctx.fillRect(0,0,canvas.width,canvas.height);
+ const factor=Math.min(canvas.width/image.width,canvas.height/image.height);
+ const w=image.width*factor,h=image.height*factor;
+ ctx.drawImage(image,(canvas.width-w)/2,(canvas.height-h)/2,w,h);
+ canvas.setAttribute('aria-label','Photorealistic '+gender+' outfit for Wada Combination 165');
+ preview.classList.remove('draw-active');
+ document.getElementById('dressStatus').textContent='Experimental photorealistic model · Combination #165 · fixed pre-generated look';
+}
+function openPhoto165FromLink(){
+ const names=['Cameo Pink','Spinel Red','Vistoris Lake'];
+ const colors=names.map(name=>palette.find(c=>c.name===name));
+ if(colors.some(c=>!c))return;
+ mode='wada';render(hexToRgb(colors[0].hex));
+ openDressMe(165,colors);
+ photo165Mode=true;photo165ApplyPreset();
+}
+
 async function drawOutfit(){
  aiUpdatePreviousFlag();
  scheduleOutfitUrlSave();
+ photo165RefreshControls();
+ if(photo165Mode&&photo165PresetMatches()){
+  try{await drawPhotographic165();return}
+  catch(error){console.warn('Photographic #165 unavailable; using illustration',error)}
+ }
+ const oldPhoto=document.querySelector('#dressPreview canvas[data-photo165]');
+ if(oldPhoto)oldPhoto.remove();
  try{
   if(manLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredMan()}
    else if(womanLayerActive()){modularNonce++;renderNonce++;editorialRenderNonce++;await drawLayeredWoman()}
@@ -1456,8 +1559,16 @@ function openWomanExperimentalDemo(){
   renderDress();
   section.scrollIntoView({block:'start'});
 }
-if(!restoreOutfitUrl()&&new URLSearchParams(location.search).get('womanDemo')==='1')
+const restoredLook=restoreOutfitUrl();
+const photo165Direct=new URLSearchParams(location.search).get('photo165')==='1';
+if(photo165Direct&&!restoredLook)queueMicrotask(openPhoto165FromLink);
+else if(!restoredLook&&new URLSearchParams(location.search).get('womanDemo')==='1')
   queueMicrotask(openWomanExperimentalDemo);
+document.getElementById('photo165Toggle').addEventListener('click',()=>{
+ if(!photo165Available())return;
+ if(photo165Mode&&photo165PresetMatches()){photo165Mode=false;renderDress()}
+ else{photo165Mode=true;photo165ApplyPreset()}
+});
 outfitUrlEnabled=true;
 document.getElementById('dressCopyLink').addEventListener('click',copyOutfitUrl);
 document.getElementById('combinationSize').addEventListener('change',scheduleOutfitUrlSave);
