@@ -1054,12 +1054,22 @@ async function drawPhotographic165(){
  document.getElementById('dressStatus').textContent='Experimental photorealistic model · Combination #165 · fixed pre-generated look';
 }
 function openPhoto165FromLink(){
+ // Open the preset immediately, without requiring historical combination data
+ // or a manual journey through the photo picker.
  const names=['Cameo Pink','Spinel Red','Vistoris Lake'];
  const colors=names.map(name=>palette.find(c=>c.name===name));
- if(colors.some(c=>!c))return;
+ if(colors.some(c=>!c)){console.error('Combination 165 source colors unavailable');return}
+ const params=new URLSearchParams(location.search);
+ const gender=params.get('gender');
+ if(gender==='man'||gender==='woman'){
+  dressState.gender=gender;
+  document.getElementById('dressGender').value=gender;
+ }
  mode='wada';render(hexToRgb(colors[0].hex));
  openDressMe(165,colors);
- photo165Mode=true;photo165ApplyPreset();
+ photo165Mode=true;
+ photo165ApplyPreset();
+ document.getElementById('dressSection').scrollIntoView({block:'start'});
 }
 
 async function drawOutfit(){
